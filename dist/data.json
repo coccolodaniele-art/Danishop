@@ -49,7 +49,7 @@
    "features": "",
    "trialLabel": "PROVALO GRATIS!",
    "trialInfo": "ALT! Per poterlo utilizzare scaricati prima la chiave API di Gemini! vai a questo link, registrati e creati la tua chiave api così potrai attivare il motore ai del programma, si tratta solo di pochi semplici passi:   https://aistudio.google.com/app/apikey\nUna volta che hai ottenuto la tua chiave api salvala da qualche parte sul tuo computer! Poi apri il programma e nella sezione API inserisci la tua api key e salva!",
-   "trialUrl": "https://coccolodaniele-art.github.io/Danishop/sintesi-mercati-ai/",
+   "trialUrl": "",
    "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet e una chiave API gratuita di Gemini (https://aistudio.google.com/app/apikey)."
   }
  ]
