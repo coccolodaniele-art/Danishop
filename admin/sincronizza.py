@@ -7,19 +7,48 @@ Uso da riga di comando:
     python admin/sincronizza.py "Descrizione della modifica"
 """
 
+import contextlib
 import json
 import os
 import subprocess
 import sys
 import threading
+import time
 from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATUS_FILE = os.path.join(ROOT, "admin", ".stato_sincronizzazione.json")
+LOCK_FILE = os.path.join(ROOT, ".git", "sincronizza.lock")
 BRANCH = "main"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 _lock = threading.Lock()
+
+
+@contextlib.contextmanager
+def _process_lock(timeout=300):
+    """Evita che il Gestore e questo script lanciato a mano usino git nello stesso momento."""
+    try:
+        import msvcrt
+    except ImportError:
+        yield
+        return
+    with open(LOCK_FILE, "a+b") as fh:
+        deadline = time.time() + timeout
+        while True:
+            try:
+                fh.seek(0)
+                msvcrt.locking(fh.fileno(), msvcrt.LK_NBLCK, 1)
+                break
+            except OSError:
+                if time.time() > deadline:
+                    raise TimeoutError("Un'altra sincronizzazione è in corso")
+                time.sleep(0.5)
+        try:
+            yield
+        finally:
+            fh.seek(0)
+            msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
 
 
 def git(*args, timeout=120):
@@ -51,6 +80,22 @@ def remote_url():
 def has_changes():
     code, out = git("status", "--porcelain")
     return code == 0 and bool(out)
+
+
+def changes_fingerprint():
+    """Elenco dei file modificati con data e dimensione: se non cambia, le modifiche sono finite."""
+    code, out = git("status", "--porcelain", "-uall")
+    if code != 0 or not out:
+        return None
+    parts = []
+    for line in out.splitlines():
+        path = line[3:].split(" -> ")[-1].strip('"')
+        try:
+            st = os.stat(os.path.join(ROOT, path))
+            parts.append(f"{line}|{st.st_mtime_ns}|{st.st_size}")
+        except OSError:
+            parts.append(line)
+    return "\n".join(parts)
 
 
 def unpushed_commits():
@@ -90,38 +135,59 @@ def write_status(**fields):
         json.dump(status, fh, ensure_ascii=False, indent=1)
 
 
+def push():
+    code, out = git("push", "-u", "origin", BRANCH, timeout=300)
+    if code != 0 and ("rejected" in out or "fetch first" in out or "non-fast-forward" in out):
+        # La copia online ha modifiche che qui non ci sono (es. fatte da github.com):
+        # le recupera, rimette sopra quelle di questo PC e riprova.
+        pcode, pout = git("pull", "--rebase", "--autostash", "origin", BRANCH, timeout=300)
+        if pcode != 0:
+            git("rebase", "--abort")
+            return pcode, "Online ci sono modifiche in conflitto con quelle di questo PC: " + pout
+        code, out = git("push", "-u", "origin", BRANCH, timeout=300)
+    return code, out
+
+
 def sync(message=None):
     """Registra e invia le modifiche. Restituisce un dizionario con l'esito."""
-    with _lock:
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        result = {"ok": True, "committed": False, "pushed": False, "error": "", "time": now}
-        ensure_identity()
+    try:
+        with _lock, _process_lock():
+            return _sync(message)
+    except TimeoutError as exc:
+        return {"ok": False, "committed": False, "pushed": False, "error": str(exc),
+                "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
-        if has_changes():
-            git("add", "-A")
-            code, out = git("commit", "-m", message or f"Aggiornamento del {now}")
-            if code != 0:
-                result.update(ok=False, error=out[-500:])
-                write_status(lastError=result["error"], lastAttempt=now)
-                return result
-            result["committed"] = True
-            write_status(lastCommit=now)
 
-        if not remote_url():
-            result["error"] = "Copia online non ancora collegata"
+def _sync(message=None):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    result = {"ok": True, "committed": False, "pushed": False, "error": "", "time": now}
+    ensure_identity()
+
+    if has_changes():
+        git("add", "-A")
+        code, out = git("commit", "-m", message or f"Aggiornamento del {now}")
+        if code != 0:
+            result.update(ok=False, error=out[-500:])
+            write_status(lastError=result["error"], lastAttempt=now)
+            return result
+        result["committed"] = True
+        write_status(lastCommit=now)
+
+    if not remote_url():
+        result["error"] = "Copia online non ancora collegata"
+        write_status(lastAttempt=now, lastError=result["error"])
+        return result
+
+    if unpushed_commits() > 0:
+        code, out = push()
+        if code != 0:
+            result.update(ok=False, error=out[-500:])
             write_status(lastAttempt=now, lastError=result["error"])
             return result
+        result["pushed"] = True
 
-        if unpushed_commits() > 0:
-            code, out = git("push", "-u", "origin", BRANCH, timeout=300)
-            if code != 0:
-                result.update(ok=False, error=out[-500:])
-                write_status(lastAttempt=now, lastError=result["error"])
-                return result
-            result["pushed"] = True
-
-        write_status(lastAttempt=now, lastPush=now if result["pushed"] else read_status().get("lastPush"), lastError="")
-        return result
+    write_status(lastAttempt=now, lastPush=now if result["pushed"] else read_status().get("lastPush"), lastError="")
+    return result
 
 
 if __name__ == "__main__":
