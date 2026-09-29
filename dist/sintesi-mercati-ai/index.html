@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Sintesi Mercati AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Raccoglie gli articoli finanziari più recenti da fonti attendibili e ne ricava un unico articolo in italiano.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2322e1ff'/><stop offset='.5' stop-color='%238b5cff'/><stop offset='1' stop-color='%23ff3ecf'/></linearGradient></defs><rect x='2' y='2' width='60' height='60' rx='15' fill='url(%23g)'/><polyline points='13,43 26,30 36,38 51,19' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='51' cy='19' r='4.5' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #07060f;
+    --panel: #141130;
+    --panel-2: #1a1638;
+    --field: #0d0a22;
+    --line: rgba(255, 255, 255, .09);
+    --line-strong: rgba(255, 255, 255, .16);
+    --ink: #f1f0ff;
+    --muted: #9d9cc4;
+    --cyan: #22e1ff;
+    --violet: #8b5cff;
+    --pink: #ff3ecf;
+    --lime: #b8ff3c;
+    --amber: #ffb547;
+    --danger: #ff4d7a;
+    --grad: linear-gradient(120deg, #22e1ff 0%, #8b5cff 50%, #ff3ecf 100%);
+    --glow: 0 0 0 1px rgba(139, 92, 255, .35), 0 10px 40px rgba(139, 92, 255, .35), 0 0 60px rgba(34, 225, 255, .15);
+    --font: "Outfit", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Space Grotesk", "Outfit", "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background:
+      radial-gradient(900px 600px at 85% -10%, rgba(139, 92, 255, .22), transparent 60%),
+      radial-gradient(800px 600px at -10% 110%, rgba(34, 225, 255, .12), transparent 60%),
+      radial-gradient(700px 500px at 110% 90%, rgba(255, 62, 207, .12), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    line-height: 1.55;
+  }
+  a { color: var(--cyan); }
+  button, input, select { font: inherit; color: inherit; }
+
+  .app { display: grid; grid-template-columns: 330px minmax(0, 1fr); min-height: 100vh; }
+
+  /* ---------- barra laterale ---------- */
+  .side {
+    background: linear-gradient(180deg, rgba(26, 22, 56, .92), rgba(16, 13, 36, .95));
+    border-right: 1px solid var(--line);
+    padding: 24px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand svg { flex: none; filter: drop-shadow(0 0 14px rgba(139, 92, 255, .55)); }
+  .brand h1 { margin: 0; font-family: var(--font-display); font-size: 1.28rem; letter-spacing: -.01em; line-height: 1.15; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: .84rem; }
+  .gline { height: 2px; border-radius: 2px; background: var(--grad); opacity: .85; margin: 6px 0 4px; }
+  .section { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); margin-top: 6px; }
+  label { display: block; font-size: .84rem; color: var(--muted); margin-bottom: 5px; }
+  .input, select {
+    width: 100%; padding: 10px 12px; border-radius: 12px;
+    background: var(--field); border: 1px solid var(--line-strong); color: var(--ink);
+    outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  select { appearance: none; cursor: pointer; padding-right: 34px;
+    background-image: linear-gradient(45deg, transparent 50%, var(--cyan) 50%), linear-gradient(135deg, var(--cyan) 50%, transparent 50%);
+    background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+  select option { background: var(--panel-2); color: var(--ink); }
+  .input:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(34, 225, 255, .15); }
+  .input:hover, select:hover { border-color: rgba(139, 92, 255, .6); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 12px 16px; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: var(--panel-2); color: var(--ink); font-weight: 600; cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, transform .15s, background .2s; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--cyan); background: #1c1d45; }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .btn.primary { background: var(--grad); border: 0; color: #fff; padding: 14px 16px; font-size: 1.02rem; box-shadow: 0 8px 26px rgba(139, 92, 255, .35); }
+  .btn.primary:hover { box-shadow: var(--glow); filter: brightness(1.08); }
+  .btn[disabled] { opacity: .55; cursor: progress; filter: saturate(.6); }
+  .btn.small { width: auto; padding: 7px 14px; font-size: .84rem; }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .side-foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+  .side-foot a { color: var(--muted); text-decoration: none; }
+  .side-foot a:hover { color: var(--cyan); }
+  .key-state { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+  .key-state i { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); flex: none; }
+  .key-state.ok i { background: var(--lime); box-shadow: 0 0 10px var(--lime); }
+
+  /* ---------- area principale ---------- */
+  .main { padding: 26px 32px 36px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .12em; color: var(--violet); text-transform: uppercase; }
+  .head h2 { margin: 2px 0 2px; font-family: var(--font-display); font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -.02em; line-height: 1.1; overflow-wrap: anywhere; }
+  .meta { color: var(--muted); font-size: .93rem; }
+  .pill {
+    flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px;
+    font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--lime); border: 1px solid rgba(184, 255, 60, .45); background: rgba(184, 255, 60, .07);
+  }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+  .pill.busy { color: var(--cyan); border-color: rgba(34, 225, 255, .45); background: rgba(34, 225, 255, .07); }
+  .pill.busy i { animation: pulse 1s ease-in-out infinite; }
+  .pill.error { color: var(--danger); border-color: rgba(255, 77, 122, .45); background: rgba(255, 77, 122, .07); }
+  @keyframes pulse { 50% { opacity: .35; transform: scale(.7); } }
+
+  .activity { height: 3px; border-radius: 3px; background: var(--grad); position: relative; overflow: hidden; }
+  .activity.busy { opacity: .55; }
+  .activity.busy::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 22%; left: -22%;
+    background: linear-gradient(90deg, transparent, #fff, transparent); animation: scan 1.4s linear infinite;
+  }
+  @keyframes scan { to { left: 100%; } }
+
+  .card { background: linear-gradient(180deg, rgba(30, 26, 62, .8), rgba(16, 14, 34, .88)); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .card-head h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; }
+  .card-head .aside { color: var(--muted); font-size: .82rem; display: flex; align-items: center; gap: 10px; }
+
+  .articles { list-style: none; margin: 0; padding: 8px 12px; max-height: 250px; overflow-y: auto; }
+  .articles li { display: flex; align-items: baseline; gap: 12px; padding: 7px 10px; border-radius: 10px; }
+  .articles li:nth-child(even) { background: rgba(255, 255, 255, .025); }
+  .articles .n { font-family: var(--font-display); color: var(--muted); font-size: .85rem; width: 22px; flex: none; }
+  .articles a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  .articles a:hover { color: var(--cyan); }
+  .articles .src { color: var(--muted); font-size: .84rem; white-space: nowrap; margin-left: auto; padding-left: 10px; }
+  .articles .empty { color: var(--muted); }
+  .hint { color: #7d7ca8; font-size: .78rem; padding: 0 20px 12px; margin: 0; }
+
+  .article { background: var(--field); padding: 26px 32px 30px; min-height: 280px; }
+  .article .title { font-family: var(--font-display); color: var(--cyan); font-size: clamp(1.25rem, 2.2vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; text-shadow: 0 0 22px rgba(34, 225, 255, .25); }
+  .article p { margin: 0 0 14px; font-size: 1.04rem; color: #e6e4ff; max-width: 80ch; }
+  .article p.muted { color: var(--muted); }
+  .article p.note { color: var(--amber); font-size: .95rem; }
+  .article p.err { color: var(--danger); }
+  .article p.engine { color: var(--violet); font-size: .88rem; margin-top: 18px; }
+  .article p.section { color: var(--lime); font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 22px 0 8px; }
+  .article p.source { color: var(--muted); font-size: .88rem; margin: 0 0 5px; padding-left: 12px; }
+  .disclaimer { color: #7d7ca8; font-size: .8rem; margin: 0; }
+
+  .skeleton { display: grid; gap: 12px; margin-top: 8px; }
+  .skeleton span { height: 14px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.05), rgba(139,92,255,.18), rgba(255,255,255,.05)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+  .skeleton span:first-child { height: 24px; width: 70%; }
+  .skeleton span:nth-child(3n) { width: 82%; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ---------- finestra chiavi ---------- */
+  dialog {
+    width: min(620px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border-radius: 20px; color: var(--ink);
+    background: linear-gradient(180deg, #1a1638, #100d24); border: 1px solid rgba(139, 92, 255, .35);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 60px rgba(139, 92, 255, .25);
+  }
+  dialog::backdrop { background: rgba(3, 2, 10, .7); backdrop-filter: blur(6px); }
+  .dlg-bar { height: 3px; background: var(--grad); }
+  .dlg { padding: 22px 26px 22px; display: grid; gap: 12px; }
+  .dlg h3 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
+  .dlg p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .provider { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 10px; }
+  .provider .section { grid-column: 1 / -1; margin: 6px 0 -4px; }
+  .keywrap { position: relative; }
+  .keywrap .input { padding-right: 70px; font-family: ui-monospace, Consolas, monospace; font-size: .92rem; }
+  .keywrap button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--muted); cursor: pointer; font-size: .8rem; padding: 4px 8px; }
+  .keywrap button:hover { color: var(--cyan); }
+  .dlg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; transition: .25s; background: var(--panel-2); border: 1px solid var(--line-strong); padding: 10px 18px; border-radius: 999px; font-size: .9rem; pointer-events: none; z-index: 10; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    .side-foot { margin-top: 4px; }
+    .main { padding: 20px 16px 30px; }
+    .article { padding: 20px 18px 24px; }
+    .head { flex-direction: column-reverse; }
+    .articles li { flex-wrap: wrap; }
+    .articles .src { margin-left: 34px; padding-left: 0; white-space: normal; }
+    .provider { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg width="46" height="46" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e1ff"/><stop offset=".5" stop-color="#8b5cff"/><stop offset="1" stop-color="#ff3ecf"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#lg)"/><polyline points="13,43 26,30 36,38 51,19" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="51" cy="19" r="4.5" fill="#fff"/></svg>
+      <div>
+        <h1>Sintesi Mercati AI</h1>
+        <p>Le notizie di mercato in sintesi</p>
+      </div>
+    </div>
+    <div class="gline"></div>
+
+    <div class="section">Cosa vuoi analizzare</div>
+    <div>
+      <label for="search">Titolo, asset o tema</label>
+      <input class="input" id="search" type="text" value="S&amp;P 500" autocomplete="off">
+    </div>
+    <div>
+      <label for="category">Categoria</label>
+      <select id="category"></select>
+    </div>
+    <div>
+      <label for="topic">Scelte rapide</label>
+      <select id="topic"></select>
+    </div>
+
+    <div class="section">Periodo e quantità</div>
+    <div class="row2">
+      <div>
+        <label for="days">Giorni</label>
+        <input class="input" id="days" type="number" min="1" max="30" value="7" inputmode="numeric">
+      </div>
+      <div>
+        <label for="limit">Articoli</label>
+        <input class="input" id="limit" type="number" min="3" max="30" value="20" inputmode="numeric">
+      </div>
+    </div>
+
+    <button class="btn primary" id="run" type="button">Leggi articoli e sintetizza</button>
+    <button class="btn" id="openKeys" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2m-4 4 3 3m-6 0 2 2"/></svg>
+      Chiavi API IA
+    </button>
+    <div class="key-state" id="keyState"><i></i><span></span></div>
+
+    <div class="side-foot">
+      <div id="status">Pronto</div>
+      <div style="margin-top:8px"><a href="../#programmi">← Torna al sito</a></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Tema analizzato</div>
+        <h2 id="heading">S&amp;P 500</h2>
+        <div class="meta" id="meta">Seleziona un tema e avvia la sintesi.</div>
+      </div>
+      <div class="pill" id="pill"><i></i><span>Pronto</span></div>
+    </div>
+    <div class="activity" id="activity"></div>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>Articoli letti</h3>
+        <div class="aside" id="count"></div>
+      </div>
+      <ul class="articles" id="articles"><li class="empty">Gli articoli letti compariranno qui.</li></ul>
+      <p class="hint">Clic su un articolo per aprirlo in una nuova scheda.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>Articolo generato</h3>
+        <div class="aside">
+          <span id="engine"></span>
+          <button class="btn small" id="copy" type="button" hidden>Copia testo</button>
+        </div>
+      </div>
+      <div class="article" id="output" aria-live="polite"></div>
+    </section>
+
+    <p class="disclaimer">Sintesi Mercati AI riassume ciò che scrivono le fonti finanziarie: non è un consiglio di investimento.</p>
+  </main>
+</div>
+
+<dialog id="keysDialog" aria-labelledby="keysTitle">
+  <div class="dlg-bar"></div>
+  <form class="dlg" method="dialog">
+    <h3 id="keysTitle">Chiavi API IA</h3>
+    <p>Inserisci una o più chiavi. Se ne salvi più di una, il programma fa cooperare i motori disponibili. Le chiavi restano salvate solo in questo browser e vengono inviate soltanto al rispettivo servizio.</p>
+    <p>Per Gemini la chiave è gratuita: si crea su <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a>.</p>
+    <div class="provider">
+      <div class="section">Google Gemini</div>
+      <div><label for="k_GEMINI_API_KEY">Chiave API</label><div class="keywrap"><input class="input" id="k_GEMINI_API_KEY" type="password" autocomplete="off" spellcheck="false"><button type="button" data-toggle="k_GEMINI_API_KEY">Mostra</button></div></div>
+      <div><label for="k_GEMINI_MODEL">Modello</label><input class="input" id="k_GEMINI_MODEL" type="text" spellcheck="false"></div>
+    </div>
+    <div class="provider">
+      <div class="section">OpenAI</div>
+      <div><label for="k_OPENAI_API_KEY">Chiave API</label><div class="keywrap"><input class="input" id="k_OPENAI_API_KEY" type="password" autocomplete="off" spellcheck="false"><button type="button" data-toggle="k_OPENAI_API_KEY">Mostra</button></div></div>
+      <div><label for="k_OPENAI_MODEL">Modello</label><input class="input" id="k_OPENAI_MODEL" type="text" spellcheck="false"></div>
+    </div>
+    <div class="provider">
+      <div class="section">Anthropic</div>
+      <div><label for="k_ANTHROPIC_API_KEY">Chiave API</label><div class="keywrap"><input class="input" id="k_ANTHROPIC_API_KEY" type="password" autocomplete="off" spellcheck="false"><button type="button" data-toggle="k_ANTHROPIC_API_KEY">Mostra</button></div></div>
+      <div><label for="k_ANTHROPIC_MODEL">Modello</label><input class="input" id="k_ANTHROPIC_MODEL" type="text" spellcheck="false"></div>
+    </div>
+    <div class="dlg-actions">
+      <button class="btn primary" type="submit" value="save">Salva</button>
+      <button class="btn" type="submit" value="cancel" formnovalidate>Chiudi</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* =====================================================================
+     Stessa logica del programma desktop (sintesi_mercati_ai.py), tradotta per il browser.
+     Le fonti vengono scaricate tramite l'intermediario (PROXY_URL) perché i browser
+     non permettono a una pagina di leggerle direttamente.
+     ===================================================================== */
+
+  const PROXY_URL = "https://formal-goose-2584.coccolodaniele-art.deno.net";
+  const DATA = {"TOPIC_CATEGORIES": {"Indici USA e globali": {"S&P 500": "\"S&P 500\"", "Nasdaq 100": "\"Nasdaq 100\"", "Dow Jones": "\"Dow Jones Industrial Average\"", "Russell 2000": "\"Russell 2000\"", "MSCI World": "\"MSCI World\"", "MSCI Emerging Markets": "\"MSCI Emerging Markets\"", "Stoxx Europe 600": "\"STOXX Europe 600\"", "DAX Germania": "DAX Germany index", "FTSE 100 Regno Unito": "FTSE 100 index", "Nikkei 225 Giappone": "Nikkei 225 Japan", "Hang Seng Hong Kong": "Hang Seng index"}, "ETF principali": {"SPY - SPDR S&P 500 ETF": "SPY ETF S&P 500", "VOO - Vanguard S&P 500 ETF": "VOO Vanguard S&P 500 ETF", "IVV - iShares Core S&P 500": "IVV iShares Core S&P 500 ETF", "QQQ - Invesco Nasdaq 100 ETF": "QQQ Invesco Nasdaq 100 ETF", "VTI - Vanguard Total Stock Market": "VTI Vanguard Total Stock Market ETF", "IWM - iShares Russell 2000 ETF": "IWM iShares Russell 2000 ETF", "DIA - SPDR Dow Jones ETF": "DIA SPDR Dow Jones Industrial Average ETF", "VEA - Developed Markets ETF": "VEA developed markets ETF", "VWO - Emerging Markets ETF": "VWO emerging markets ETF", "EFA - MSCI EAFE ETF": "EFA MSCI EAFE ETF", "ARKK - ARK Innovation ETF": "ARKK innovation ETF", "TLT - Treasury Bond ETF": "TLT iShares 20+ Year Treasury Bond ETF", "IEF - Treasury 7-10 anni ETF": "IEF Treasury 7-10 year ETF", "SHY - Treasury breve ETF": "SHY short Treasury ETF", "HYG - High Yield Bond ETF": "HYG iShares High Yield Corporate Bond ETF", "LQD - Investment Grade Bond ETF": "LQD investment grade corporate bond ETF", "GLD - SPDR Gold Shares": "GLD SPDR Gold Shares ETF", "SLV - iShares Silver Trust": "SLV iShares Silver Trust ETF", "USO - United States Oil Fund": "USO United States Oil Fund ETF"}, "Azioni USA mega-cap": {"Apple": "Apple AAPL", "Microsoft": "Microsoft MSFT", "Nvidia": "Nvidia NVDA", "Amazon": "Amazon AMZN", "Alphabet": "Alphabet Google GOOGL GOOG", "Meta Platforms": "Meta META Facebook", "Tesla": "Tesla TSLA", "Broadcom": "Broadcom AVGO", "Berkshire Hathaway": "Berkshire Hathaway BRK", "JPMorgan Chase": "JPMorgan Chase JPM", "Eli Lilly": "Eli Lilly LLY", "Visa": "Visa V", "Mastercard": "Mastercard MA", "Exxon Mobil": "Exxon Mobil XOM", "UnitedHealth": "UnitedHealth UNH", "Walmart": "Walmart WMT", "Costco": "Costco COST", "Netflix": "Netflix NFLX", "Oracle": "Oracle ORCL", "Salesforce": "Salesforce CRM", "Adobe": "Adobe ADBE", "Cisco": "Cisco CSCO", "Coca-Cola": "Coca-Cola KO", "PepsiCo": "PepsiCo PEP", "Procter & Gamble": "Procter Gamble PG", "Johnson & Johnson": "Johnson & Johnson JNJ", "Merck": "Merck MRK", "Chevron": "Chevron CVX", "Bank of America": "Bank of America BAC", "Goldman Sachs": "Goldman Sachs GS"}, "Tecnologia e semiconduttori": {"AMD": "AMD Advanced Micro Devices", "Intel": "Intel INTC", "Micron": "Micron MU", "Qualcomm": "Qualcomm QCOM", "Texas Instruments": "Texas Instruments TXN", "Applied Materials": "Applied Materials AMAT", "Lam Research": "Lam Research LRCX", "ASML": "ASML semiconductor equipment", "Taiwan Semiconductor": "Taiwan Semiconductor TSM", "Arm Holdings": "Arm Holdings ARM", "Palantir": "Palantir PLTR", "Snowflake": "Snowflake SNOW", "ServiceNow": "ServiceNow NOW", "CrowdStrike": "CrowdStrike CRWD", "Palo Alto Networks": "Palo Alto Networks PANW"}, "Finanza, pagamenti e fintech": {"Coinbase": "Coinbase COIN", "PayPal": "PayPal PYPL", "Block": "Block Square SQ", "Robinhood": "Robinhood HOOD", "BlackRock": "BlackRock BLK", "Morgan Stanley": "Morgan Stanley MS", "Charles Schwab": "Charles Schwab SCHW", "American Express": "American Express AXP"}, "Cripto": {"Crypto market": "cryptocurrency crypto market bitcoin ethereum", "Bitcoin": "Bitcoin BTC", "Ethereum": "Ethereum Ether ETH", "Solana": "Solana SOL", "XRP": "XRP Ripple", "BNB": "BNB Binance Coin", "Cardano": "Cardano ADA", "Dogecoin": "Dogecoin DOGE", "Toncoin": "Toncoin TON", "TRON": "TRON TRX", "Avalanche": "Avalanche AVAX", "Chainlink": "Chainlink LINK", "Polkadot": "Polkadot DOT", "Polygon": "Polygon MATIC POL", "Litecoin": "Litecoin LTC", "Bitcoin ETF spot": "spot Bitcoin ETF", "Ethereum ETF spot": "spot Ethereum ETF", "Stablecoin": "stablecoin market USDT USDC", "DeFi": "decentralized finance DeFi crypto"}, "Metalli": {"Oro": "gold bullion", "Argento": "silver bullion", "Rame": "copper", "Platino": "platinum", "Palladio": "palladium", "Uranio": "uranium", "Litio": "lithium", "Alluminio": "aluminum", "Nickel": "nickel", "Zinco": "zinc", "Minerali terre rare": "rare earth minerals"}, "Energia": {"Petrolio WTI": "WTI crude oil", "Petrolio Brent": "Brent crude oil", "Gas naturale": "natural gas LNG", "Benzina": "gasoline prices", "Diesel": "diesel fuel prices", "Carbone": "coal market", "Energia nucleare": "nuclear energy uranium", "Rinnovabili": "renewable energy stocks solar wind", "Solare": "solar energy stocks", "Idrogeno": "hydrogen energy market"}, "Materie prime agricole": {"Grano": "wheat", "Mais": "corn", "Soia": "soybeans", "Riso": "rice commodity", "Caffe": "coffee futures", "Cacao": "cocoa futures", "Zucchero": "sugar futures", "Cotone": "cotton futures", "Bestiame": "live cattle futures"}, "Macro e temi di mercato": {"Federal Reserve": "Federal Reserve interest rates inflation", "Inflazione USA": "US inflation CPI PCE", "Tassi Treasury": "US Treasury yields bond market", "Dollaro USA": "US dollar DXY", "Recessione USA": "US recession risk economy", "Utili aziendali USA": "US corporate earnings", "Intelligenza artificiale": "artificial intelligence stocks investment", "Difesa e geopolitica": "defense stocks geopolitical risk", "Cina mercati": "China economy stocks markets", "India mercati": "India economy stocks markets"}}, "STOPWORDS": ["a", "about", "after", "amid", "an", "and", "are", "as", "at", "before", "but", "by", "for", "from", "had", "has", "have", "in", "into", "its", "market", "markets", "not", "of", "on", "over", "reuters", "said", "say", "says", "shares", "stock", "stocks", "that", "the", "this", "to", "under", "was", "were", "with"], "THEME_WORDS": {"Fed e tassi": ["dollar", "fed", "inflation", "powell", "rate", "rates", "treasury", "warsh", "yield", "yields"], "Utili e societa": ["earnings", "forecast", "guidance", "profit", "profits", "quarter", "results", "revenue", "sales"], "Domanda e offerta": ["demand", "exports", "imports", "inventories", "inventory", "output", "production", "supply"], "Rischio geopolitico": ["china", "geopolitical", "iran", "russia", "sanctions", "tariff", "trade", "war"], "Cripto e regolazione": ["bitcoin", "crypto", "etf", "ether", "ethereum", "sec", "stablecoin", "token"], "Sentiment di mercato": ["drop", "fall", "gain", "investors", "rally", "rise", "risk", "selloff", "volatility"]}, "TRUSTED_FEEDS": [["CNBC", "https://www.cnbc.com/id/100003114/device/rss/rss.html"], ["MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"], ["Yahoo Finance", "https://finance.yahoo.com/news/rssindex"], ["Investing.com", "https://www.investing.com/rss/news_25.rss"], ["CoinDesk", "https://www.coindesk.com/arc/outboundfeeds/rss/"], ["EIA", "https://www.eia.gov/rss/todayinenergy.xml"], ["Federal Reserve", "https://www.federalreserve.gov/feeds/press_all.xml"], ["SEC", "https://www.sec.gov/news/pressreleases.rss"], ["Kitco", "https://www.kitco.com/news/category/mining/feed"]], "TRUSTED_HUBS": [["AP News", "https://apnews.com/hub/business"], ["AP News", "https://apnews.com/hub/financial-markets"]], "ALLOWED_DOMAINS": ["reuters.com", "apnews.com", "cnbc.com", "marketwatch.com", "finance.yahoo.com", "investing.com", "coindesk.com", "kitco.com", "eia.gov", "federalreserve.gov", "sec.gov"], "GOOGLE_NEWS_SOURCES": ["apnews.com", "cnbc.com", "marketwatch.com", "finance.yahoo.com", "investing.com", "coindesk.com", "kitco.com", "eia.gov", "federalreserve.gov", "sec.gov"], "EXTRA_TOPIC_TERMS": {"S&P 500": ["dow", "equities", "nasdaq", "s&p 500", "spx", "stocks", "wall street"], "Nasdaq 100": ["nasdaq", "qqq", "tech stocks", "technology stocks", "wall street"], "Dow Jones": ["blue chips", "djia", "dow", "stocks", "wall street"], "Russell 2000": ["iwm", "russell", "small caps", "small-cap"], "Bitcoin": ["bitcoin", "btc", "crypto", "cryptocurrency"], "Ethereum": ["crypto", "cryptocurrency", "eth", "ether", "ethereum"], "Oro": ["bullion", "gold", "xau"], "Argento": ["bullion", "silver", "xag"], "Rame": ["copper"], "Petrolio WTI": ["crude", "oil", "wti"], "Petrolio Brent": ["brent", "crude", "oil"]}, "PROMPT_PREFIX": "Sei un analista finanziario prudente e un bravo divulgatore economico. Leggi tutti gli articoli forniti e usali come materiale di base per scrivere un articolo originale in italiano, chiaro, organico e comprensibile per una persona che sta valutando un investimento. Non devi fare un elenco di riassunti articolo per articolo: devi creare un testo tuo, scorrevole, con un filo logico unico. Usa solo le informazioni presenti negli articoli forniti. Non inventare dati, non dare consigli finanziari personalizzati e non presentare l'investimento come sicuro. Non usare markdown, asterischi o tabelle.\n\nStruttura obbligatoria, senza scrivere i nomi delle sezioni nel testo:\nPrima riga: un titolo chiaro e informativo.\nPoi lascia una riga vuota e apri con un paragrafo iniziale che spiega in modo semplice perche' il tema e' rilevante ora.\nPoi lascia una riga vuota e sviluppa il quadro principale collegando le notizie tra loro, distinguendo fattori macroeconomici, societari, settoriali, valutativi, rischi e sentiment degli investitori quando emergono dagli articoli. In questa parte chiarisci anche che cosa potrebbe contare per un investitore di medio periodo, quali segnali sono positivi, quali punti richiedono prudenza e quali elementi monitorare nei prossimi giorni o settimane.\nPoi lascia una riga vuota e chiudi con una valutazione equilibrata del quadro emerso, senza dare ordini di acquisto o vendita.\nNon scrivere mai le parole Introduzione, Corpo del testo, Lettura per chi investe o Conclusione come titoli o etichette.\n\nL'articolo deve essere approfondito e discorsivo: produci almeno 30 righe effettive di testo, salvo il caso estremo in cui non ci siano abbastanza informazioni negli articoli. Se gli articoli sono pochi o deboli, dillo chiaramente ma cerca comunque di spiegare bene il contesto.\n\n"};
+  const { TOPIC_CATEGORIES, TRUSTED_FEEDS, TRUSTED_HUBS, ALLOWED_DOMAINS, GOOGLE_NEWS_SOURCES, PROMPT_PREFIX } = DATA;
+  const STOPWORDS = new Set(DATA.STOPWORDS);
+  const THEME_WORDS = DATA.THEME_WORDS;
+  const EXTRA_TOPIC_TERMS = DATA.EXTRA_TOPIC_TERMS;
+  const TOPICS = Object.assign({}, ...Object.values(TOPIC_CATEGORIES));
+  const KEY_DEFAULTS = {
+    OPENAI_API_KEY: '', OPENAI_MODEL: 'gpt-4o-mini',
+    ANTHROPIC_API_KEY: '', ANTHROPIC_MODEL: 'claude-3-5-haiku-latest',
+    GEMINI_API_KEY: '', GEMINI_MODEL: 'gemini-2.5-flash'
+  };
+
+  /* ---------- utilità di testo ---------- */
+  const decoder = document.createElement('textarea');
+  function unescapeHtml(s) { decoder.innerHTML = s; return decoder.value; }
+  function cleanText(value) {
+    let v = unescapeHtml(String(value || '').replace(/<[^>]+>/g, ' '));
+    v = v.replace(/\s+/g, ' ').trim();
+    return v.replace(/\s+-\s+Reuters$/i, '');
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function fmt(date, withTime = true) {
+    const d = `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+    return withTime ? `${d} ${pad(date.getHours())}:${pad(date.getMinutes())}` : d;
+  }
+  // Come email.utils.parsedate_to_datetime: solo date nel formato delle email (RFC 2822),
+  // es. "Tue, 29 Sep 2026 20:54:52 +0000". Le date scritte in altri formati restano senza data.
+  const RFC2822 = /^\s*(?:[A-Za-z]{3},?\s+)?\d{1,2}\s+[A-Za-z]{3}[a-z]*\s+\d{2,4}\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*(?:[+-]\d{4}|[A-Za-z]{1,5}))?\s*$/;
+  function parseDate(value) {
+    if (!RFC2822.test(value || '')) return null;
+    const t = Date.parse(value);
+    return Number.isNaN(t) ? null : new Date(t);
+  }
+  // Testo di un nodo con uno spazio tra un pezzo e l'altro (come get_text(" ") di BeautifulSoup).
+  function nodeText(node) {
+    const parts = [];
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) { const t = walker.currentNode.nodeValue.trim(); if (t) parts.push(t); }
+    return parts.join(' ');
+  }
+
+  /* ---------- rete ---------- */
+  async function httpGet(url, timeout = 18000) {
+    if (!PROXY_URL) throw new Error('Il servizio per leggere le fonti non è ancora configurato.');
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeout);
+    try {
+      const res = await fetch(PROXY_URL + '?url=' + encodeURIComponent(url), { signal: ctrl.signal });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const buf = await res.arrayBuffer();
+      const m = /charset=([^;]+)/i.exec(res.headers.get('Content-Type') || '');
+      let charset = m ? m[1].trim().replace(/["']/g, '') : 'utf-8';
+      try { return new TextDecoder(charset).decode(buf); } catch (_) { return new TextDecoder('utf-8').decode(buf); }
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  async function httpPostJson(url, payload, headers, timeout = 45000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeout);
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(payload), signal: ctrl.signal });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const err = new Error((data.error && (data.error.message || data.error.type)) || 'HTTP ' + res.status);
+        err.status = res.status; throw err;
+      }
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /* ---------- XML (come xml.etree: elementi senza namespace) ---------- */
+  function parseXml(text) {
+    const doc = new DOMParser().parseFromString(text.replace(/^﻿/, ''), 'application/xml');
+    if (doc.getElementsByTagName('parsererror').length) throw new Error('XML non valido');
+    return doc;
+  }
+  function xmlItems(doc) {
+    return Array.from(doc.getElementsByTagName('*')).filter((e) => e.localName === 'item' && !e.namespaceURI);
+  }
+  function child(el, name, ns = null) {
+    for (const c of el.children) if (c.localName === name && (c.namespaceURI || null) === ns) return c;
+    return null;
+  }
+  function childText(el, name, ns = null) { const c = child(el, name, ns); return c ? c.textContent : ''; }
+
+  /* ---------- scelta degli articoli pertinenti ---------- */
+  function topicTerms(topic, expanded) {
+    const raw = `${topic} ${expanded}`.replace(/&/g, ' ').replace(/-/g, ' ');
+    const terms = new Set((raw.match(/[A-Za-z0-9]+/g) || []).filter((p) => p.length > 1 && !STOPWORDS.has(p.toLowerCase())).map((p) => p.toLowerCase()));
+    for (const [name, extra] of Object.entries(EXTRA_TOPIC_TERMS)) {
+      if (topic.toLowerCase() === name.toLowerCase() || expanded.toLowerCase().includes(name.toLowerCase())) extra.forEach((t) => terms.add(t));
+    }
+    return terms;
+  }
+  function relevant(article, terms) {
+    if (!terms.size) return true;
+    const haystack = `${article.title} ${article.summary}`.toLowerCase();
+    if (terms.has('s&p 500')) return ['s&p 500', 'spx', 'wall street', 'vix', 'volatility index'].some((p) => haystack.includes(p));
+    return [...terms].filter((t) => t.length >= 3).some((t) => haystack.includes(t));
+  }
+  function article(title, url, published, summary, source) { return { title, url, published, summary, source, text: '' }; }
+
+  function parseTrustedGoogleNewsRss(xml, terms, limit) {
+    const items = xmlItems(parseXml(xml));
+    const out = [];
+    const seen = new Set();
+    for (const item of items) {
+      const node = child(item, 'source');
+      const source = node && node.textContent ? node.textContent : 'Google News';
+      const sourceUrl = node ? (node.getAttribute('url') || '') : '';
+      const rawTitle = cleanText(childText(item, 'title'));
+      const title = rawTitle.replace(/\s+-\s+[^-]+$/, '').trim();
+      const link = childText(item, 'link');
+      if (!title || seen.has(title.toLowerCase())) continue;
+      const trusted = GOOGLE_NEWS_SOURCES.some((d) => sourceUrl.toLowerCase().includes(d));
+      if (!trusted && !GOOGLE_NEWS_SOURCES.some((d) => d.replace(/\./g, '').includes(source.toLowerCase().replace(/ /g, '')))) continue;
+      const a = article(title, link, parseDate(childText(item, 'pubDate')), cleanText(childText(item, 'description')), source);
+      if (relevant(a, terms)) { seen.add(title.toLowerCase()); out.push(a); }
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
+  async function collectTrustedGoogleNews(topic, days, limit) {
+    const expanded = (TOPICS[topic] || topic).trim() || topic;
+    const terms = topicTerms(topic, expanded);
+    const filter = GOOGLE_NEWS_SOURCES.map((d) => `site:${d}`).join(' OR ');
+    const params = new URLSearchParams({ q: `${expanded} (${filter}) when:${days}d`, hl: 'en-US', gl: 'US', ceid: 'US:en' });
+    return parseTrustedGoogleNewsRss(await httpGet('https://news.google.com/rss/search?' + params), terms, limit);
+  }
+  function parseDirectRss(xml, sourceName, terms, limit) {
+    const items = xmlItems(parseXml(xml));
+    const out = [];
+    const seen = new Set();
+    for (const item of items) {
+      const title = cleanText(childText(item, 'title'));
+      const link = childText(item, 'link');
+      if (!title || seen.has(title.toLowerCase())) continue;
+      if (!ALLOWED_DOMAINS.some((d) => link.toLowerCase().includes(d))) continue;
+      seen.add(title.toLowerCase());
+      const summary = cleanText(childText(item, 'description') || childText(item, 'encoded', 'http://purl.org/rss/1.0/modules/content/'));
+      const a = article(title, link, parseDate(childText(item, 'pubDate')), summary, sourceName);
+      if (relevant(article(title, link, a.published, '', sourceName), terms)) out.push(a);
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
+  function collectApHubArticles(pages, terms, limit) {
+    const out = [];
+    const seen = new Set();
+    for (const [sourceName, page] of pages) {
+      if (page == null) continue;
+      const doc = new DOMParser().parseFromString(page, 'text/html');
+      for (const link of doc.querySelectorAll('a[href]')) {
+        let href = link.getAttribute('href');
+        if (!href.includes('/article/')) continue;
+        if (href.startsWith('/')) href = 'https://apnews.com' + href;
+        const title = cleanText(nodeText(link));
+        if (title.length < 25 || seen.has(href)) continue;
+        const a = article(title, href, null, '', sourceName);
+        if (relevant(a, terms)) { out.push(a); seen.add(href); }
+        if (out.length >= limit) return out;
+      }
+    }
+    return out;
+  }
+  async function collectTrustedArticles(topic, days, limit) {
+    const expanded = (TOPICS[topic] || topic).trim() || topic;
+    const terms = topicTerms(topic, expanded);
+    const perFeed = Math.max(3, Math.min(8, limit));
+    // Le fonti si scaricano tutte insieme, ma si esaminano nello stesso ordine del programma desktop.
+    const settle = (p) => p.then((v) => v, () => null);
+    const feedPages = TRUSTED_FEEDS.map(([, url]) => settle(httpGet(url)));
+    const hubPages = TRUSTED_HUBS.map(([, url]) => settle(httpGet(url)));
+    const google = settle(collectTrustedGoogleNews(topic, days, limit));
+    const articles = [];
+    for (let i = 0; i < TRUSTED_FEEDS.length; i++) {
+      const page = await feedPages[i];
+      if (page == null) continue;
+      try { articles.push(...parseDirectRss(page, TRUSTED_FEEDS[i][0], terms, perFeed)); } catch (_) { /* fonte non leggibile */ }
+    }
+    const hubs = await Promise.all(hubPages);
+    articles.push(...collectApHubArticles(TRUSTED_HUBS.map(([name], i) => [name, hubs[i]]), terms, perFeed));
+    const g = await google;
+    if (g) articles.push(...g);
+
+    const unique = [];
+    const seen = new Set();
+    const seenTitles = new Set();
+    for (const a of articles) {
+      const key = a.url || a.title.toLowerCase();
+      const titleKey = a.title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      if (seen.has(key) || seenTitles.has(titleKey)) continue;
+      seen.add(key); seenTitles.add(titleKey); unique.push(a);
+      if (unique.length >= limit) break;
+    }
+    unique.sort((x, y) => (y.published ? y.published.getTime() : -Infinity) - (x.published ? x.published.getTime() : -Infinity));
+    return unique;
+  }
+
+  /* ---------- testo completo degli articoli ---------- */
+  const allowedUrl = (url) => ALLOWED_DOMAINS.some((d) => url.toLowerCase().includes(d));
+  async function extractArticleText(url) {
+    if (!url || !allowedUrl(url)) return '';
+    let page;
+    try { page = await httpGet(url); } catch (_) { return ''; }
+    const doc = new DOMParser().parseFromString(page, 'text/html');
+    const canonical = doc.querySelector('link[rel~="canonical"]');
+    if (canonical && !allowedUrl(canonical.getAttribute('href') || '')) return '';
+    for (const script of doc.querySelectorAll('script[type="application/ld+json"]')) {
+      let data;
+      try { data = JSON.parse(script.textContent || ''); } catch (_) { continue; }
+      const stack = Array.isArray(data) ? [...data] : [data];
+      for (let i = 0; i < stack.length; i++) {
+        const item = stack[i];
+        if (item && typeof item === 'object' && Array.isArray(item['@graph'])) stack.push(...item['@graph']);
+        if (item && typeof item === 'object' && item.articleBody) {
+          const body = cleanText(String(item.articleBody));
+          if (body.length > 250) return body;
+        }
+      }
+    }
+    const chunks = [];
+    const selectors = ['[data-testid="paragraph"]', 'p[data-testid^="paragraph"]', '.article-body p', '.ArticleBody-articleBody p', '.RichTextStoryBody p',
+      '.body-content p', '.story-body p', '.wysiwyg p', '.tie-article p', '.tie-article', 'article p', 'main p', 'p'];
+    for (const sel of selectors) {
+      for (const node of doc.querySelectorAll(sel)) {
+        const text = cleanText(nodeText(node));
+        if (text.length > 60 && !chunks.includes(text)) chunks.push(text);
+      }
+      if (chunks.length >= 3) break;
+    }
+    return chunks.slice(0, 12).join(' ');
+  }
+
+  /* ---------- motori IA ---------- */
+  function articleDigest(articles, maxChars = 36000) {
+    return articles.map((a, i) => {
+      const stamp = a.published ? fmt(a.published) : 'data n.d.';
+      const body = cleanText(a.text || a.summary).slice(0, 2200);
+      return `${i + 1}. Fonte: ${a.source}\nData: ${stamp}\nTitolo: ${a.title}\nTesto/anteprima: ${body}\nURL: ${a.url}`;
+    }).join('\n\n').slice(0, maxChars);
+  }
+  const aiPrompt = (topic, articles) => `${PROMPT_PREFIX}Tema: ${topic}\n\nArticoli:\n${articleDigest(articles)}`;
+
+  async function callOpenAI(topic, articles, keys) {
+    const key = keys.OPENAI_API_KEY; if (!key) return null;
+    const data = await httpPostJson('https://api.openai.com/v1/responses',
+      { model: keys.OPENAI_MODEL || 'gpt-4o-mini', input: aiPrompt(topic, articles), temperature: 0.35, max_output_tokens: 3800 },
+      { Authorization: `Bearer ${key}` });
+    const chunks = [];
+    for (const item of data.output || []) for (const c of item.content || []) if ((c.type === 'output_text' || c.type === 'text') && c.text) chunks.push(c.text);
+    return chunks.join('\n').trim() || data.output_text;
+  }
+  async function callAnthropic(topic, articles, keys) {
+    const key = keys.ANTHROPIC_API_KEY; if (!key) return null;
+    const data = await httpPostJson('https://api.anthropic.com/v1/messages',
+      { model: keys.ANTHROPIC_MODEL || 'claude-3-5-haiku-latest', max_tokens: 3800, temperature: 0.35, messages: [{ role: 'user', content: aiPrompt(topic, articles) }] },
+      { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' });
+    return (data.content || []).filter((p) => p.type === 'text').map((p) => p.text || '').join('\n').trim();
+  }
+  function geminiTextAndFinish(data) {
+    const chunks = []; let finish = '';
+    for (const c of data.candidates || []) {
+      finish = c.finishReason || finish;
+      for (const p of (c.content && c.content.parts) || []) if (p.text) chunks.push(p.text);
+    }
+    return [chunks.join('\n').trim(), finish];
+  }
+  function looksIncomplete(text) {
+    const t = text.replace(/\s+$/, '');
+    if (!t) return true;
+    if (t.endsWith('...') || t.endsWith('…')) return true;
+    return !'.!?:;)'.includes(t[t.length - 1]);
+  }
+  function cleanGeneratedArticle(text) {
+    return text.trim()
+      .replace(/^[ \t]*(introduzione|corpo del testo|lettura per chi investe|conclusione)[ \t]*:?[ \t]*$/gim, '')
+      .replace(/\n{3,}/g, '\n\n').trim();
+  }
+  const geminiUrl = (model) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  async function callGemini(topic, articles, keys) {
+    const key = keys.GEMINI_API_KEY || keys.GOOGLE_API_KEY; if (!key) return null;
+    const payload = { contents: [{ parts: [{ text: aiPrompt(topic, articles) }] }], generationConfig: { temperature: 0.35, maxOutputTokens: 12000, thinkingConfig: { thinkingBudget: 0 } } };
+    const preferred = (keys.GEMINI_MODEL || 'gemini-2.5-flash').trim() || 'gemini-2.5-flash';
+    let data = null, lastError = null;
+    for (const model of [...new Set([preferred, 'gemini-2.5-flash', 'gemini-2.5-flash-lite'])]) {
+      try { data = await httpPostJson(geminiUrl(model), payload, { 'x-goog-api-key': key }); break; } catch (e) { lastError = e; }
+    }
+    if (!data) { if (lastError) throw lastError; return null; }
+    let [text, finish] = geminiTextAndFinish(data);
+    if (finish === 'MAX_TOKENS' || looksIncomplete(text)) {
+      const cont = "Hai scritto questo articolo ma sembra incompleto o tagliato. Continua esattamente da dove si interrompe, " +
+        "senza ripetere l'inizio, e chiudi con un paragrafo finale equilibrato. Non usare etichette come Introduzione o Conclusione. " +
+        "Mantieni italiano chiaro e discorsivo.\n\n" +
+        `Tema: ${topic}\n\nTesto gia' scritto:\n${text.slice(-4500)}\n\nMateriale originale:\n${articleDigest(articles, 18000)}`;
+      try {
+        const [extra] = geminiTextAndFinish(await httpPostJson(geminiUrl(preferred),
+          { contents: [{ parts: [{ text: cont }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 5000, thinkingConfig: { thinkingBudget: 0 } } },
+          { 'x-goog-api-key': key }));
+        if (extra) text = (text.replace(/\s+$/, '') + '\n\n' + extra.replace(/^\s+/, '')).trim();
+      } catch (_) { /* si tiene il testo già scritto */ }
+    }
+    return cleanGeneratedArticle(text);
+  }
+  const aiErrors = [];
+  async function synthesizeWithAi(topic, articles) {
+    const keys = loadKeys();
+    const callers = [['OpenAI', callOpenAI], ['Anthropic', callAnthropic], ['Gemini', callGemini]];
+    const drafts = [], used = [];
+    aiErrors.length = 0;
+    for (const [name, caller] of callers) {
+      try {
+        const text = await caller(topic, articles, keys);
+        if (text) { drafts.push([name, cleanGeneratedArticle(text)]); used.push(name); }
+      } catch (e) { aiErrors.push(`${name}: ${e.message}`); }
+    }
+    if (!drafts.length) return [null, []];
+    if (drafts.length === 1) return [drafts[0][1], used];
+    const combined = drafts.map(([name, text]) => ({ title: `Sintesi ${name}`, url: '', published: null, summary: text, source: name, text }));
+    try {
+      let final = used.includes('OpenAI') ? await callOpenAI(`Fusione finale su ${topic}`, combined, keys) : null;
+      if (!final) final = used.includes('Anthropic') ? await callAnthropic(`Fusione finale su ${topic}`, combined, keys) : null;
+      if (!final) final = used.includes('Gemini') ? await callGemini(`Fusione finale su ${topic}`, combined, keys) : null;
+      if (final) return [cleanGeneratedArticle(final), used];
+    } catch (_) { /* si usa l'unione delle bozze */ }
+    return [cleanGeneratedArticle(drafts.map(([n, t]) => `${n}:\n${t}`).join('\n\n')), used];
+  }
+
+  /* ---------- sintesi locale (senza chiavi) ---------- */
+  function translateHeadline(title) {
+    let text = cleanText(title);
+    const replacements = [
+      [/\bGold\b/gi, "l'oro"], [/\bsilver\b/gi, "l'argento"], [/\bcopper\b/gi, 'il rame'], [/\bplatinum\b/gi, 'il platino'],
+      [/\bpalladium\b/gi, 'il palladio'], [/\bBitcoin\b/gi, 'Bitcoin'], [/\bEthereum\b/gi, 'Ethereum'], [/\bdrops?\b/gi, 'scende'],
+      [/\bslips?\b/gi, 'scivola'], [/\bfalls?\b/gi, 'cede'], [/\bdips?\b/gi, 'arretra'], [/\bticks up\b/gi, 'sale leggermente'],
+      [/\brises?\b/gi, 'sale'], [/\bgains?\b/gi, 'avanza'], [/\blifts?\b/gi, 'sostiene'], [/\brally gains momentum\b/gi, 'il rialzo prende forza'],
+      [/\bsteadies?\b/gi, 'si stabilizza'], [/\bahead of\b/gi, 'in vista di'], [/\bafter\b/gi, 'dopo'], [/\bamid\b/gi, 'mentre pesano'],
+      [/\bon weaker dollar\b/gi, "con il dollaro piu' debole"], [/\brate hike bets\b/gi, 'attese di rialzi dei tassi'],
+      [/\binflation data\b/gi, "dati sull'inflazione"], [/\bJackson Hole event\b/gi, 'appuntamento di Jackson Hole'], [/\bFed\b/gi, 'Federal Reserve'],
+      [/\bshares\b/gi, 'azioni'], [/\bstocks\b/gi, 'azioni'], [/\byields\b/gi, 'rendimenti'], [/\bdollar\b/gi, 'dollaro'],
+      [/\btrade tensions\b/gi, 'tensioni commerciali'], [/\bsources say\b/gi, 'secondo fonti Reuters']
+    ];
+    for (const [pattern, repl] of replacements) text = text.replace(pattern, repl);
+    text = text.replace(/  /g, ' ').replace(/^[ .]+|[ .]+$/g, '');
+    return text ? text[0].toUpperCase() + text.slice(1) : title;
+  }
+  function headlineInsights(articles, topic) {
+    const joined = articles.map((a) => `${a.title} ${a.summary} ${a.text}`.toLowerCase()).join(' ');
+    const out = [];
+    if (/\b(drop|drops|fell|fall|falls|slip|slips|dip|dips|down|lower)\b/.test(joined)) out.push(`su ${topic} emergono pressioni ribassiste o prese di profitto in alcune sedute`);
+    if (/\b(rise|rises|gain|gains|rally|up|higher|lift|lifts|ticks up)\b/.test(joined)) out.push("il movimento non e' lineare: compaiono anche rimbalzi o fasi di recupero");
+    if (/\b(steady|steadies|flat|mixed)\b/.test(joined)) out.push('alcuni articoli descrivono una fase di stabilizzazione dopo movimenti forti');
+    if (/\b(fed|rate|rates|inflation|treasury|yield|yields|dollar|jackson hole|warsh|powell)\b/.test(joined)) out.push('il driver principale resta macro: Federal Reserve, inflazione, rendimenti e dollaro');
+    if (/\b(supply|demand|exports|imports|output|production|inventory|inventories|funds|buyers)\b/.test(joined)) out.push("il tema viene collegato anche a domanda, offerta, flussi fisici o disponibilita' di fondi");
+    if (/\b(profit|revenue|earnings|sales|forecast|guidance|quarter|results)\b/.test(joined)) out.push("per le societa' emergono risultati, guidance e aspettative sugli utili");
+    if (/\b(china|iran|russia|tariff|sanctions|trade tensions|war|geopolitical)\b/.test(joined)) out.push('rimane presente una componente geopolitica o commerciale');
+    if (/\b(bitcoin|ethereum|crypto|stablecoin|token|sec|etf)\b/.test(joined)) out.push('sulle cripto pesano regolazione, flussi sugli ETF e sentiment verso gli asset digitali');
+    return out;
+  }
+  function detectThemes(articles) {
+    const text = articles.map((a) => `${a.title} ${a.summary} ${a.text}`).join(' ').toLowerCase();
+    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const found = [];
+    for (const [label, keys] of Object.entries(THEME_WORDS)) {
+      if (keys.some((k) => new RegExp(`(?<![a-z0-9])${esc(k)}(?![a-z0-9])`).test(text))) found.push(label);
+    }
+    return found.slice(0, 5);
+  }
+  function summarize(topic, articles) {
+    if (!articles.length) return 'Non ho trovato articoli pertinenti per questa ricerca nel periodo selezionato.';
+    const enriched = articles.filter((a) => a.text.length > 300).length;
+    const dates = articles.map((a) => a.published).filter(Boolean);
+    let dateText = '';
+    if (dates.length) {
+      const newest = new Date(Math.max(...dates)); const oldest = new Date(Math.min(...dates));
+      dateText = ` Il materiale copre articoli tra ${fmt(oldest, false)} e ${fmt(newest)}.`;
+    }
+    const themes = detectThemes(articles);
+    const themeText = themes.length ? themes.join(', ').toLowerCase() : 'notizie societarie e andamento di mercato';
+    const sourceNames = [...new Set(articles.map((a) => a.source).filter(Boolean))].sort();
+    const sourceText = sourceNames.length ? sourceNames.join(', ') : 'le fonti selezionate';
+    const lead = `Le fonti lette (${sourceText}), negli ultimi articoli disponibili su ${topic}, raccontano un quadro centrato soprattutto su ${themeText}.` +
+      ` Ho letto ${articles.length} articoli; ${enriched} contenevano testo esteso scaricabile, gli altri sono stati sintetizzati da titolo e anteprima.${dateText}`;
+    const fullText = articles.some((a) => a.text.length > 300);
+    const insights = headlineInsights(articles, topic);
+    let body;
+    if (fullText && insights.length) body = 'Dalla lettura dei testi completi emerge un quadro abbastanza chiaro: ' + insights.slice(0, 6).join('; ') + '.';
+    else if (insights.length) body = "Il filo conduttore delle notizie e' questo: " + insights.slice(0, 6).join('; ') + '.';
+    else body = "Il filo conduttore delle notizie e' questo: " + articles.slice(0, 5).map((a) => translateHeadline(a.title)).join('; ') + '.';
+    const conclusion = " In sintesi, il punto da seguire non e' una singola notizia isolata, ma la direzione comune che emerge dagli articoli: " +
+      'pressioni macro, aspettative sugli utili, domanda/offerta e percezione del rischio stanno guidando il modo in cui il mercato legge questo asset.';
+    const detailLines = articles.slice(0, 20).map((a) => {
+      const stamp = a.published ? fmt(a.published, false) : 'data n.d.';
+      let snippet = cleanText(a.text || a.summary || a.title);
+      if (snippet.length > 260) { const cut = snippet.slice(0, 260); const i = cut.lastIndexOf(' '); snippet = (i >= 0 ? cut.slice(0, i) : cut) + '...'; }
+      return `${stamp} - ${a.source}: ${translateHeadline(a.title)}. ${snippet}`;
+    });
+    const details = detailLines.length ? '\n\nLettura articolo per articolo:\n' + detailLines.join('\n') : '';
+    const sources = '\n\nArticoli considerati:\n' + articles.map((a) => `- ${a.published ? fmt(a.published) : 'data n.d.'} | ${a.source} | ${a.title}`).join('\n');
+    return `${lead}\n\n${body}${conclusion}${details}${sources}`;
+  }
+
+  /* =====================================================================
+     Interfaccia
+     ===================================================================== */
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    search: $('search'), category: $('category'), topic: $('topic'), days: $('days'), limit: $('limit'), run: $('run'),
+    openKeys: $('openKeys'), keyState: $('keyState'), status: $('status'), heading: $('heading'), meta: $('meta'), pill: $('pill'),
+    activity: $('activity'), articles: $('articles'), count: $('count'), output: $('output'), engine: $('engine'), copy: $('copy'),
+    dialog: $('keysDialog')
+  };
+  let busy = false;
+  let lastText = '';
+
+  function loadKeys() {
+    try { return Object.assign({}, KEY_DEFAULTS, JSON.parse(localStorage.getItem('smai_keys') || '{}')); } catch (_) { return { ...KEY_DEFAULTS }; }
+  }
+  function saveKeys(values) {
+    try { localStorage.setItem('smai_keys', JSON.stringify(values)); return true; } catch (_) { return false; }
+  }
+  function availableProviders() {
+    const k = loadKeys(); const out = [];
+    if (k.OPENAI_API_KEY) out.push('OpenAI');
+    if (k.ANTHROPIC_API_KEY) out.push('Anthropic');
+    if (k.GEMINI_API_KEY || k.GOOGLE_API_KEY) out.push('Gemini');
+    return out;
+  }
+  function refreshKeyState() {
+    const p = availableProviders();
+    els.keyState.classList.toggle('ok', p.length > 0);
+    els.keyState.querySelector('span').textContent = p.length ? `Motore: ${p.join(', ')}` : 'Nessuna chiave: verrà usata la sintesi locale';
+  }
+
+  function fill(select, values) {
+    select.innerHTML = '';
+    for (const v of values) { const o = document.createElement('option'); o.value = o.textContent = v; select.appendChild(o); }
+  }
+  fill(els.category, Object.keys(TOPIC_CATEGORIES));
+  els.category.value = 'Indici USA e globali';
+  fill(els.topic, Object.keys(TOPIC_CATEGORIES[els.category.value]));
+  els.topic.value = 'S&P 500';
+  els.category.addEventListener('change', () => {
+    const values = Object.keys(TOPIC_CATEGORIES[els.category.value] || TOPICS);
+    fill(els.topic, values);
+    if (values[0]) { els.topic.value = values[0]; els.search.value = values[0]; }
+  });
+  els.topic.addEventListener('change', () => { els.search.value = els.topic.value.trim(); refresh(); });
+  els.search.addEventListener('keydown', (e) => { if (e.key === 'Enter') refresh(); });
+  els.run.addEventListener('click', refresh);
+
+  // ---- chiavi
+  els.openKeys.addEventListener('click', () => {
+    const k = loadKeys();
+    for (const name of Object.keys(KEY_DEFAULTS)) $('k_' + name).value = k[name] || '';
+    if (!k.GEMINI_API_KEY && k.GOOGLE_API_KEY) $('k_GEMINI_API_KEY').value = k.GOOGLE_API_KEY;
+    els.dialog.querySelectorAll('[data-toggle]').forEach((b) => { b.textContent = 'Mostra'; $(b.dataset.toggle).type = 'password'; });
+    els.dialog.showModal();
+  });
+  els.dialog.querySelectorAll('[data-toggle]').forEach((b) => b.addEventListener('click', () => {
+    const input = $(b.dataset.toggle); const show = input.type === 'password';
+    input.type = show ? 'text' : 'password'; b.textContent = show ? 'Nascondi' : 'Mostra';
+  }));
+  els.dialog.addEventListener('close', () => {
+    if (els.dialog.returnValue !== 'save') return;
+    const values = {};
+    for (const name of Object.keys(KEY_DEFAULTS)) values[name] = $('k_' + name).value.trim();
+    saveKeys(values);
+    refreshKeyState();
+    const p = availableProviders();
+    els.status.textContent = `Chiavi API IA salvate - motore: ${p.length ? p.join(', ') : 'sintesi locale'}`;
+    toast('Chiavi salvate correttamente.');
+  });
+
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+  function setState(state, label) {
+    els.pill.className = 'pill' + (state === 'ready' ? '' : ' ' + state);
+    els.pill.querySelector('span').textContent = label;
+    els.activity.classList.toggle('busy', state === 'busy');
+  }
+  function setBusy(on) {
+    busy = on; els.run.disabled = on;
+    els.run.textContent = on ? 'Lettura in corso…' : 'Leggi articoli e sintetizza';
+  }
+  function p(text, cls) { const el = document.createElement('p'); if (cls) el.className = cls; el.textContent = text; return el; }
+
+  // Titolo, paragrafi e sezioni ben distinti (come la finestra del programma desktop).
+  function showText(text, ai) {
+    els.output.replaceChildren();
+    let section = null;
+    let titleDone = !ai;
+    for (const line of text.split('\n')) {
+      const s = line.trim();
+      if (!s) continue;
+      if (s === 'Articoli considerati:' || s === 'Lettura articolo per articolo:') { section = s; els.output.append(p(s.replace(/:$/, ''), 'section')); }
+      else if (s.startsWith('Motori IA usati:')) els.output.append(p(s, 'engine'));
+      else if (s.startsWith('Nota:')) els.output.append(p(s, 'note'));
+      else if (!titleDone) { const h = document.createElement('h4'); h.className = 'title'; h.textContent = s; els.output.append(h); titleDone = true; }
+      else if (section) els.output.append(p(s.replace(/^[- ]+/, ''), 'source'));
+      else els.output.append(p(s));
+    }
+  }
+  function showWelcome() {
+    showText('Benvenuto in Sintesi Mercati AI\n\n' +
+      'Scegli un tema a sinistra (un indice, un ETF, un\'azione, una criptovaluta o una materia prima) oppure scrivi tu cosa cercare, poi premi "Leggi articoli e sintetizza".\n\n' +
+      'Il programma raccoglie gli articoli più recenti da fonti finanziarie attendibili (CNBC, MarketWatch, Yahoo Finance, Investing.com, AP News, CoinDesk, Kitco, Federal Reserve, SEC, EIA e altre) e ne ricava un unico articolo in italiano, basato solo su quegli articoli.\n\n' +
+      'Con una chiave API di un motore IA (Gemini, OpenAI o Anthropic) la sintesi è scritta dall\'intelligenza artificiale; senza chiavi viene usata la sintesi locale. Per Gemini la chiave è gratuita: premi "Chiavi API IA".', true);
+  }
+  function renderArticles(articles) {
+    els.articles.replaceChildren();
+    if (!articles.length) { els.articles.innerHTML = '<li class="empty">Nessun articolo trovato per questo tema nel periodo scelto.</li>'; return; }
+    articles.forEach((a, i) => {
+      const li = document.createElement('li');
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = String(i + 1).padStart(2, '0');
+      const link = document.createElement('a'); link.href = a.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = a.title;
+      const src = document.createElement('span'); src.className = 'src';
+      src.textContent = `${a.source} · ${a.published ? `${pad(a.published.getDate())}/${pad(a.published.getMonth() + 1)} ${pad(a.published.getHours())}:${pad(a.published.getMinutes())}` : 'data n.d.'}`;
+      li.append(n, link, src); els.articles.appendChild(li);
+    });
+  }
+
+  async function refresh() {
+    if (busy) return;
+    const topic = els.search.value.trim() || els.topic.value.trim() || 'S&P 500';
+    let days = parseInt(els.days.value, 10); if (Number.isNaN(days)) days = 7; days = Math.max(1, Math.min(30, days)); els.days.value = days;
+    let limit = parseInt(els.limit.value, 10); if (Number.isNaN(limit)) limit = 20; limit = Math.max(3, Math.min(30, limit)); els.limit.value = limit;
+    const providers = availableProviders();
+    const aiText = providers.length ? providers.join(', ') : 'sintesi locale';
+
+    setBusy(true); setState('busy', 'In corso');
+    els.heading.textContent = topic;
+    els.meta.textContent = `Ricerca e lettura in corso · ultimi ${days} ${days === 1 ? 'giorno' : 'giorni'} · fino a ${limit} articoli`;
+    els.status.textContent = `Cerco articoli per: ${topic} - motore: ${aiText}`;
+    els.engine.textContent = `Motore: ${aiText}`; els.copy.hidden = true; els.count.textContent = '';
+    els.articles.innerHTML = '<li class="empty">Lettura articoli in corso…</li>';
+    const sk = document.createElement('div'); sk.className = 'skeleton';
+    for (let i = 0; i < 8; i++) sk.appendChild(document.createElement('span'));
+    els.output.replaceChildren(p(`Sto raccogliendo articoli da fonti finanziarie attendibili e preparando una sintesi organica. Motore: ${aiText}.`, 'muted'), sk);
+
+    try {
+      const articles = await collectTrustedArticles(topic, days, limit);
+      renderArticles(articles);
+      els.count.textContent = `${articles.length} articoli`;
+      // Testo completo di ogni articolo (qualche download alla volta).
+      let done = 0;
+      const queue = articles.slice();
+      const worker = async () => {
+        while (queue.length) {
+          const a = queue.shift();
+          a.text = await extractArticleText(a.url);
+          done++;
+          els.status.textContent = `Leggo il testo degli articoli: ${done} di ${articles.length}`;
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(6, articles.length) }, worker));
+      if (providers.length) els.status.textContent = `Scrivo la sintesi con: ${aiText}`;
+
+      const [ai, used] = await synthesizeWithAi(topic, articles);
+      let text;
+      if (ai) {
+        text = ai + '\n\nMotori IA usati: ' + used.join(', ');
+        text += '\n\nArticoli considerati:\n' + articles.map((a) => `- ${a.published ? fmt(a.published) : 'data n.d.'} | ${a.source} | ${a.title}`).join('\n');
+      } else {
+        text = 'Nota: nessuna chiave IA sicura trovata; ho usato la sintesi locale.\n\n' + summarize(topic, articles);
+      }
+      lastText = text;
+      showText(text, !!ai);
+      els.copy.hidden = false;
+      els.engine.textContent = 'Scritto da: ' + (ai ? used.join(', ') : 'sintesi locale');
+      els.meta.textContent = `${articles.length} articoli letti · aggiornato ${fmt(new Date())}`;
+      els.status.textContent = aiErrors.length && !ai
+        ? `Sintesi locale: il motore IA ha risposto con un errore (${aiErrors.join(' · ')}). Controlla le chiavi.`
+        : 'Sintesi pronta. Clic su un articolo per aprirlo.';
+      setState('ready', 'Pronto');
+    } catch (err) {
+      els.status.textContent = `Errore durante la ricerca per ${topic}: ${err.message}`;
+      els.meta.textContent = 'Si è verificato un errore: controlla la connessione e riprova.';
+      els.articles.innerHTML = '<li class="empty">Nessun articolo.</li>';
+      els.output.replaceChildren(p(`Non sono riuscito a completare la ricerca per ${topic}.`, 'err'), p(err.message, 'note'));
+      setState('error', 'Errore');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  els.copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(lastText); toast('Testo copiato'); }
+    catch (_) { toast('Copia non riuscita: seleziona il testo e usa Ctrl+C'); }
+  });
+
+  refreshKeyState();
+  showWelcome();
+  
+})();
+</script>
+</body>
+</html>
