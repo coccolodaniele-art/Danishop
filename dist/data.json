@@ -37,6 +37,20 @@
    "trialInfo": "",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/codequest/",
    "requirements": ""
+  },
+  {
+   "id": "mun8vbdr71vb7",
+   "name": "SINTESI MERCATI AI",
+   "tagline": "Scopri la situazione attuale dei mercati di tutto il mondo!",
+   "image": "",
+   "platform": "Windows 10/11",
+   "version": "",
+   "description": "Questo programma raccoglie tutti gli articoli di finanza scritti da tutti i più importanti siti finanziari nell'ultima settimana. Dopodichè un motore ai Gemini, o anche altri se vuoi aggiungerne, genererà per te una sintesi chiara e pulita! Con un linguaggio semplice e accessibile a chiunque! Anche per i meno esperti! Provalo!",
+   "features": "",
+   "trialLabel": "PROVALO GRATIS!",
+   "trialInfo": "",
+   "trialUrl": "",
+   "requirements": ""
   }
  ]
 }
