@@ -295,6 +295,7 @@
     lastFocus = document.activeElement;
     modalBody.innerHTML = html;
     modalCard.classList.toggle('narrow', !!opts.narrow);
+    modalCard.classList.toggle('wide', !!opts.wide);
     modal.hidden = false;
     document.body.classList.add('modal-open');
     modalCard.scrollTop = 0;
@@ -633,7 +634,12 @@
     const hasTrial = p.trialLabel || p.trialInfo || trialUrl;
     return `
       <article class="program" id="prog-${esc(p.id)}">
-        <div class="program-media">${img ? `<img src="${img}" alt="${esc(p.name)}">` : `<span class="initial">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`}</div>
+        <div class="program-media${img ? ' has-shot' : ''}">${img ? `
+          <button type="button" class="shot" data-action="zoom-shot" data-id="${esc(p.id)}" aria-label="Ingrandisci l'immagine di ${esc(p.name)}">
+            <span class="shot-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+            <img src="${img}" alt="${esc(p.name)}" loading="lazy">
+            <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
+          </button>` : `<span class="initial">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`}</div>
         <div class="program-body">
           <div>
             <h2>${esc(p.name)}</h2>
@@ -1218,6 +1224,14 @@
       const src = modalBody._photos[i];
       document.getElementById('galleryMain').innerHTML = `<img src="${src}" alt="${esc(modalBody._title)}">`;
       modalBody.querySelectorAll('.thumbs button').forEach((b, j) => b.classList.toggle('active', i === j));
+    },
+    'zoom-shot': (el) => {
+      const p = state.data.programs.find((x) => x.id === el.dataset.id);
+      const src = p && safeImg(p.image);
+      if (!src) return;
+      openModal(`
+        <h2 id="modalTitle" class="shot-title">${esc(p.name)}</h2>
+        <img class="shot-full" src="${src}" alt="${esc(p.name)}">`, { wide: true });
     },
     'buy': (el) => openCheckout(el.dataset.id),
     'copy': (el) => copy(el.dataset.value),
