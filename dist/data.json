@@ -48,7 +48,7 @@
    "description": "Questo programma raccoglie tutti gli articoli di finanza scritti da tutti i più importanti siti finanziari nell'ultima settimana. Dopodichè un motore ai Gemini, o anche altri se vuoi aggiungerne, genererà per te una sintesi chiara e pulita! Con un linguaggio semplice e accessibile a chiunque! Anche per i meno esperti! Provalo!",
    "features": "",
    "trialLabel": "PROVALO GRATIS!",
-   "trialInfo": "",
+   "trialInfo": "ALT! Per poterlo utilizzare scaricati prima la chiave API di Gemini! vai a questo link, registrati e creati la tua chiave api così potrai attivare il motore ai del programma, si tratta solo di pochi semplici passi:   https://aistudio.google.com/app/apikey\nUna volta che hai ottenuto la tua chiave api salvala da qualche parte sul tuo computer! Poi apri il programma e nella sezione API inserisci la tua api key e salva!",
    "trialUrl": "",
    "requirements": ""
   }
