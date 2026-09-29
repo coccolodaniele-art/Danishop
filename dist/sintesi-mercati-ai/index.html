@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Sintesi Mercati AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Le notizie di mercato più recenti, riassunte in un unico articolo in italiano dall'intelligenza artificiale.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2322e1ff'/><stop offset='.5' stop-color='%238b5cff'/><stop offset='1' stop-color='%23ff3ecf'/></linearGradient></defs><rect x='2' y='2' width='60' height='60' rx='15' fill='url(%23g)'/><polyline points='13,43 26,30 36,38 51,19' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='51' cy='19' r='4.5' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #07060f;
+    --bg-2: #0e0b22;
+    --panel: #141130;
+    --panel-2: #1a1638;
+    --field: #0d0a22;
+    --line: rgba(255, 255, 255, .09);
+    --line-strong: rgba(255, 255, 255, .16);
+    --ink: #f1f0ff;
+    --muted: #9d9cc4;
+    --cyan: #22e1ff;
+    --violet: #8b5cff;
+    --pink: #ff3ecf;
+    --lime: #b8ff3c;
+    --amber: #ffb547;
+    --danger: #ff4d7a;
+    --grad: linear-gradient(120deg, #22e1ff 0%, #8b5cff 50%, #ff3ecf 100%);
+    --glow: 0 0 0 1px rgba(139, 92, 255, .35), 0 10px 40px rgba(139, 92, 255, .35), 0 0 60px rgba(34, 225, 255, .15);
+    --font: "Outfit", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Space Grotesk", "Outfit", "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background:
+      radial-gradient(900px 600px at 85% -10%, rgba(139, 92, 255, .22), transparent 60%),
+      radial-gradient(800px 600px at -10% 110%, rgba(34, 225, 255, .12), transparent 60%),
+      radial-gradient(700px 500px at 110% 90%, rgba(255, 62, 207, .12), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    line-height: 1.55;
+  }
+  a { color: var(--cyan); }
+  button, input, select { font: inherit; color: inherit; }
+
+  .app { display: grid; grid-template-columns: 330px minmax(0, 1fr); min-height: 100vh; }
+
+  /* ---------- barra laterale ---------- */
+  .side {
+    background: linear-gradient(180deg, rgba(26, 22, 56, .92), rgba(16, 13, 36, .95));
+    border-right: 1px solid var(--line);
+    padding: 24px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand svg { flex: none; filter: drop-shadow(0 0 14px rgba(139, 92, 255, .55)); }
+  .brand h1 { margin: 0; font-family: var(--font-display); font-size: 1.28rem; letter-spacing: -.01em; line-height: 1.15; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: .84rem; }
+  .gline { height: 2px; border-radius: 2px; background: var(--grad); opacity: .85; margin: 6px 0 4px; }
+  .section { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); margin-top: 6px; }
+  label { display: block; font-size: .84rem; color: var(--muted); margin-bottom: 5px; }
+  .input, select {
+    width: 100%; padding: 10px 12px; border-radius: 12px;
+    background: var(--field); border: 1px solid var(--line-strong); color: var(--ink);
+    outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  select { appearance: none; cursor: pointer; padding-right: 34px;
+    background-image: linear-gradient(45deg, transparent 50%, var(--cyan) 50%), linear-gradient(135deg, var(--cyan) 50%, transparent 50%);
+    background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+  select option { background: var(--panel-2); color: var(--ink); }
+  .input:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(34, 225, 255, .15); }
+  .input:hover, select:hover { border-color: rgba(139, 92, 255, .6); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 12px 16px; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: var(--panel-2); color: var(--ink); font-weight: 600; cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, transform .15s, background .2s; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--cyan); background: #1c1d45; }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .btn.primary { background: var(--grad); border: 0; color: #fff; padding: 14px 16px; font-size: 1.02rem; box-shadow: 0 8px 26px rgba(139, 92, 255, .35); }
+  .btn.primary:hover { box-shadow: var(--glow); filter: brightness(1.08); }
+  .btn[disabled] { opacity: .55; cursor: progress; filter: saturate(.6); }
+  .btn.small { width: auto; padding: 7px 14px; font-size: .84rem; }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .side-foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+  .side-foot a { color: var(--muted); text-decoration: none; }
+  .side-foot a:hover { color: var(--cyan); }
+  .key-state { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+  .key-state i { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+  .key-state.ok i { background: var(--lime); box-shadow: 0 0 10px var(--lime); }
+
+  /* ---------- area principale ---------- */
+  .main { padding: 26px 32px 36px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .12em; color: var(--violet); text-transform: uppercase; }
+  .head h2 { margin: 2px 0 2px; font-family: var(--font-display); font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -.02em; line-height: 1.1; overflow-wrap: anywhere; }
+  .meta { color: var(--muted); font-size: .93rem; }
+  .pill {
+    flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px;
+    font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--lime); border: 1px solid rgba(184, 255, 60, .45); background: rgba(184, 255, 60, .07);
+  }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+  .pill.busy { color: var(--cyan); border-color: rgba(34, 225, 255, .45); background: rgba(34, 225, 255, .07); }
+  .pill.busy i { animation: pulse 1s ease-in-out infinite; }
+  .pill.error { color: var(--danger); border-color: rgba(255, 77, 122, .45); background: rgba(255, 77, 122, .07); }
+  @keyframes pulse { 50% { opacity: .35; transform: scale(.7); } }
+
+  .activity { height: 3px; border-radius: 3px; background: var(--grad); position: relative; overflow: hidden; }
+  .activity.busy { opacity: .55; }
+  .activity.busy::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 22%; left: -22%;
+    background: linear-gradient(90deg, transparent, #fff, transparent); animation: scan 1.4s linear infinite;
+  }
+  @keyframes scan { to { left: 100%; } }
+
+  .card { background: linear-gradient(180deg, rgba(30, 26, 62, .8), rgba(16, 14, 34, .88)); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .card-head h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; }
+  .card-head .aside { color: var(--muted); font-size: .82rem; display: flex; align-items: center; gap: 10px; }
+
+  .sources { list-style: none; margin: 0; padding: 8px 12px; max-height: 240px; overflow-y: auto; }
+  .sources li { display: flex; align-items: center; gap: 12px; padding: 7px 10px; border-radius: 10px; }
+  .sources li:nth-child(even) { background: rgba(255, 255, 255, .025); }
+  .sources .n { font-family: var(--font-display); color: var(--muted); font-size: .85rem; width: 22px; flex: none; }
+  .sources a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  .sources a:hover { color: var(--cyan); }
+  .sources .empty { color: var(--muted); }
+  .suggest { padding: 0 18px 14px; }
+  .suggest iframe { width: 100%; border: 0; height: 64px; border-radius: 10px; background: transparent; color-scheme: normal; }
+  .hint { color: #7d7ca8; font-size: .78rem; padding: 0 20px 12px; margin: 0; }
+
+  .article { background: var(--field); padding: 26px 32px 30px; min-height: 280px; }
+  .article .title { font-family: var(--font-display); color: var(--cyan); font-size: clamp(1.25rem, 2.2vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; text-shadow: 0 0 22px rgba(34, 225, 255, .25); }
+  .article p { margin: 0 0 14px; font-size: 1.04rem; color: #e6e4ff; max-width: 78ch; }
+  .article p.muted { color: var(--muted); }
+  .article p.note { color: var(--amber); }
+  .article p.err { color: var(--danger); }
+  .article .engine { color: var(--violet); font-size: .88rem; margin-top: 18px; }
+  .disclaimer { color: #7d7ca8; font-size: .8rem; margin: 0; }
+
+  .skeleton { display: grid; gap: 12px; }
+  .skeleton span { height: 14px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.05), rgba(139,92,255,.18), rgba(255,255,255,.05)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+  .skeleton span:first-child { height: 24px; width: 70%; }
+  .skeleton span:nth-child(3n) { width: 82%; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ---------- finestra chiave ---------- */
+  dialog {
+    width: min(560px, calc(100vw - 32px)); padding: 0; border-radius: 20px; color: var(--ink);
+    background: linear-gradient(180deg, #1a1638, #100d24); border: 1px solid rgba(139, 92, 255, .35);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 60px rgba(139, 92, 255, .25);
+  }
+  dialog::backdrop { background: rgba(3, 2, 10, .7); backdrop-filter: blur(6px); }
+  .dlg-bar { height: 3px; background: var(--grad); }
+  .dlg { padding: 24px 26px 22px; display: grid; gap: 14px; }
+  .dlg h3 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
+  .dlg p { margin: 0; color: var(--muted); font-size: .92rem; }
+  .steps { margin: 0; padding-left: 20px; color: var(--muted); font-size: .92rem; display: grid; gap: 4px; }
+  .steps b { color: var(--ink); font-weight: 600; }
+  .keyrow { display: flex; gap: 8px; }
+  .keyrow .input { flex: 1; font-family: ui-monospace, Consolas, monospace; }
+  .dlg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+  .linkbtn { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: .84rem; padding: 0; text-decoration: underline; justify-self: start; }
+  .linkbtn:hover { color: var(--danger); }
+
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; transition: .25s; background: var(--panel-2); border: 1px solid var(--line-strong); padding: 10px 18px; border-radius: 999px; font-size: .9rem; pointer-events: none; z-index: 10; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    .side-foot { margin-top: 4px; }
+    .main { padding: 20px 16px 30px; }
+    .article { padding: 20px 18px 24px; }
+    .head { flex-direction: column-reverse; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg width="46" height="46" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e1ff"/><stop offset=".5" stop-color="#8b5cff"/><stop offset="1" stop-color="#ff3ecf"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#lg)"/><polyline points="13,43 26,30 36,38 51,19" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="51" cy="19" r="4.5" fill="#fff"/></svg>
+      <div>
+        <h1>Sintesi Mercati AI</h1>
+        <p>Le notizie di mercato in sintesi</p>
+      </div>
+    </div>
+    <div class="gline"></div>
+
+    <div class="section">Cosa vuoi analizzare</div>
+    <div>
+      <label for="search">Titolo, asset o tema</label>
+      <input class="input" id="search" type="text" value="S&amp;P 500" autocomplete="off" placeholder="Es. Oro, Nvidia, Bitcoin…">
+    </div>
+    <div>
+      <label for="category">Categoria</label>
+      <select id="category"></select>
+    </div>
+    <div>
+      <label for="topic">Scelte rapide</label>
+      <select id="topic"></select>
+    </div>
+
+    <div class="section">Periodo</div>
+    <div>
+      <label for="days">Notizie degli ultimi</label>
+      <select id="days">
+        <option value="1">1 giorno</option>
+        <option value="3">3 giorni</option>
+        <option value="7" selected>7 giorni</option>
+        <option value="14">14 giorni</option>
+        <option value="30">30 giorni</option>
+      </select>
+    </div>
+
+    <button class="btn primary" id="run" type="button">Leggi articoli e sintetizza</button>
+    <button class="btn" id="openKey" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2m-4 4 3 3m-6 0 2 2"/></svg>
+      Chiave API Gemini
+    </button>
+    <div class="key-state" id="keyState"><i></i><span>Nessuna chiave inserita</span></div>
+
+    <div class="side-foot">
+      <div id="status">Pronto</div>
+      <div style="margin-top:8px"><a href="../#programmi">← Torna al sito</a></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Tema analizzato</div>
+        <h2 id="heading">S&amp;P 500</h2>
+        <div class="meta" id="meta">Scegli un tema e avvia la sintesi.</div>
+      </div>
+      <div class="pill" id="pill"><i></i><span>Pronto</span></div>
+    </div>
+    <div class="activity" id="activity"></div>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>Fonti consultate</h3>
+        <div class="aside" id="count"></div>
+      </div>
+      <ul class="sources" id="sources"><li class="empty">Le fonti usate per la sintesi compariranno qui.</li></ul>
+      <div class="suggest" id="suggest" hidden></div>
+      <p class="hint">Clic su una fonte per aprirla in una nuova scheda.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>Articolo generato</h3>
+        <div class="aside">
+          <span id="engine"></span>
+          <button class="btn small" id="copy" type="button" hidden>Copia testo</button>
+        </div>
+      </div>
+      <div class="article" id="article" aria-live="polite"></div>
+    </section>
+
+    <p class="disclaimer">Sintesi Mercati AI riassume ciò che scrivono le fonti finanziarie: non è un consiglio di investimento. Verifica sempre le informazioni prima di prendere decisioni.</p>
+  </main>
+</div>
+
+<dialog id="keyDialog" aria-labelledby="keyTitle">
+  <div class="dlg-bar"></div>
+  <form class="dlg" method="dialog" id="keyForm">
+    <h3 id="keyTitle">Chiave API Gemini</h3>
+    <p id="keyIntro">Per scrivere la sintesi il programma usa Gemini, l'intelligenza artificiale di Google, con la tua chiave personale e gratuita.</p>
+    <ol class="steps">
+      <li>Apri <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener"><b>aistudio.google.com/app/apikey</b></a> e accedi con un account Google.</li>
+      <li>Clicca <b>Create API key</b> e copia la chiave.</li>
+      <li>Incollala qui sotto e premi <b>Salva</b>.</li>
+    </ol>
+    <div>
+      <label for="keyInput">La tua chiave</label>
+      <div class="keyrow">
+        <input class="input" id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…">
+        <button class="btn small" id="toggleKey" type="button">Mostra</button>
+      </div>
+    </div>
+    <div>
+      <label for="model">Modello</label>
+      <select id="model">
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash (consigliato)</option>
+        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (più veloce)</option>
+      </select>
+    </div>
+    <p style="font-size:.84rem">La chiave resta salvata solo in questo browser e viene inviata soltanto a Google. Non condividerla con nessuno.</p>
+    <button class="linkbtn" id="removeKey" type="button">Rimuovi la chiave da questo browser</button>
+    <div class="dlg-actions">
+      <button class="btn primary" id="saveKey" type="submit" value="save">Salva</button>
+      <button class="btn" type="submit" value="cancel" formnovalidate>Chiudi</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const TOPIC_CATEGORIES = {"Indici USA e globali":{"S&P 500":"\"S&P 500\"","Nasdaq 100":"\"Nasdaq 100\"","Dow Jones":"\"Dow Jones Industrial Average\"","Russell 2000":"\"Russell 2000\"","MSCI World":"\"MSCI World\"","MSCI Emerging Markets":"\"MSCI Emerging Markets\"","Stoxx Europe 600":"\"STOXX Europe 600\"","DAX Germania":"DAX Germany index","FTSE 100 Regno Unito":"FTSE 100 index","Nikkei 225 Giappone":"Nikkei 225 Japan","Hang Seng Hong Kong":"Hang Seng index"},"ETF principali":{"SPY - SPDR S&P 500 ETF":"SPY ETF S&P 500","VOO - Vanguard S&P 500 ETF":"VOO Vanguard S&P 500 ETF","IVV - iShares Core S&P 500":"IVV iShares Core S&P 500 ETF","QQQ - Invesco Nasdaq 100 ETF":"QQQ Invesco Nasdaq 100 ETF","VTI - Vanguard Total Stock Market":"VTI Vanguard Total Stock Market ETF","IWM - iShares Russell 2000 ETF":"IWM iShares Russell 2000 ETF","DIA - SPDR Dow Jones ETF":"DIA SPDR Dow Jones Industrial Average ETF","VEA - Developed Markets ETF":"VEA developed markets ETF","VWO - Emerging Markets ETF":"VWO emerging markets ETF","EFA - MSCI EAFE ETF":"EFA MSCI EAFE ETF","ARKK - ARK Innovation ETF":"ARKK innovation ETF","TLT - Treasury Bond ETF":"TLT iShares 20+ Year Treasury Bond ETF","IEF - Treasury 7-10 anni ETF":"IEF Treasury 7-10 year ETF","SHY - Treasury breve ETF":"SHY short Treasury ETF","HYG - High Yield Bond ETF":"HYG iShares High Yield Corporate Bond ETF","LQD - Investment Grade Bond ETF":"LQD investment grade corporate bond ETF","GLD - SPDR Gold Shares":"GLD SPDR Gold Shares ETF","SLV - iShares Silver Trust":"SLV iShares Silver Trust ETF","USO - United States Oil Fund":"USO United States Oil Fund ETF"},"Azioni USA mega-cap":{"Apple":"Apple AAPL","Microsoft":"Microsoft MSFT","Nvidia":"Nvidia NVDA","Amazon":"Amazon AMZN","Alphabet":"Alphabet Google GOOGL GOOG","Meta Platforms":"Meta META Facebook","Tesla":"Tesla TSLA","Broadcom":"Broadcom AVGO","Berkshire Hathaway":"Berkshire Hathaway BRK","JPMorgan Chase":"JPMorgan Chase JPM","Eli Lilly":"Eli Lilly LLY","Visa":"Visa V","Mastercard":"Mastercard MA","Exxon Mobil":"Exxon Mobil XOM","UnitedHealth":"UnitedHealth UNH","Walmart":"Walmart WMT","Costco":"Costco COST","Netflix":"Netflix NFLX","Oracle":"Oracle ORCL","Salesforce":"Salesforce CRM","Adobe":"Adobe ADBE","Cisco":"Cisco CSCO","Coca-Cola":"Coca-Cola KO","PepsiCo":"PepsiCo PEP","Procter & Gamble":"Procter Gamble PG","Johnson & Johnson":"Johnson & Johnson JNJ","Merck":"Merck MRK","Chevron":"Chevron CVX","Bank of America":"Bank of America BAC","Goldman Sachs":"Goldman Sachs GS"},"Tecnologia e semiconduttori":{"AMD":"AMD Advanced Micro Devices","Intel":"Intel INTC","Micron":"Micron MU","Qualcomm":"Qualcomm QCOM","Texas Instruments":"Texas Instruments TXN","Applied Materials":"Applied Materials AMAT","Lam Research":"Lam Research LRCX","ASML":"ASML semiconductor equipment","Taiwan Semiconductor":"Taiwan Semiconductor TSM","Arm Holdings":"Arm Holdings ARM","Palantir":"Palantir PLTR","Snowflake":"Snowflake SNOW","ServiceNow":"ServiceNow NOW","CrowdStrike":"CrowdStrike CRWD","Palo Alto Networks":"Palo Alto Networks PANW"},"Finanza, pagamenti e fintech":{"Coinbase":"Coinbase COIN","PayPal":"PayPal PYPL","Block":"Block Square SQ","Robinhood":"Robinhood HOOD","BlackRock":"BlackRock BLK","Morgan Stanley":"Morgan Stanley MS","Charles Schwab":"Charles Schwab SCHW","American Express":"American Express AXP"},"Cripto":{"Crypto market":"cryptocurrency crypto market bitcoin ethereum","Bitcoin":"Bitcoin BTC","Ethereum":"Ethereum Ether ETH","Solana":"Solana SOL","XRP":"XRP Ripple","BNB":"BNB Binance Coin","Cardano":"Cardano ADA","Dogecoin":"Dogecoin DOGE","Toncoin":"Toncoin TON","TRON":"TRON TRX","Avalanche":"Avalanche AVAX","Chainlink":"Chainlink LINK","Polkadot":"Polkadot DOT","Polygon":"Polygon MATIC POL","Litecoin":"Litecoin LTC","Bitcoin ETF spot":"spot Bitcoin ETF","Ethereum ETF spot":"spot Ethereum ETF","Stablecoin":"stablecoin market USDT USDC","DeFi":"decentralized finance DeFi crypto"},"Metalli":{"Oro":"gold bullion","Argento":"silver bullion","Rame":"copper","Platino":"platinum","Palladio":"palladium","Uranio":"uranium","Litio":"lithium","Alluminio":"aluminum","Nickel":"nickel","Zinco":"zinc","Minerali terre rare":"rare earth minerals"},"Energia":{"Petrolio WTI":"WTI crude oil","Petrolio Brent":"Brent crude oil","Gas naturale":"natural gas LNG","Benzina":"gasoline prices","Diesel":"diesel fuel prices","Carbone":"coal market","Energia nucleare":"nuclear energy uranium","Rinnovabili":"renewable energy stocks solar wind","Solare":"solar energy stocks","Idrogeno":"hydrogen energy market"},"Materie prime agricole":{"Grano":"wheat","Mais":"corn","Soia":"soybeans","Riso":"rice commodity","Caffe":"coffee futures","Cacao":"cocoa futures","Zucchero":"sugar futures","Cotone":"cotton futures","Bestiame":"live cattle futures"},"Macro e temi di mercato":{"Federal Reserve":"Federal Reserve interest rates inflation","Inflazione USA":"US inflation CPI PCE","Tassi Treasury":"US Treasury yields bond market","Dollaro USA":"US dollar DXY","Recessione USA":"US recession risk economy","Utili aziendali USA":"US corporate earnings","Intelligenza artificiale":"artificial intelligence stocks investment","Difesa e geopolitica":"defense stocks geopolitical risk","Cina mercati":"China economy stocks markets","India mercati":"India economy stocks markets"}};
+  const TOPICS = Object.assign({}, ...Object.values(TOPIC_CATEGORIES));
+  const TRUSTED = 'Reuters, AP News, Bloomberg, CNBC, MarketWatch, Financial Times, Wall Street Journal, Yahoo Finance, Investing.com, Barron\'s, CoinDesk (per le cripto), Kitco (per i metalli) e comunicati ufficiali di Federal Reserve, BCE, SEC ed EIA';
+  const API = 'https://generativelanguage.googleapis.com/v1beta/models/';
+
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    search: $('search'), category: $('category'), topic: $('topic'), days: $('days'), run: $('run'),
+    openKey: $('openKey'), keyState: $('keyState'), status: $('status'), heading: $('heading'), meta: $('meta'),
+    pill: $('pill'), activity: $('activity'), sources: $('sources'), count: $('count'), suggest: $('suggest'),
+    article: $('article'), engine: $('engine'), copy: $('copy'), dialog: $('keyDialog'), keyForm: $('keyForm'),
+    keyInput: $('keyInput'), model: $('model'), toggleKey: $('toggleKey'), removeKey: $('removeKey'), keyIntro: $('keyIntro')
+  };
+  let busy = false;
+  let lastText = '';
+
+  /* ---------- memoria locale (solo in questo browser) ---------- */
+  const store = {
+    get(k) { try { return localStorage.getItem('smai_' + k) || ''; } catch (_) { return ''; } },
+    set(k, v) { try { v ? localStorage.setItem('smai_' + k, v) : localStorage.removeItem('smai_' + k); } catch (_) {} }
+  };
+
+  /* ---------- scelta dei temi ---------- */
+  function fill(select, values) {
+    select.innerHTML = '';
+    for (const v of values) { const o = document.createElement('option'); o.value = o.textContent = v; select.appendChild(o); }
+  }
+  fill(els.category, Object.keys(TOPIC_CATEGORIES));
+  fill(els.topic, Object.keys(TOPIC_CATEGORIES[els.category.value]));
+  els.topic.value = 'S&P 500';
+  els.category.addEventListener('change', () => {
+    const values = Object.keys(TOPIC_CATEGORIES[els.category.value] || {});
+    fill(els.topic, values);
+    if (values[0]) els.search.value = values[0];
+  });
+  els.topic.addEventListener('change', () => { els.search.value = els.topic.value; run(); });
+  els.search.addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
+  els.run.addEventListener('click', run);
+
+  /* ---------- chiave ---------- */
+  function refreshKeyState() {
+    const has = !!store.get('key');
+    els.keyState.classList.toggle('ok', has);
+    els.keyState.querySelector('span').textContent = has ? 'Chiave inserita · motore Gemini attivo' : 'Nessuna chiave inserita';
+  }
+  function openKeyDialog(reason) {
+    els.keyInput.value = store.get('key');
+    els.model.value = store.get('model') || 'gemini-2.5-flash';
+    els.keyInput.type = 'password'; els.toggleKey.textContent = 'Mostra';
+    els.keyIntro.textContent = reason || 'Per scrivere la sintesi il programma usa Gemini, l\'intelligenza artificiale di Google, con la tua chiave personale e gratuita.';
+    els.dialog.showModal();
+    setTimeout(() => els.keyInput.focus(), 50);
+  }
+  els.openKey.addEventListener('click', () => openKeyDialog());
+  els.toggleKey.addEventListener('click', () => {
+    const show = els.keyInput.type === 'password';
+    els.keyInput.type = show ? 'text' : 'password';
+    els.toggleKey.textContent = show ? 'Nascondi' : 'Mostra';
+  });
+  els.removeKey.addEventListener('click', () => {
+    store.set('key', ''); els.keyInput.value = ''; refreshKeyState(); toast('Chiave rimossa da questo browser');
+  });
+  els.dialog.addEventListener('close', () => {
+    if (els.dialog.returnValue !== 'save') return;
+    const key = els.keyInput.value.trim();
+    store.set('key', key);
+    store.set('model', els.model.value);
+    refreshKeyState();
+    toast(key ? 'Chiave salvata' : 'Nessuna chiave salvata');
+  });
+  refreshKeyState();
+
+  /* ---------- interfaccia ---------- */
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+  function setState(state, label) {
+    els.pill.className = 'pill' + (state === 'ready' ? '' : ' ' + state);
+    els.pill.querySelector('span').textContent = label;
+    els.activity.classList.toggle('busy', state === 'busy');
+  }
+  function setBusy(on) {
+    busy = on;
+    els.run.disabled = on;
+    els.run.textContent = on ? 'Lettura in corso…' : 'Leggi articoli e sintetizza';
+  }
+  function paragraph(text, cls) {
+    const p = document.createElement('p'); if (cls) p.className = cls; p.textContent = text; return p;
+  }
+  function showWelcome() {
+    els.article.replaceChildren();
+    const h = document.createElement('h4'); h.className = 'title'; h.textContent = 'Benvenuto in Sintesi Mercati AI';
+    els.article.append(
+      h,
+      paragraph('Scegli un tema a sinistra (un indice, un ETF, un\'azione, una criptovaluta o una materia prima) oppure scrivi tu cosa cercare, poi premi "Leggi articoli e sintetizza".'),
+      paragraph('Il programma cerca le notizie più recenti su fonti finanziarie attendibili e ne ricava un unico articolo in italiano, chiaro e discorsivo, scritto dall\'intelligenza artificiale Gemini.'),
+      paragraph(store.get('key') ? 'La tua chiave è già inserita: puoi partire subito.' : 'Prima di iniziare inserisci la tua chiave API Gemini gratuita con il pulsante "Chiave API Gemini".', store.get('key') ? 'muted' : 'note')
+    );
+  }
+  function showSkeleton() {
+    const s = document.createElement('div'); s.className = 'skeleton';
+    for (let i = 0; i < 9; i++) s.appendChild(document.createElement('span'));
+    els.article.replaceChildren(paragraph('Sto cercando le notizie e scrivendo la sintesi: di solito servono 15-40 secondi.', 'muted'), s);
+  }
+
+  /* ---------- testo generato ---------- */
+  function cleanText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*/g, '')
+      .replace(/^#{1,6}\s*/gm, '')
+      .replace(/^\s*(titolo|introduzione|corpo del testo|lettura per chi investe|conclusione)\s*:?\s*$/gim, '')
+      .replace(/^\s*titolo\s*:\s*/im, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+  function renderArticle(text, model) {
+    const lines = text.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+    els.article.replaceChildren();
+    if (!lines.length) { els.article.append(paragraph('Gemini non ha restituito testo. Riprova tra qualche istante.', 'err')); return; }
+    const h = document.createElement('h4'); h.className = 'title'; h.textContent = lines[0];
+    els.article.append(h, ...lines.slice(1).map((l) => paragraph(l)));
+    els.article.append(paragraph(`Scritto da Gemini (${model}) con la Ricerca Google.`, 'engine'));
+  }
+  function renderSources(meta) {
+    const chunks = (meta && meta.groundingChunks) || [];
+    const seen = new Set();
+    const list = [];
+    for (const c of chunks) {
+      const web = c.web || {};
+      if (!web.uri) continue;
+      const key = (web.title || '') + '|' + web.uri;
+      if (seen.has(key)) continue;
+      seen.add(key); list.push(web);
+    }
+    els.sources.replaceChildren();
+    if (!list.length) {
+      const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Gemini non ha indicato le fonti per questa sintesi.';
+      els.sources.appendChild(li);
+    }
+    list.forEach((web, i) => {
+      const li = document.createElement('li');
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = String(i + 1).padStart(2, '0');
+      const a = document.createElement('a'); a.href = web.uri; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = web.title || new URL(web.uri).hostname;
+      li.append(n, a); els.sources.appendChild(li);
+    });
+    els.count.textContent = list.length ? `${list.length} fonti` : '';
+    // Suggerimenti di ricerca di Google: vanno mostrati quando si usano i risultati della Ricerca Google.
+    const rendered = meta && meta.searchEntryPoint && meta.searchEntryPoint.renderedContent;
+    els.suggest.replaceChildren();
+    els.suggest.hidden = !rendered;
+    if (rendered) {
+      const f = document.createElement('iframe');
+      f.title = 'Ricerche Google correlate';
+      f.setAttribute('sandbox', 'allow-popups allow-popups-to-escape-sandbox');
+      f.srcdoc = '<base target="_blank"><style>body{margin:0;background:transparent}</style>' + rendered;
+      els.suggest.appendChild(f);
+    }
+    return list.length;
+  }
+
+  function prompt(topic, days) {
+    const terms = TOPICS[topic] && TOPICS[topic] !== topic ? ` (termini utili per la ricerca in inglese: ${TOPICS[topic]})` : '';
+    const today = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+    return (
+      `Oggi è il ${today}. Usa la Ricerca Google per trovare le notizie e le analisi finanziarie pubblicate negli ultimi ${days} giorni su: ${topic}${terms}. ` +
+      `Privilegia fonti attendibili come ${TRUSTED}. Consulta più articoli possibile (almeno 8 se disponibili) e scarta notizie più vecchie del periodo indicato.\n\n` +
+      'Sei un analista finanziario prudente e un bravo divulgatore economico. Usa gli articoli trovati come materiale di base ' +
+      'per scrivere un articolo originale in italiano, chiaro, organico e comprensibile per una persona che sta valutando un investimento. ' +
+      'Non devi fare un elenco di riassunti articolo per articolo: devi creare un testo tuo, scorrevole, con un filo logico unico. ' +
+      'Usa solo le informazioni presenti negli articoli trovati. Non inventare dati, non dare consigli finanziari personalizzati e non presentare ' +
+      "l'investimento come sicuro. Non usare markdown, asterischi, elenchi puntati o tabelle.\n\n" +
+      'Struttura obbligatoria, senza scrivere i nomi delle sezioni nel testo:\n' +
+      'Prima riga: un titolo chiaro e informativo.\n' +
+      "Poi un paragrafo iniziale che spiega in modo semplice perche' il tema e' rilevante ora.\n" +
+      'Poi sviluppa il quadro principale in più paragrafi collegando le notizie tra loro, distinguendo fattori macroeconomici, societari, ' +
+      'settoriali, valutativi, rischi e sentiment degli investitori quando emergono dagli articoli. Chiarisci anche che cosa potrebbe ' +
+      'contare per un investitore di medio periodo, quali segnali sono positivi, quali punti richiedono prudenza e quali elementi monitorare nei ' +
+      'prossimi giorni o settimane.\n' +
+      'Chiudi con un paragrafo di valutazione equilibrata del quadro emerso, senza dare ordini di acquisto o vendita.\n' +
+      'Separa i paragrafi con una riga vuota. Non scrivere mai le parole Introduzione, Corpo del testo, Lettura per chi investe o Conclusione come titoli o etichette.\n\n' +
+      "L'articolo deve essere approfondito e discorsivo (almeno 400 parole), salvo il caso in cui non ci siano abbastanza notizie: in quel caso dillo chiaramente ma spiega comunque bene il contesto."
+    );
+  }
+
+  async function callGemini(model, key, body) {
+    const res = await fetch(API + encodeURIComponent(model) + ':generateContent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const err = new Error((data.error && data.error.message) || 'Errore ' + res.status);
+      err.status = res.status; err.reason = data.error && data.error.status;
+      throw err;
+    }
+    return data;
+  }
+
+  function friendlyError(err) {
+    const msg = String(err.message || '');
+    if (err instanceof TypeError) return 'Impossibile contattare Gemini: controlla la connessione a internet e riprova.';
+    if (err.status === 400 && /api key/i.test(msg)) return 'La chiave API non è valida. Controllala con il pulsante "Chiave API Gemini".';
+    if (err.status === 403) return 'La chiave API non è autorizzata a usare Gemini. Crea una nuova chiave su aistudio.google.com/app/apikey.';
+    if (err.status === 429) return 'Hai raggiunto il limite di richieste gratuite di Gemini per ora. Aspetta qualche minuto (o fino a domani) e riprova.';
+    if (err.status >= 500) return 'I server di Gemini sono momentaneamente occupati. Riprova tra poco.';
+    return 'Gemini ha risposto con un errore: ' + msg;
+  }
+
+  async function run() {
+    if (busy) return;
+    const key = store.get('key');
+    if (!key) { openKeyDialog('Per usare Sintesi Mercati AI serve una chiave API Gemini (gratuita). Si crea in un minuto:'); return; }
+    const topic = els.search.value.trim() || els.topic.value || 'S&P 500';
+    const days = Number(els.days.value) || 7;
+    const model = store.get('model') || 'gemini-2.5-flash';
+
+    setBusy(true); setState('busy', 'In corso');
+    els.heading.textContent = topic;
+    els.meta.textContent = `Ricerca e lettura in corso · notizie degli ultimi ${days} ${days === 1 ? 'giorno' : 'giorni'}`;
+    els.status.textContent = `Cerco articoli per: ${topic} - motore: Gemini`;
+    els.engine.textContent = ''; els.copy.hidden = true; els.count.textContent = '';
+    els.sources.innerHTML = '<li class="empty">Ricerca delle fonti in corso…</li>';
+    els.suggest.hidden = true;
+    showSkeleton();
+
+    const body = {
+      contents: [{ parts: [{ text: prompt(topic, days) }] }],
+      tools: [{ google_search: {} }],
+      generationConfig: { temperature: 0.35, maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 } }
+    };
+    try {
+      let data, used = model;
+      try {
+        data = await callGemini(model, key, body);
+      } catch (err) {
+        // Se il modello scelto è sovraccarico o ha finito la quota, riprova con quello più leggero.
+        if (model !== 'gemini-2.5-flash-lite' && (err.status === 429 || err.status >= 500)) {
+          used = 'gemini-2.5-flash-lite';
+          data = await callGemini(used, key, body);
+        } else throw err;
+      }
+      const cand = (data.candidates || [])[0] || {};
+      const raw = ((cand.content && cand.content.parts) || []).map((p) => p.text || '').join('');
+      lastText = cleanText(raw);
+      renderArticle(lastText, used);
+      const n = renderSources(cand.groundingMetadata);
+      els.engine.textContent = 'Scritto da: Gemini';
+      els.copy.hidden = !lastText;
+      const now = new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      els.meta.textContent = `${n} fonti consultate · aggiornato ${now}`;
+      els.status.textContent = 'Sintesi pronta. Clic su una fonte per aprirla.';
+      setState('ready', 'Pronto');
+    } catch (err) {
+      const msg = friendlyError(err);
+      els.article.replaceChildren(paragraph(`Non sono riuscito a completare la ricerca per ${topic}.`, 'err'), paragraph(msg, 'note'));
+      els.sources.innerHTML = '<li class="empty">Nessuna fonte.</li>';
+      els.meta.textContent = 'Si è verificato un errore.';
+      els.status.textContent = msg;
+      setState('error', 'Errore');
+      if (err.status === 400 || err.status === 403) openKeyDialog(msg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  els.copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(lastText); toast('Testo copiato'); }
+    catch (_) { toast('Copia non riuscita: seleziona il testo e usa Ctrl+C'); }
+  });
+
+  showWelcome();
+})();
+</script>
+</body>
+</html>
