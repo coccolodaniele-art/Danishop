@@ -1,7 +1,7 @@
 {
  "version": 1,
  "settings": {
-  "siteName": "Il mio sito",
+  "siteName": "Laboratorio del Dany",
   "tagline": "Oggetti usati, programmi e contatti",
   "shopIntro": "Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.",
   "programsIntro": "I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.",
@@ -15,12 +15,12 @@
   "facebook": "",
   "linkedin": "",
   "about": "",
-  "ibanHolder": "",
-  "iban": "",
-  "bank": "",
+  "ibanHolder": "Daniele Coccolo",
+  "iban": "IT51I3608105138246244546251",
+  "bank": "Poste Italiane",
   "bic": "",
   "paymentNote": "Dopo aver ricevuto il bonifico spedisco l'oggetto entro 2 giorni lavorativi e ti invio il codice di tracciamento.",
-  "defaultShipping": 8
+  "defaultShipping": 6
  },
  "items": [],
  "programs": []
