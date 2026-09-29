@@ -480,6 +480,8 @@
     const terms = TOPICS[topic] && TOPICS[topic] !== topic ? ` (termini utili per la ricerca in inglese: ${TOPICS[topic]})` : '';
     const today = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
     return (
+      'Prima di scrivere DEVI eseguire delle ricerche con lo strumento Ricerca Google: non rispondere usando solo le tue conoscenze, ' +
+      'perché servono notizie recenti che non conosci. ' +
       `Oggi è il ${today}. Usa la Ricerca Google per trovare le notizie e le analisi finanziarie pubblicate negli ultimi ${days} giorni su: ${topic}${terms}. ` +
       `Privilegia fonti attendibili come ${TRUSTED}. Consulta più articoli possibile (almeno 8 se disponibili) e scarta notizie più vecchie del periodo indicato.\n\n` +
       'Sei un analista finanziario prudente e un bravo divulgatore economico. Usa gli articoli trovati come materiale di base ' +
@@ -515,7 +517,19 @@
     return data;
   }
 
+  // Il modello leggero ragiona poco di suo: un piccolo margine di ragionamento lo aiuta a fare davvero le ricerche.
+  function ask(model, key, text) {
+    const generationConfig = { temperature: 0.35, maxOutputTokens: 16000 };
+    if (model === 'gemini-2.5-flash-lite') generationConfig.thinkingConfig = { thinkingBudget: 1024 };
+    return callGemini(model, key, { contents: [{ parts: [{ text }] }], tools: [{ google_search: {} }], generationConfig });
+  }
+  function hasSources(data) {
+    const cand = (data && data.candidates || [])[0] || {};
+    return !!(cand.groundingMetadata && (cand.groundingMetadata.groundingChunks || []).length);
+  }
+
   function friendlyError(err) {
+    if (err.noSources) return 'Gemini non ha trovato notizie verificabili su questo tema, quindi non mostro una sintesi senza fonti. Riprova, prova un periodo più lungo o scrivi il tema in modo diverso (anche in inglese).';
     const msg = String(err.message || '');
     if (err instanceof TypeError) return 'Impossibile contattare Gemini: controlla la connessione a internet e riprova.';
     if (err.status === 400 && /api key/i.test(msg)) return 'La chiave API non è valida. Controllala con il pulsante "Chiave API Gemini".';
@@ -542,21 +556,22 @@
     els.suggest.hidden = true;
     showSkeleton();
 
-    const body = {
-      contents: [{ parts: [{ text: prompt(topic, days) }] }],
-      tools: [{ google_search: {} }],
-      generationConfig: { temperature: 0.35, maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 } }
-    };
+    const text = prompt(topic, days);
     try {
       let data, used = model;
       try {
-        data = await callGemini(model, key, body);
+        data = await ask(model, key, text);
       } catch (err) {
         // Se il modello scelto è sovraccarico o ha finito la quota, riprova con quello più leggero.
         if (model !== 'gemini-2.5-flash-lite' && (err.status === 429 || err.status >= 500)) {
           used = 'gemini-2.5-flash-lite';
-          data = await callGemini(used, key, body);
+          data = await ask(used, key, text);
         } else throw err;
+      }
+      // Senza fonti l'articolo non si basa su notizie reali: si riprova una volta, poi si rinuncia.
+      if (!hasSources(data)) data = await ask(used, key, text);
+      if (!hasSources(data)) {
+        const e = new Error('Gemini non ha consultato nessuna fonte per questo tema.'); e.noSources = true; throw e;
       }
       const cand = (data.candidates || [])[0] || {};
       const raw = ((cand.content && cand.content.parts) || []).map((p) => p.text || '').join('');
