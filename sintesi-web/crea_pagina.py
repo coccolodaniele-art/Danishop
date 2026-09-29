@@ -17,7 +17,7 @@ if not proxy.startswith("https://"):
     sys.exit("Indica l'indirizzo https dell'intermediario Cloudflare.")
 t = open(os.path.join(HERE, "modello.html"), encoding="utf-8").read()
 data = json.load(open(os.path.join(HERE, "dati_programma.json"), encoding="utf-8"))
-js = json.dumps(data, ensure_ascii=False).replace("</", "<" + "\/")
+js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 assert t.count("__DATA__") == 1 and t.count("'__PROXY_URL__'") == 1
 t = t.replace("__DATA__", js).replace("'__PROXY_URL__'", json.dumps(proxy)).replace("/*__DEBUG__*/", "")
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
