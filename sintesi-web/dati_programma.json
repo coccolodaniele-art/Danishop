@@ -1,0 +1,416 @@
+{
+ "TOPIC_CATEGORIES": {
+  "Indici USA e globali": {
+   "S&P 500": "\"S&P 500\"",
+   "Nasdaq 100": "\"Nasdaq 100\"",
+   "Dow Jones": "\"Dow Jones Industrial Average\"",
+   "Russell 2000": "\"Russell 2000\"",
+   "MSCI World": "\"MSCI World\"",
+   "MSCI Emerging Markets": "\"MSCI Emerging Markets\"",
+   "Stoxx Europe 600": "\"STOXX Europe 600\"",
+   "DAX Germania": "DAX Germany index",
+   "FTSE 100 Regno Unito": "FTSE 100 index",
+   "Nikkei 225 Giappone": "Nikkei 225 Japan",
+   "Hang Seng Hong Kong": "Hang Seng index"
+  },
+  "ETF principali": {
+   "SPY - SPDR S&P 500 ETF": "SPY ETF S&P 500",
+   "VOO - Vanguard S&P 500 ETF": "VOO Vanguard S&P 500 ETF",
+   "IVV - iShares Core S&P 500": "IVV iShares Core S&P 500 ETF",
+   "QQQ - Invesco Nasdaq 100 ETF": "QQQ Invesco Nasdaq 100 ETF",
+   "VTI - Vanguard Total Stock Market": "VTI Vanguard Total Stock Market ETF",
+   "IWM - iShares Russell 2000 ETF": "IWM iShares Russell 2000 ETF",
+   "DIA - SPDR Dow Jones ETF": "DIA SPDR Dow Jones Industrial Average ETF",
+   "VEA - Developed Markets ETF": "VEA developed markets ETF",
+   "VWO - Emerging Markets ETF": "VWO emerging markets ETF",
+   "EFA - MSCI EAFE ETF": "EFA MSCI EAFE ETF",
+   "ARKK - ARK Innovation ETF": "ARKK innovation ETF",
+   "TLT - Treasury Bond ETF": "TLT iShares 20+ Year Treasury Bond ETF",
+   "IEF - Treasury 7-10 anni ETF": "IEF Treasury 7-10 year ETF",
+   "SHY - Treasury breve ETF": "SHY short Treasury ETF",
+   "HYG - High Yield Bond ETF": "HYG iShares High Yield Corporate Bond ETF",
+   "LQD - Investment Grade Bond ETF": "LQD investment grade corporate bond ETF",
+   "GLD - SPDR Gold Shares": "GLD SPDR Gold Shares ETF",
+   "SLV - iShares Silver Trust": "SLV iShares Silver Trust ETF",
+   "USO - United States Oil Fund": "USO United States Oil Fund ETF"
+  },
+  "Azioni USA mega-cap": {
+   "Apple": "Apple AAPL",
+   "Microsoft": "Microsoft MSFT",
+   "Nvidia": "Nvidia NVDA",
+   "Amazon": "Amazon AMZN",
+   "Alphabet": "Alphabet Google GOOGL GOOG",
+   "Meta Platforms": "Meta META Facebook",
+   "Tesla": "Tesla TSLA",
+   "Broadcom": "Broadcom AVGO",
+   "Berkshire Hathaway": "Berkshire Hathaway BRK",
+   "JPMorgan Chase": "JPMorgan Chase JPM",
+   "Eli Lilly": "Eli Lilly LLY",
+   "Visa": "Visa V",
+   "Mastercard": "Mastercard MA",
+   "Exxon Mobil": "Exxon Mobil XOM",
+   "UnitedHealth": "UnitedHealth UNH",
+   "Walmart": "Walmart WMT",
+   "Costco": "Costco COST",
+   "Netflix": "Netflix NFLX",
+   "Oracle": "Oracle ORCL",
+   "Salesforce": "Salesforce CRM",
+   "Adobe": "Adobe ADBE",
+   "Cisco": "Cisco CSCO",
+   "Coca-Cola": "Coca-Cola KO",
+   "PepsiCo": "PepsiCo PEP",
+   "Procter & Gamble": "Procter Gamble PG",
+   "Johnson & Johnson": "Johnson & Johnson JNJ",
+   "Merck": "Merck MRK",
+   "Chevron": "Chevron CVX",
+   "Bank of America": "Bank of America BAC",
+   "Goldman Sachs": "Goldman Sachs GS"
+  },
+  "Tecnologia e semiconduttori": {
+   "AMD": "AMD Advanced Micro Devices",
+   "Intel": "Intel INTC",
+   "Micron": "Micron MU",
+   "Qualcomm": "Qualcomm QCOM",
+   "Texas Instruments": "Texas Instruments TXN",
+   "Applied Materials": "Applied Materials AMAT",
+   "Lam Research": "Lam Research LRCX",
+   "ASML": "ASML semiconductor equipment",
+   "Taiwan Semiconductor": "Taiwan Semiconductor TSM",
+   "Arm Holdings": "Arm Holdings ARM",
+   "Palantir": "Palantir PLTR",
+   "Snowflake": "Snowflake SNOW",
+   "ServiceNow": "ServiceNow NOW",
+   "CrowdStrike": "CrowdStrike CRWD",
+   "Palo Alto Networks": "Palo Alto Networks PANW"
+  },
+  "Finanza, pagamenti e fintech": {
+   "Coinbase": "Coinbase COIN",
+   "PayPal": "PayPal PYPL",
+   "Block": "Block Square SQ",
+   "Robinhood": "Robinhood HOOD",
+   "BlackRock": "BlackRock BLK",
+   "Morgan Stanley": "Morgan Stanley MS",
+   "Charles Schwab": "Charles Schwab SCHW",
+   "American Express": "American Express AXP"
+  },
+  "Cripto": {
+   "Crypto market": "cryptocurrency crypto market bitcoin ethereum",
+   "Bitcoin": "Bitcoin BTC",
+   "Ethereum": "Ethereum Ether ETH",
+   "Solana": "Solana SOL",
+   "XRP": "XRP Ripple",
+   "BNB": "BNB Binance Coin",
+   "Cardano": "Cardano ADA",
+   "Dogecoin": "Dogecoin DOGE",
+   "Toncoin": "Toncoin TON",
+   "TRON": "TRON TRX",
+   "Avalanche": "Avalanche AVAX",
+   "Chainlink": "Chainlink LINK",
+   "Polkadot": "Polkadot DOT",
+   "Polygon": "Polygon MATIC POL",
+   "Litecoin": "Litecoin LTC",
+   "Bitcoin ETF spot": "spot Bitcoin ETF",
+   "Ethereum ETF spot": "spot Ethereum ETF",
+   "Stablecoin": "stablecoin market USDT USDC",
+   "DeFi": "decentralized finance DeFi crypto"
+  },
+  "Metalli": {
+   "Oro": "gold bullion",
+   "Argento": "silver bullion",
+   "Rame": "copper",
+   "Platino": "platinum",
+   "Palladio": "palladium",
+   "Uranio": "uranium",
+   "Litio": "lithium",
+   "Alluminio": "aluminum",
+   "Nickel": "nickel",
+   "Zinco": "zinc",
+   "Minerali terre rare": "rare earth minerals"
+  },
+  "Energia": {
+   "Petrolio WTI": "WTI crude oil",
+   "Petrolio Brent": "Brent crude oil",
+   "Gas naturale": "natural gas LNG",
+   "Benzina": "gasoline prices",
+   "Diesel": "diesel fuel prices",
+   "Carbone": "coal market",
+   "Energia nucleare": "nuclear energy uranium",
+   "Rinnovabili": "renewable energy stocks solar wind",
+   "Solare": "solar energy stocks",
+   "Idrogeno": "hydrogen energy market"
+  },
+  "Materie prime agricole": {
+   "Grano": "wheat",
+   "Mais": "corn",
+   "Soia": "soybeans",
+   "Riso": "rice commodity",
+   "Caffe": "coffee futures",
+   "Cacao": "cocoa futures",
+   "Zucchero": "sugar futures",
+   "Cotone": "cotton futures",
+   "Bestiame": "live cattle futures"
+  },
+  "Macro e temi di mercato": {
+   "Federal Reserve": "Federal Reserve interest rates inflation",
+   "Inflazione USA": "US inflation CPI PCE",
+   "Tassi Treasury": "US Treasury yields bond market",
+   "Dollaro USA": "US dollar DXY",
+   "Recessione USA": "US recession risk economy",
+   "Utili aziendali USA": "US corporate earnings",
+   "Intelligenza artificiale": "artificial intelligence stocks investment",
+   "Difesa e geopolitica": "defense stocks geopolitical risk",
+   "Cina mercati": "China economy stocks markets",
+   "India mercati": "India economy stocks markets"
+  }
+ },
+ "STOPWORDS": [
+  "a",
+  "about",
+  "after",
+  "amid",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "before",
+  "but",
+  "by",
+  "for",
+  "from",
+  "had",
+  "has",
+  "have",
+  "in",
+  "into",
+  "its",
+  "market",
+  "markets",
+  "not",
+  "of",
+  "on",
+  "over",
+  "reuters",
+  "said",
+  "say",
+  "says",
+  "shares",
+  "stock",
+  "stocks",
+  "that",
+  "the",
+  "this",
+  "to",
+  "under",
+  "was",
+  "were",
+  "with"
+ ],
+ "THEME_WORDS": {
+  "Fed e tassi": [
+   "dollar",
+   "fed",
+   "inflation",
+   "powell",
+   "rate",
+   "rates",
+   "treasury",
+   "warsh",
+   "yield",
+   "yields"
+  ],
+  "Utili e societa": [
+   "earnings",
+   "forecast",
+   "guidance",
+   "profit",
+   "profits",
+   "quarter",
+   "results",
+   "revenue",
+   "sales"
+  ],
+  "Domanda e offerta": [
+   "demand",
+   "exports",
+   "imports",
+   "inventories",
+   "inventory",
+   "output",
+   "production",
+   "supply"
+  ],
+  "Rischio geopolitico": [
+   "china",
+   "geopolitical",
+   "iran",
+   "russia",
+   "sanctions",
+   "tariff",
+   "trade",
+   "war"
+  ],
+  "Cripto e regolazione": [
+   "bitcoin",
+   "crypto",
+   "etf",
+   "ether",
+   "ethereum",
+   "sec",
+   "stablecoin",
+   "token"
+  ],
+  "Sentiment di mercato": [
+   "drop",
+   "fall",
+   "gain",
+   "investors",
+   "rally",
+   "rise",
+   "risk",
+   "selloff",
+   "volatility"
+  ]
+ },
+ "TRUSTED_FEEDS": [
+  [
+   "CNBC",
+   "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+  ],
+  [
+   "MarketWatch",
+   "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"
+  ],
+  [
+   "Yahoo Finance",
+   "https://finance.yahoo.com/news/rssindex"
+  ],
+  [
+   "Investing.com",
+   "https://www.investing.com/rss/news_25.rss"
+  ],
+  [
+   "CoinDesk",
+   "https://www.coindesk.com/arc/outboundfeeds/rss/"
+  ],
+  [
+   "EIA",
+   "https://www.eia.gov/rss/todayinenergy.xml"
+  ],
+  [
+   "Federal Reserve",
+   "https://www.federalreserve.gov/feeds/press_all.xml"
+  ],
+  [
+   "SEC",
+   "https://www.sec.gov/news/pressreleases.rss"
+  ],
+  [
+   "Kitco",
+   "https://www.kitco.com/news/category/mining/feed"
+  ]
+ ],
+ "TRUSTED_HUBS": [
+  [
+   "AP News",
+   "https://apnews.com/hub/business"
+  ],
+  [
+   "AP News",
+   "https://apnews.com/hub/financial-markets"
+  ]
+ ],
+ "ALLOWED_DOMAINS": [
+  "reuters.com",
+  "apnews.com",
+  "cnbc.com",
+  "marketwatch.com",
+  "finance.yahoo.com",
+  "investing.com",
+  "coindesk.com",
+  "kitco.com",
+  "eia.gov",
+  "federalreserve.gov",
+  "sec.gov"
+ ],
+ "GOOGLE_NEWS_SOURCES": [
+  "apnews.com",
+  "cnbc.com",
+  "marketwatch.com",
+  "finance.yahoo.com",
+  "investing.com",
+  "coindesk.com",
+  "kitco.com",
+  "eia.gov",
+  "federalreserve.gov",
+  "sec.gov"
+ ],
+ "EXTRA_TOPIC_TERMS": {
+  "S&P 500": [
+   "dow",
+   "equities",
+   "nasdaq",
+   "s&p 500",
+   "spx",
+   "stocks",
+   "wall street"
+  ],
+  "Nasdaq 100": [
+   "nasdaq",
+   "qqq",
+   "tech stocks",
+   "technology stocks",
+   "wall street"
+  ],
+  "Dow Jones": [
+   "blue chips",
+   "djia",
+   "dow",
+   "stocks",
+   "wall street"
+  ],
+  "Russell 2000": [
+   "iwm",
+   "russell",
+   "small caps",
+   "small-cap"
+  ],
+  "Bitcoin": [
+   "bitcoin",
+   "btc",
+   "crypto",
+   "cryptocurrency"
+  ],
+  "Ethereum": [
+   "crypto",
+   "cryptocurrency",
+   "eth",
+   "ether",
+   "ethereum"
+  ],
+  "Oro": [
+   "bullion",
+   "gold",
+   "xau"
+  ],
+  "Argento": [
+   "bullion",
+   "silver",
+   "xag"
+  ],
+  "Rame": [
+   "copper"
+  ],
+  "Petrolio WTI": [
+   "crude",
+   "oil",
+   "wti"
+  ],
+  "Petrolio Brent": [
+   "brent",
+   "crude",
+   "oil"
+  ]
+ },
+ "PROMPT_PREFIX": "Sei un analista finanziario prudente e un bravo divulgatore economico. Leggi tutti gli articoli forniti e usali come materiale di base per scrivere un articolo originale in italiano, chiaro, organico e comprensibile per una persona che sta valutando un investimento. Non devi fare un elenco di riassunti articolo per articolo: devi creare un testo tuo, scorrevole, con un filo logico unico. Usa solo le informazioni presenti negli articoli forniti. Non inventare dati, non dare consigli finanziari personalizzati e non presentare l'investimento come sicuro. Non usare markdown, asterischi o tabelle.\n\nStruttura obbligatoria, senza scrivere i nomi delle sezioni nel testo:\nPrima riga: un titolo chiaro e informativo.\nPoi lascia una riga vuota e apri con un paragrafo iniziale che spiega in modo semplice perche' il tema e' rilevante ora.\nPoi lascia una riga vuota e sviluppa il quadro principale collegando le notizie tra loro, distinguendo fattori macroeconomici, societari, settoriali, valutativi, rischi e sentiment degli investitori quando emergono dagli articoli. In questa parte chiarisci anche che cosa potrebbe contare per un investitore di medio periodo, quali segnali sono positivi, quali punti richiedono prudenza e quali elementi monitorare nei prossimi giorni o settimane.\nPoi lascia una riga vuota e chiudi con una valutazione equilibrata del quadro emerso, senza dare ordini di acquisto o vendita.\nNon scrivere mai le parole Introduzione, Corpo del testo, Lettura per chi investe o Conclusione come titoli o etichette.\n\nL'articolo deve essere approfondito e discorsivo: produci almeno 30 righe effettive di testo, salvo il caso estremo in cui non ci siano abbastanza informazioni negli articoli. Se gli articoli sono pochi o deboli, dillo chiaramente ma cerca comunque di spiegare bene il contesto.\n\n"
+}

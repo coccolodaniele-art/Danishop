@@ -29,6 +29,7 @@ const ALLOWED_ORIGINS = [
   "https://coccolodaniele-art.github.io",
   "http://localhost:5501",
   "http://localhost:5500",
+  "http://localhost:5502",
 ];
 
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) SintesiFontiAI/1.0 contact: local-user";
