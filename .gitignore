@@ -1,0 +1,4 @@
+backup/
+__pycache__/
+admin/.stato_sincronizzazione.json
+*.tmp

@@ -1,0 +1,27 @@
+{
+ "version": 1,
+ "settings": {
+  "siteName": "Il mio sito",
+  "tagline": "Oggetti usati, programmi e contatti",
+  "shopIntro": "Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.",
+  "programsIntro": "I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.",
+  "ownerName": "",
+  "email": "",
+  "phone": "",
+  "whatsapp": "",
+  "city": "",
+  "website": "",
+  "instagram": "",
+  "facebook": "",
+  "linkedin": "",
+  "about": "",
+  "ibanHolder": "",
+  "iban": "",
+  "bank": "",
+  "bic": "",
+  "paymentNote": "Dopo aver ricevuto il bonifico spedisco l'oggetto entro 2 giorni lavorativi e ti invio il codice di tracciamento.",
+  "defaultShipping": 8
+ },
+ "items": [],
+ "programs": []
+}
