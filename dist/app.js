@@ -174,6 +174,13 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
+  // Testo con i link (http/https) resi cliccabili; tutto il resto resta testo semplice.
+  function linkify(v) {
+    return esc(v).replace(/https?:\/\/[^\s<]+/g, (m) => {
+      const url = m.replace(/[.,;:!?)\]]+$/, '');
+      return `<a href="${url}" target="_blank" rel="noopener">${url}</a>${m.slice(url.length)}`;
+    });
+  }
   function safeImg(src) { return typeof src === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(src) ? src : ''; }
   function safeUrl(url) {
     const u = String(url || '').trim();
@@ -656,12 +663,12 @@
             ${p.platform ? `<span class="badge">${esc(p.platform)}</span>` : ''}
             ${p.version ? `<span class="badge">Versione ${esc(p.version)}</span>` : ''}
           </div>` : ''}
-          ${p.description ? `<div class="text">${esc(p.description)}</div>` : ''}
+          ${p.description ? `<div class="text">${linkify(p.description)}</div>` : ''}
           ${features.length ? `<ul class="features">${features.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${hasTrial ? `
             <div class="trial">
               <h4>${esc(p.trialLabel || 'Modalità di prova')}</h4>
-              ${p.trialInfo ? `<p>${esc(p.trialInfo)}</p>` : ''}
+              ${p.trialInfo ? `<p>${linkify(p.trialInfo)}</p>` : ''}
               <div class="row">
                 ${trialUrl ? (/\.(exe|msi|zip|rar|7z|dmg|apk)([?#]|$)/i.test(trialUrl)
                   ? `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.download} Scarica il programma</a>`
@@ -669,7 +676,7 @@
                 <a class="btn secondary small" href="#info">Contattami per informazioni</a>
               </div>
             </div>` : `<div><a class="btn secondary small" href="#info">Contattami per informazioni</a></div>`}
-          ${p.requirements ? `<details><summary class="details-toggle">Requisiti di sistema</summary><div class="req" style="margin-top:6px">${esc(p.requirements)}</div></details>` : ''}
+          ${p.requirements ? `<details><summary class="details-toggle">Requisiti di sistema</summary><div class="req" style="margin-top:6px">${linkify(p.requirements)}</div></details>` : ''}
         </div>
       </article>`;
   }

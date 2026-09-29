@@ -456,6 +456,7 @@ img { max-width: 100%; display: block; }
 .program-body h2 { margin: 0; font-family: var(--font-display); font-size: 1.6rem; letter-spacing: -.02em; }
 .program-body .tagline { color: var(--cyan); margin: 2px 0 0; font-weight: 500; }
 .program-body .text { white-space: pre-line; color: #d6d4f3; }
+.program-body .text a, .trial p a, .req a { overflow-wrap: anywhere; }
 .features { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 18px; }
 .features li { position: relative; padding-left: 24px; color: #e6e4ff; }
 .features li::before {
