@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>CodeQuest Python — Impara a Programmare</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='52' font-size='52'>🐍</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg-0:#0b0d12; --bg-1:#11141b; --bg-2:#181c25; --bg-3:#212635;
+    --line:#2a3142; --text:#e6e9ef; --muted:#8a93a6; --dim:#5b6479;
+    --accent:#3776ab; --accent-2:#ffd43b; --accent-3:#5fd3ff;
+    --good:#3ddc97; --warn:#ffcc4d; --bad:#ff5b6b;
+    --xp:#ffd24a; --gold:#ffce4a;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --radius:14px;
+  }
+  html,body{height:100%;}
+  body{
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(1200px 800px at 80% -10%, rgba(55,118,171,.25), transparent 60%),
+                radial-gradient(900px 600px at -10% 110%, rgba(255,212,59,.15), transparent 60%),
+                var(--bg-0);
+    color: var(--text);
+    overflow:hidden;
+  }
+  button{font-family:inherit;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#2a3142;border-radius:10px;}
+  ::-webkit-scrollbar-thumb:hover{background:#3a435a;}
+
+  .app{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 64px 1fr;
+    height:100vh;
+  }
+  header.topbar{
+    grid-column: 1 / -1;
+    display:flex; align-items:center; gap:18px;
+    padding: 0 20px;
+    background: linear-gradient(180deg, rgba(17,20,27,.95), rgba(17,20,27,.7));
+    border-bottom:1px solid var(--line);
+    backdrop-filter: blur(10px);
+    z-index: 5;
+  }
+  .logo{
+    font-weight:800; font-size:18px; letter-spacing:.5px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .badge{
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff; font-size:11px; padding:2px 8px; border-radius:8px;
+    -webkit-text-fill-color:#fff;
+  }
+  .top-stats{display:flex; align-items:center; gap:14px; margin-left:auto;}
+  .stat{
+    display:flex; align-items:center; gap:6px;
+    background:var(--bg-2); border:1px solid var(--line);
+    padding:6px 12px; border-radius:10px; font-size:13px;
+  }
+  .stat .ico{font-size:15px;}
+  .xp-wrap{
+    flex:1; max-width:280px;
+    background:var(--bg-2); border:1px solid var(--line);
+    border-radius:12px; padding:6px 10px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .xp-row{display:flex; justify-content:space-between; font-size:11px; color:var(--muted);}
+  .xp-row b{color:var(--text);}
+  .xp-bar{height:8px; background:#0d1018; border-radius:4px; overflow:hidden; position:relative;}
+  .xp-fill{height:100%; background:linear-gradient(90deg, var(--xp), #ff8c5a); border-radius:4px; width:0%; transition:width .6s cubic-bezier(.2,.8,.2,1);}
+  .level-pill{
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff; font-weight:700; font-size:12px;
+    padding:4px 10px; border-radius:10px;
+  }
+  .icon-btn{
+    background:var(--bg-2); border:1px solid var(--line); color:var(--text);
+    width:36px; height:36px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition: all .15s;
+  }
+  .icon-btn:hover{background:var(--bg-3); transform:translateY(-1px);}
+
+  aside.sidebar{
+    background:rgba(17,20,27,.7);
+    border-right:1px solid var(--line);
+    overflow-y:auto;
+    padding: 14px 12px 80px;
+  }
+  .track{
+    margin-bottom:14px;
+    background: var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .track-head{
+    padding:10px 12px; display:flex; align-items:center; gap:10px;
+    cursor:pointer; user-select:none;
+    background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+  }
+  .track-head:hover{background: rgba(255,255,255,.04);}
+  .track-icon{
+    width:30px; height:30px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+    background:linear-gradient(135deg, #2a3142, #1a2030);
+  }
+  .track-icon.fond{background:linear-gradient(135deg,#3776ab,#5fd3ff); color:#fff;}
+  .track-icon.dati{background:linear-gradient(135deg,#ffd43b,#ffae00); color:#000;}
+  .track-icon.func{background:linear-gradient(135deg,#7c5cff,#ff7ad8); color:#fff;}
+  .track-icon.avan{background:linear-gradient(135deg,#3ddc97,#2bb673); color:#fff;}
+  .track-icon.algo{background:linear-gradient(135deg,#ff7a3a,#ffce4a); color:#000;}
+  .track-title{flex:1; font-weight:600; font-size:13px;}
+  .track-prog{font-size:11px; color:var(--muted);}
+  .track-list{display:none; padding:4px 6px 8px;}
+  .track.open .track-list{display:block;}
+  .track-head .caret{transition: transform .2s; color:var(--muted);}
+  .track.open .caret{transform: rotate(90deg);}
+  .lesson-item{
+    display:flex; align-items:center; gap:8px;
+    padding:7px 10px; border-radius:8px; cursor:pointer;
+    font-size:12.5px; color:var(--text);
+    transition: all .12s;
+  }
+  .lesson-item:hover{background: rgba(255,255,255,.05);}
+  .lesson-item.active{
+    background: linear-gradient(90deg, rgba(55,118,171,.35), rgba(55,118,171,.05));
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .lesson-item.locked{color:var(--dim); cursor:not-allowed;}
+  .lesson-item.locked:hover{background:transparent;}
+  .lesson-item .ldot{
+    width:18px; height:18px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700;
+    background:#0d1018; border:1px solid var(--line); color:var(--muted);
+    flex-shrink:0;
+  }
+  .lesson-item.done .ldot{background:var(--good); color:#062; border-color:var(--good);}
+  .lesson-item.star .ldot{background:var(--gold); color:#553300; border-color:var(--gold);}
+  .lesson-name{flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .lesson-xp{font-size:10px; color:var(--xp); opacity:.9;}
+
+  main.main{
+    display:flex; flex-direction:column;
+    overflow:hidden;
+    min-width:0;
+  }
+  .lesson-bar{
+    padding:12px 18px; display:flex; align-items:center; gap:12px;
+    border-bottom:1px solid var(--line);
+    background:rgba(17,20,27,.5);
+  }
+  .lesson-title{font-weight:700; font-size:15px;}
+  .lesson-meta{font-size:11px; color:var(--muted);}
+  .diff-pill{
+    font-size:10px; padding:2px 8px; border-radius:6px;
+    font-weight:700; letter-spacing:.5px;
+  }
+  .diff-1{background:rgba(61,220,151,.15); color:#3ddc97;}
+  .diff-2{background:rgba(95,211,255,.15); color:#5fd3ff;}
+  .diff-3{background:rgba(255,204,77,.15); color:#ffcc4d;}
+  .diff-4{background:rgba(255,122,216,.18); color:#ff7ad8;}
+  .diff-5{background:rgba(255,91,107,.18); color:#ff5b6b;}
+
+  .workspace{
+    flex:1; display:grid;
+    grid-template-columns: 1fr 1fr;
+    overflow:hidden; min-height:0;
+  }
+  .lesson-panel{
+    overflow-y:auto; padding:20px 22px;
+    border-right:1px solid var(--line);
+    background: rgba(11,13,18,.4);
+  }
+  .lesson-panel h2{font-size:20px; margin-bottom:8px;}
+  .lesson-panel h3{font-size:15px; margin:18px 0 8px; color:var(--accent-2);}
+  .lesson-panel p{font-size:14px; line-height:1.65; color:#cfd4e0; margin-bottom:10px;}
+  .lesson-panel ul, .lesson-panel ol{margin:8px 0 12px 22px; color:#cfd4e0; font-size:14px;}
+  .lesson-panel li{margin:3px 0; line-height:1.55;}
+  .lesson-panel code{
+    background:#0d1018; padding:2px 6px; border-radius:5px;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace;
+    font-size:12.5px; color:var(--accent-2);
+    border:1px solid var(--line);
+  }
+  .lesson-panel pre{
+    background:#0d1018; padding:12px 14px; border-radius:10px;
+    border:1px solid var(--line); margin:10px 0;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace;
+    font-size:12.5px; line-height:1.55; overflow-x:auto;
+  }
+  .lesson-panel pre code{background:transparent; border:0; padding:0; color:#cfd4e0;}
+  .task-box{
+    background: linear-gradient(135deg, rgba(55,118,171,.18), rgba(255,212,59,.08));
+    border:1px solid rgba(55,118,171,.45);
+    border-radius:12px; padding:14px 16px; margin:14px 0;
+  }
+  .task-box h3{margin-top:0; color:var(--accent-2);}
+  .task-box ul{margin-left:18px;}
+  .hint{
+    background:rgba(255,204,77,.08); border:1px solid rgba(255,204,77,.3);
+    border-radius:10px; padding:10px 14px; margin:10px 0; font-size:13px; color:#ffdd80;
+  }
+
+  .lesson-help{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin:16px 0 4px;
+  }
+  .help-box{
+    background:#0d1018; border:1px solid var(--line);
+    border-radius:12px; padding:12px 16px;
+    margin:10px 0;
+  }
+  .help-box h3{margin-top:0;}
+  .help-box pre{margin:8px 0 12px;}
+  #hint-box{background:rgba(255,204,77,.06); border-color:rgba(255,204,77,.35);}
+  #solution-box{background:rgba(255,122,216,.05); border-color:rgba(255,122,216,.3);}
+  .tests-summary{
+    background:var(--bg-2); border:1px solid var(--line);
+    border-radius:12px; padding:12px 16px;
+    margin:14px 0 4px;
+  }
+  .tests-summary h3{margin-top:0; font-size:14px; color:var(--accent-3);}
+  .tests-summary ul{margin:6px 0 0 22px; color:#cfd4e0;}
+  .tests-summary li{font-size:13px; margin:2px 0;}
+
+  .editor-panel{
+    display:flex; flex-direction:column; min-height:0;
+    background:#0d1018;
+  }
+  .editor-tabs{
+    display:flex; align-items:center; gap:0;
+    background:#0a0c12; border-bottom:1px solid var(--line);
+    padding: 0 8px;
+  }
+  .etab{
+    padding:9px 14px; font-size:12px; color:var(--muted);
+    border-bottom:2px solid transparent; cursor:pointer;
+  }
+  .etab.active{color:var(--text); border-bottom-color:var(--accent-2);}
+  .editor-toolbar{
+    display:flex; gap:8px; padding:8px 10px;
+    border-bottom:1px solid var(--line); background:#0a0c12;
+    align-items:center;
+  }
+  .btn{
+    padding:7px 13px; border-radius:8px; border:1px solid var(--line);
+    background:var(--bg-2); color:var(--text); font-size:12.5px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:all .15s; font-weight:500;
+  }
+  .btn:hover{background:var(--bg-3); transform:translateY(-1px);}
+  .btn-primary{
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    border-color: transparent; color:#fff; font-weight:600;
+    box-shadow: 0 4px 14px rgba(55,118,171,.4);
+  }
+  .btn-primary:hover{filter: brightness(1.1);}
+  .btn-good{background: linear-gradient(135deg, #2bb673, var(--good)); color:#fff; border-color:transparent;}
+  .btn-warn{background: linear-gradient(135deg, #e6a020, var(--warn)); color:#000; border-color:transparent;}
+  .btn-ghost{background:transparent;}
+  .pylabel{
+    margin-left:auto; font-size:11px; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .py-status{
+    width:8px; height:8px; border-radius:50%; background:var(--warn);
+    display:inline-block;
+  }
+  .py-status.ready{background:var(--good); box-shadow:0 0 8px var(--good);}
+
+  #editor-area{flex:1; position:relative; min-height:0;}
+  .CodeMirror{height:100% !important; font-size:13.5px; background:#0d1018 !important;}
+  .CodeMirror-gutters{background:#0a0c12 !important; border-right:1px solid var(--line) !important;}
+  .CodeMirror-linenumber{color:#4a5266 !important;}
+
+  .console-wrap{
+    height: 220px; min-height:80px; max-height:50%;
+    border-top:1px solid var(--line);
+    background:#08090d;
+    display:flex; flex-direction:column;
+    resize: vertical; overflow:auto;
+  }
+  .console-head{
+    display:flex; align-items:center; gap:10px; padding:6px 12px;
+    background:#0a0c12; border-bottom:1px solid var(--line);
+    font-size:11px; color:var(--muted);
+  }
+  .console-head .tabs{display:flex; gap:2px;}
+  .ctab{padding:4px 10px; border-radius:6px; cursor:pointer; font-size:11px; color:var(--muted);}
+  .ctab.active{background:var(--bg-2); color:var(--text);}
+  .console-body{
+    flex:1; overflow:auto; padding:8px 12px;
+    font-family: ui-monospace, "SF Mono", Consolas, Menlo, monospace;
+    font-size:12px; line-height:1.5;
+  }
+  .log-line{padding:2px 0; white-space:pre-wrap; word-break:break-word;}
+  .log-info{color:#cfd4e0;}
+  .log-err{color:var(--bad);}
+  .log-warn{color:var(--warn);}
+  .log-ok{color:var(--good);}
+  .log-trace{color:var(--accent-3); font-size:11px; opacity:.85;}
+
+  aside.right{
+    border-left:1px solid var(--line);
+    background:rgba(17,20,27,.7);
+    overflow-y:auto;
+    padding:14px 14px 60px;
+  }
+  .card{
+    background: var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:14px;
+  }
+  .card h4{
+    font-size:11px; font-weight:700; letter-spacing:1.2px;
+    text-transform:uppercase; color:var(--muted); margin-bottom:10px;
+  }
+  .rating-big{ text-align:center; padding:8px 0; }
+  .rank-letter{
+    font-size:54px; font-weight:900; line-height:1;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow: 0 4px 30px rgba(55,118,171,.5);
+  }
+  .rank-label{font-size:12px; color:var(--muted); margin-top:4px;}
+  .rank-score{font-size:18px; color:var(--gold); font-weight:700; margin-top:6px;}
+
+  .badges-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .badge-tile{
+    aspect-ratio:1; border-radius:10px;
+    background:#0d1018; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; position:relative;
+    transition: transform .2s;
+  }
+  .badge-tile.unlocked{
+    background: linear-gradient(135deg, rgba(255,206,74,.18), rgba(255,212,59,.12));
+    border-color: var(--gold);
+    box-shadow: 0 0 16px rgba(255,206,74,.25);
+    cursor:pointer;
+  }
+  .badge-tile.unlocked:hover{transform:scale(1.1);}
+  .badge-tile.locked{filter: grayscale(1) opacity(.35);}
+
+  .streak-row{display:flex; gap:5px; justify-content:space-between;}
+  .day-dot{
+    flex:1; height:26px; border-radius:6px;
+    background:#0d1018; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; color:var(--muted);
+  }
+  .day-dot.on{background: linear-gradient(135deg, #ff7a3a, #ffce4a); color:#3a2200; border-color:transparent; font-weight:700;}
+  .day-dot.today{outline:2px solid var(--accent-3); outline-offset:1px;}
+
+  .skill-row{
+    display:flex; align-items:center; gap:10px; margin:7px 0;
+    font-size:12px;
+  }
+  .skill-row .lbl{flex:0 0 90px; color:var(--muted);}
+  .skill-bar{flex:1; height:6px; background:#0d1018; border-radius:4px; overflow:hidden;}
+  .skill-fill{height:100%; background: linear-gradient(90deg, var(--accent-3), var(--accent)); border-radius:4px; transition: width .6s;}
+  .skill-val{font-size:11px; color:var(--text); width:38px; text-align:right;}
+
+  .small-btn{
+    width:100%; padding:9px; border-radius:9px; cursor:pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff; border:0; font-weight:600; font-size:12.5px;
+    margin-top:8px;
+  }
+  .small-btn:hover{filter:brightness(1.1);}
+  .ghost-btn{
+    width:100%; padding:8px; border-radius:9px; cursor:pointer;
+    background:transparent; border:1px solid var(--line); color:var(--text);
+    font-size:12px; margin-top:6px;
+  }
+  .ghost-btn:hover{background:var(--bg-3);}
+
+  .toast-wrap{
+    position:fixed; top:80px; right:24px; z-index:200;
+    display:flex; flex-direction:column; gap:10px;
+    pointer-events:none;
+  }
+  .toast{
+    background: linear-gradient(135deg, rgba(55,118,171,.95), rgba(95,211,255,.9));
+    color:#fff; padding:12px 18px; border-radius:12px;
+    box-shadow: var(--shadow); min-width:240px;
+    display:flex; align-items:center; gap:10px;
+    animation: slideIn .4s cubic-bezier(.2,.8,.2,1), slideOut .4s 3.5s forwards;
+    font-weight:600; font-size:13.5px;
+  }
+  .toast.good{background: linear-gradient(135deg, #2bb673, #3ddc97);}
+  .toast.bad{background: linear-gradient(135deg, #c94555, #ff5b6b);}
+  .toast.gold{background: linear-gradient(135deg, #ffae00, #ffd24a); color:#000;}
+  @keyframes slideIn { from{transform:translateX(120%); opacity:0;} to{transform:translateX(0); opacity:1;} }
+  @keyframes slideOut { to{transform:translateX(120%); opacity:0;} }
+
+  .levelup{
+    position:fixed; inset:0; z-index:300;
+    display:none; align-items:center; justify-content:center;
+    background: radial-gradient(circle at center, rgba(55,118,171,.35), rgba(0,0,0,.85));
+    backdrop-filter: blur(8px);
+  }
+  .levelup.show{display:flex;}
+  .lu-card{
+    background: linear-gradient(135deg, #1a1430, #0d1018);
+    border:1px solid rgba(255,206,74,.5);
+    padding:40px 60px; border-radius:24px;
+    text-align:center;
+    box-shadow: 0 0 80px rgba(255,206,74,.4);
+    animation: pop .5s cubic-bezier(.2,1.4,.4,1);
+  }
+  @keyframes pop { from{transform:scale(.5); opacity:0;} to{transform:scale(1); opacity:1;} }
+  .lu-card .star{font-size:80px; animation: spin 1.2s linear infinite;}
+  @keyframes spin { to{transform:rotate(360deg);} }
+  .lu-card h2{
+    font-size:32px; margin:12px 0;
+    background: linear-gradient(90deg, var(--gold), var(--accent-2), var(--accent-3));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lu-card p{color:var(--muted); margin-bottom:18px;}
+
+  .confetti{ position:fixed; inset:0; pointer-events:none; z-index:250; }
+
+  .modal-back{
+    position:fixed; inset:0; z-index:400;
+    background:rgba(0,0,0,.7); backdrop-filter: blur(8px);
+    display:none; align-items:center; justify-content:center;
+  }
+  .modal-back.show{display:flex;}
+  .modal{
+    background:var(--bg-1); border:1px solid var(--line);
+    border-radius:18px; padding:28px 32px;
+    max-width:560px; width:90%;
+    max-height: 85vh; overflow-y:auto;
+    box-shadow: var(--shadow);
+  }
+  .modal h2{margin-bottom:14px;}
+  .modal p{color:var(--muted); line-height:1.6; margin-bottom:10px; font-size:13.5px;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px;}
+
+  .welcome{
+    position:fixed; inset:0; z-index:500;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background: radial-gradient(circle at center, rgba(55,118,171,.35), rgba(0,0,0,.95));
+    text-align:center; padding:20px;
+  }
+  .welcome .py-icon{
+    font-size:80px; margin-bottom:8px;
+    filter: drop-shadow(0 6px 20px rgba(55,118,171,.6));
+  }
+  .welcome h1{
+    font-size:56px; font-weight:900; letter-spacing:1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin-bottom:6px;
+  }
+  .welcome .subtitle{
+    color:var(--accent-2); font-size:18px; font-weight:600; margin-bottom:14px;
+    letter-spacing:.5px;
+  }
+  .welcome p{color:var(--muted); font-size:16px; max-width:580px; margin-bottom:24px; line-height:1.6;}
+  .welcome input{
+    background:var(--bg-2); border:1px solid var(--line);
+    color:var(--text); padding:14px 20px; border-radius:14px;
+    font-size:16px; width:320px; text-align:center; outline:none;
+  }
+  .welcome input:focus{border-color:var(--accent);}
+  .welcome .start-btn{
+    margin-top:18px; padding:14px 36px; border-radius:14px;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff; border:0; font-size:16px; font-weight:700; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(55,118,171,.5);
+  }
+  .welcome .start-btn:hover{transform:translateY(-2px);}
+
+  .daily-card{
+    background: linear-gradient(135deg, rgba(55,118,171,.22), rgba(255,212,59,.15));
+    border:1px solid rgba(255,212,59,.4);
+  }
+  .daily-card .reward{ color:var(--xp); font-weight:700; font-size:13px; }
+
+  .dash-stats{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px;}
+  .stat-card{
+    background:var(--bg-2); border:1px solid var(--line); padding:12px;
+    border-radius:12px; text-align:center;
+  }
+  .stat-card .big{font-size:24px; font-weight:800; color:var(--accent-3);}
+  .stat-card .lbl{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px;}
+
+  .row{display:flex; align-items:center; gap:8px;}
+  .gap{flex:1;}
+  .tiny{font-size:11px; color:var(--muted);}
+
+  button:disabled{opacity:.5; cursor:not-allowed; transform:none !important;}
+
+  @media (max-width: 1100px){ .app{grid-template-columns: 220px 1fr;} }
+  @media (max-width: 880px){
+    .app{grid-template-columns: 1fr; grid-template-rows: 64px auto 1fr;}
+    aside.sidebar{max-height:240px;}
+    .workspace{grid-template-columns: 1fr;}
+  }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.26.2/pyodide.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js'"></script>
+</head>
+<body>
+
+<div class="welcome" id="welcome">
+  <div class="py-icon">🐍</div>
+  <h1>CodeQuest</h1>
+  <div class="subtitle">PYTHON EDITION</div>
+  <p>Da zero a programmatore professionista in Python.<br>
+     50 lezioni con Python <b>vero</b> nel browser, gamification e progressi salvati.</p>
+  <input id="welcome-name" type="text" placeholder="Come ti chiami?" maxlength="20">
+  <button class="start-btn" id="welcome-start">Inizia l'avventura 🚀</button>
+  <p class="tiny" style="margin-top:24px;">I tuoi progressi vengono salvati automaticamente.</p>
+</div>
+
+<div class="app" id="app" style="display:none;">
+  <header class="topbar">
+    <div class="logo">🐍 CodeQuest <span class="badge">PYTHON</span></div>
+    <div class="top-stats">
+      <div class="stat" title="Streak giornaliera"><span class="ico">🔥</span><span id="ui-streak">0</span></div>
+      <div class="xp-wrap">
+        <div class="xp-row"><span><b id="ui-name">Player</b></span><span>Liv. <b id="ui-lvl">1</b> · <span id="ui-xp">0</span>/<span id="ui-xpneed">100</span> XP</span></div>
+        <div class="xp-bar"><div class="xp-fill" id="ui-xpfill"></div></div>
+      </div>
+      <button class="icon-btn" id="btn-fullscreen" title="Attiva/disattiva tutto schermo">⛶</button>
+      <button class="icon-btn" id="btn-dashboard" title="Dashboard e badge">📊</button>
+      <button class="icon-btn" id="btn-settings" title="Impostazioni">⚙️</button>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="lesson-bar">
+      <span class="lesson-title" id="lb-title">Benvenuto in CodeQuest Python</span>
+      <span class="diff-pill diff-1" id="lb-diff">FACILE</span>
+      <span class="lesson-meta" id="lb-meta">Seleziona una lezione dalla sidebar per iniziare</span>
+      <span class="gap"></span>
+      <span class="lesson-meta">Reward: <b style="color:var(--xp)" id="lb-xp">+0 XP</b></span>
+    </div>
+    <div class="workspace">
+      <div class="lesson-panel" id="lesson-panel">
+        <h2>🐍 Benvenuto in CodeQuest Python!</h2>
+        <p>Questa è la tua palestra per imparare <b>Python</b> dal livello base assoluto fino a quello professionale. Ecco come funziona:</p>
+        <ul>
+          <li>Apri una <b>traccia</b> dalla sidebar e seleziona la prima lezione.</li>
+          <li>Ogni lezione ha <b>teoria</b>, un <b>esercizio</b> e <b>test automatici</b> per validarlo.</li>
+          <li>Premi <b>▶ Esegui</b> per lanciare il codice, <b>✅ Verifica</b> per testarlo, <b>🐞 Debug</b> per analizzarlo.</li>
+          <li>Guadagni <b>XP</b>, sali di <b>livello</b>, ottieni <b>badge</b> e mantieni la tua <b>streak</b> quotidiana.</li>
+          <li>Le lezioni si sbloccano in sequenza. Quelle con <span style="color:var(--gold)">⭐</span> sono completate al primo tentativo.</li>
+        </ul>
+        <div class="task-box">
+          <h3>🎯 Il tuo primo obiettivo</h3>
+          <p>Apri <b>Fondamenti → Hello, Python!</b> dalla sidebar e completalo per guadagnare i tuoi primi XP.</p>
+        </div>
+        <div class="hint">💡 La prima esecuzione di Python richiede ~5 secondi (caricamento Pyodide). Le successive sono istantanee.</div>
+      </div>
+
+      <div class="editor-panel" id="epanel">
+        <div class="editor-toolbar">
+          <button class="btn btn-primary" id="btn-run">▶ Esegui</button>
+          <button class="btn btn-good" id="btn-check">✅ Verifica</button>
+          <button class="btn btn-ghost" id="btn-debug" title="Analizza il codice e mostra variabili">🐞 Debug</button>
+          <button class="btn btn-ghost" id="btn-reset" title="Ripristina il codice di partenza">↺ Reset</button>
+          <button class="btn btn-ghost" id="btn-ripasso" title="Riapri una lezione completata per ripassare">🔄 Ripasso</button>
+          <div class="pylabel"><span class="py-status" id="py-status"></span><span id="py-text">Python in caricamento…</span></div>
+        </div>
+        <div id="editor-area">
+          <textarea id="code"></textarea>
+        </div>
+        <div class="console-wrap">
+          <div class="console-head">
+            <div class="tabs">
+              <div class="ctab active" data-ctab="out">📤 Output</div>
+              <div class="ctab" data-ctab="dbg">🐞 Debug</div>
+              <div class="ctab" data-ctab="tres">🧪 Test</div>
+            </div>
+            <span class="gap"></span>
+            <button class="btn btn-ghost" id="btn-clear-console" style="padding:3px 8px;font-size:11px;">Pulisci</button>
+          </div>
+          <div class="console-body" id="console-body"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <input type="file" id="import-file" accept=".json" style="display:none">
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<div class="levelup" id="levelup">
+  <div class="lu-card">
+    <div class="star">⭐</div>
+    <h2 id="lu-title">LIVELLO SU!</h2>
+    <p id="lu-sub">Sei diventato Livello 2</p>
+    <button class="btn btn-primary" onclick="document.getElementById('levelup').classList.remove('show');">Continua</button>
+  </div>
+</div>
+
+<div class="modal-back" id="modal-back">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* ====================================================================
+   CODEQUEST PYTHON — Single-file learning platform
+   ==================================================================== */
+
+const STORAGE_KEY = 'codequest_py_save_v1';
+const DEFAULT_STATE = {
+  name: 'Player', createdAt: Date.now(),
+  xp: 0, level: 1, totalDone: 0, stars: 0, streak: 0,
+  lastActive: null, activeDays: [], badges: [],
+  progress: {}, currentLesson: null,
+  dailyDone: null, dailyLesson: null, dailyDate: null
+};
+let S = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return structuredClone(DEFAULT_STATE);
+    return Object.assign(structuredClone(DEFAULT_STATE), JSON.parse(raw));
+  }catch(e){ return structuredClone(DEFAULT_STATE); }
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
+
+function xpNeededFor(level){
+  return Math.round(80 + level * 40 + Math.pow(level, 1.6) * 8);
+}
+function xpTotalUpToLevel(lvl){
+  let s = 0; for(let i=1;i<lvl;i++) s += xpNeededFor(i); return s;
+}
+function rankFromXP(totalXp){
+  if(totalXp < 100) return {letter:'D', label:'Apprendista Pythonista'};
+  if(totalXp < 300) return {letter:'C', label:'Pythonista Promettente'};
+  if(totalXp < 700) return {letter:'B', label:'Sviluppatore in Ascesa'};
+  if(totalXp < 1400) return {letter:'A', label:'Programmatore Esperto'};
+  if(totalXp < 2500) return {letter:'S', label:'Maestro Python'};
+  if(totalXp < 4500) return {letter:'S+', label:'Architetto Pythonico'};
+  return {letter:'S++', label:'Leggenda di Python'};
+}
+
+const TRACKS = [
+  {id:'fond', name:'📘 Fondamenti', icon:'🐍', cls:'fond', desc:'Da zero ai concetti base'},
+  {id:'dati', name:'📦 Strutture Dati', icon:'📊', cls:'dati', desc:'Liste, dizionari, set, tuple'},
+  {id:'func', name:'🧰 Funzioni & OOP', icon:'⚙️', cls:'func', desc:'Funzioni, classi, ereditarietà'},
+  {id:'avan', name:'🚀 Python Avanzato', icon:'🚀', cls:'avan', desc:'Decoratori, generatori, asincronia'},
+  {id:'algo', name:'🧩 Algoritmi & Sfide', icon:'🧩', cls:'algo', desc:'Problemi di programmazione'}
+];
+
+const LESSONS = buildLessons();
+
+/* ============ LEZIONI ============ */
+function buildLessons(){
+  const fond = [
+    {
+      id:'fond-1', track:'fond', title:'Hello, Python!', diff:1, xp:20,
+      theory:`<h2>🐍 Il tuo primo programma</h2>
+        <p>Python è un linguaggio elegante, leggibile e potente. È usato per: data science, AI, web, automazione, scienza... <b>ovunque</b>.</p>
+        <p>La funzione <code>print()</code> stampa nella console. È il modo classico di iniziare:</p>
+        <pre><code>print("Ciao mondo")</code></pre>
+        <p>Le stringhe vanno tra virgolette doppie <code>"..."</code> o singole <code>'...'</code>.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3><p>Stampa esattamente la frase: <code>Ciao, Python!</code></p></div>`,
+      starter:`# Scrivi qui il tuo print\n`,
+      tests:[{name:'Output esatto', check:o=>o.trim()==='Ciao, Python!'}],
+      hint:'print("Ciao, Python!") — attenzione alla virgola e al punto esclamativo.',
+      solution:`print("Ciao, Python!")`
+    },
+    {
+      id:'fond-2', track:'fond', title:'Variabili e tipi', diff:1, xp:25,
+      theory:`<h2>📦 Variabili</h2>
+        <p>Una variabile è un nome che "contiene" un valore. Python deduce automaticamente il tipo:</p>
+        <pre><code>nome = "Luca"      # stringa (str)
+eta = 30           # intero (int)
+altezza = 1.75     # decimale (float)
+attivo = True      # booleano (bool)</code></pre>
+        <p>Per stampare più cose: <code>print(nome, eta)</code></p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea: <code>citta = "Roma"</code> e <code>abitanti = 2873000</code>.</p>
+          <p>Stampa esattamente: <code>Roma 2873000</code></p>
+        </div>`,
+      starter:`# Crea le variabili e stampale\n`,
+      tests:[{name:'Output corretto', check:o=>o.trim()==='Roma 2873000'}],
+      hint:'print(citta, abitanti)',
+      solution:`citta = "Roma"\nabitanti = 2873000\nprint(citta, abitanti)`
+    },
+    {
+      id:'fond-3', track:'fond', title:'Operatori matematici', diff:1, xp:30,
+      theory:`<h2>➕ Calcoli in Python</h2>
+        <ul>
+          <li><code>+</code> somma, <code>-</code> sottrazione, <code>*</code> moltiplicazione</li>
+          <li><code>/</code> divisione (decimale), <code>//</code> divisione intera</li>
+          <li><code>%</code> resto (modulo), <code>**</code> potenza</li>
+        </ul>
+        <pre><code>print(7 / 2)   # 3.5
+print(7 // 2)  # 3
+print(7 % 2)   # 1
+print(2 ** 10) # 1024</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Calcola e stampa l'area di un cerchio con raggio 5 (usa π = 3.14159).</p>
+          <p>Output atteso (approssimato): <code>78.53975</code></p>
+        </div>`,
+      starter:`r = 5\npi = 3.14159\n# stampa l'area\n`,
+      tests:[{name:'Area circa 78.54', check:o=>{
+        const n=parseFloat(o.trim()); return !isNaN(n) && Math.abs(n - 3.14159*25) < 0.01;
+      }}],
+      hint:'Area = π × r²  →  pi * r ** 2',
+      solution:`r=5; pi=3.14159\nprint(pi * r ** 2)`
+    },
+    {
+      id:'fond-4', track:'fond', title:'Stringhe e f-string', diff:1, xp:35,
+      theory:`<h2>🔤 Stringhe e formattazione</h2>
+        <p>Le <b>f-string</b> (formatted string) sono il modo moderno di unire testo e variabili:</p>
+        <pre><code>nome = "Anna"
+eta = 30
+print(f"{nome} ha {eta} anni")
+# Anna ha 30 anni</code></pre>
+        <p>Tra parentesi graffe <code>{}</code> dentro la f-string puoi mettere qualsiasi espressione: <code>f"{2+3}"</code> → <code>5</code>.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Dati <code>nome="Mario"</code>, <code>anni=42</code>, stampa: <code>Salve Mario, hai 42 anni e fra 10 anni ne avrai 52.</code></p>
+        </div>`,
+      starter:`nome = "Mario"\nanni = 42\n# stampa la frase con f-string\n`,
+      tests:[{name:'Output esatto', check:o=>o.trim()==='Salve Mario, hai 42 anni e fra 10 anni ne avrai 52.'}],
+      hint:`f"Salve {nome}, hai {anni} anni e fra 10 anni ne avrai {anni+10}."`,
+      solution:`nome="Mario"; anni=42\nprint(f"Salve {nome}, hai {anni} anni e fra 10 anni ne avrai {anni+10}.")`
+    },
+    {
+      id:'fond-5', track:'fond', title:'Booleani e confronti', diff:2, xp:35,
+      theory:`<h2>✅ Vero o Falso</h2>
+        <p>I booleani sono <code>True</code> e <code>False</code> (con maiuscola!).</p>
+        <p>Operatori di confronto: <code>== != &gt; &lt; &gt;= &lt;=</code></p>
+        <p>Operatori logici: <code>and</code>, <code>or</code>, <code>not</code></p>
+        <pre><code>print(5 &gt; 3)            # True
+print(5 == 5 and 2 &lt; 1) # False
+print(not False)         # True</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Stampa il risultato (True/False) dell'espressione: <i>"10 è maggiore di 5 E 7 è minore di 3"</i>.</p>
+          <p>Output atteso: <code>False</code></p>
+        </div>`,
+      starter:`# stampa True/False dell'espressione richiesta\n`,
+      tests:[{name:'Output False', check:o=>o.trim()==='False'}],
+      hint:'print(10 > 5 and 7 < 3)',
+      solution:`print(10 > 5 and 7 < 3)`
+    },
+    {
+      id:'fond-6', track:'fond', title:'Condizioni if/elif/else', diff:2, xp:45,
+      theory:`<h2>🔀 Decisioni</h2>
+        <pre><code>voto = 7
+if voto &gt;= 9:
+    print("ottimo")
+elif voto &gt;= 6:
+    print("sufficiente")
+else:
+    print("insufficiente")</code></pre>
+        <p><b>Attenzione all'indentazione!</b> Python usa l'indentazione (4 spazi) per delimitare i blocchi. Niente parentesi graffe.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Dato <code>temperatura = 28</code>, stampa:</p>
+          <ul>
+            <li><code>freddo</code> se &lt; 15</li>
+            <li><code>mite</code> se tra 15 e 25 (incluso 25)</li>
+            <li><code>caldo</code> se &gt; 25</li>
+          </ul>
+        </div>`,
+      starter:`temperatura = 28\n# if/elif/else\n`,
+      tests:[{name:'caldo', check:o=>o.trim()==='caldo'}],
+      hint:'if temperatura > 25: print("caldo")',
+      solution:`temperatura = 28\nif temperatura < 15: print("freddo")\nelif temperatura <= 25: print("mite")\nelse: print("caldo")`
+    },
+    {
+      id:'fond-7', track:'fond', title:'Cicli for e range', diff:2, xp:50,
+      theory:`<h2>🔁 Ripetere con for</h2>
+        <p><code>range(n)</code> genera 0, 1, 2, ..., n-1. <code>range(a,b)</code> genera a, a+1, ..., b-1.</p>
+        <pre><code>for i in range(1, 6):
+    print(i)
+# stampa 1, 2, 3, 4, 5</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Stampa la somma dei numeri da 1 a 100 inclusi (output: <code>5050</code>).</p>
+        </div>`,
+      starter:`somma = 0\n# cicla e somma\nprint(somma)\n`,
+      tests:[{name:'5050', check:o=>o.trim()==='5050'}],
+      hint:'for i in range(1, 101): somma += i',
+      solution:`somma = 0\nfor i in range(1, 101):\n    somma += i\nprint(somma)`
+    },
+    {
+      id:'fond-8', track:'fond', title:'Cicli while', diff:2, xp:50,
+      theory:`<h2>♾️ Cicli while</h2>
+        <p><code>while</code> ripete finché la condizione è vera.</p>
+        <pre><code>n = 10
+while n &gt; 0:
+    print(n)
+    n -= 1</code></pre>
+        <p>Usa <code>break</code> per uscire, <code>continue</code> per saltare al ciclo successivo.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Partendo da <code>n = 64</code>, dividi per 2 finché diventa minore di 1. Conta quante divisioni servono e stampa il numero (output: <code>7</code>).</p>
+        </div>`,
+      starter:`n = 64\ncount = 0\n# while ...\nprint(count)\n`,
+      tests:[{name:'7 divisioni', check:o=>o.trim()==='7'}],
+      hint:'while n >= 1: n /= 2; count += 1',
+      solution:`n = 64\ncount = 0\nwhile n >= 1:\n    n /= 2\n    count += 1\nprint(count)`
+    },
+    {
+      id:'fond-9', track:'fond', title:'Liste base', diff:2, xp:50,
+      theory:`<h2>📋 Liste</h2>
+        <p>Le liste sono sequenze ordinate e modificabili.</p>
+        <pre><code>frutti = ["mela", "pera", "kiwi"]
+print(frutti[0])         # mela
+print(len(frutti))       # 3
+frutti.append("uva")     # aggiunge in fondo
+frutti.remove("pera")    # rimuove
+print("kiwi" in frutti)  # True</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data <code>nums = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]</code>, stampa la sua lunghezza, il valore minimo, il valore massimo e la somma, separati da virgola.</p>
+          <p>Output atteso: <code>10,1,9,39</code></p>
+        </div>`,
+      starter:`nums = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]\n# stampa "len,min,max,sum"\n`,
+      tests:[{name:'10,1,9,39', check:o=>o.trim()==='10,1,9,39'}],
+      hint:`print(f"{len(nums)},{min(nums)},{max(nums)},{sum(nums)}")`,
+      solution:`nums=[3,1,4,1,5,9,2,6,5,3]\nprint(f"{len(nums)},{min(nums)},{max(nums)},{sum(nums)}")`
+    },
+    {
+      id:'fond-10', track:'fond', title:'Input e conversioni', diff:2, xp:45,
+      theory:`<h2>🔄 Convertire tipi</h2>
+        <p>Spesso devi convertire da/verso stringa: <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>list()</code>.</p>
+        <pre><code>s = "42"
+n = int(s) + 1  # 43
+x = float("3.14")</code></pre>
+        <p class="tiny">(Nota: in questo ambiente <code>input()</code> non è disponibile, usiamo variabili predefinite.)</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data la stringa <code>cifre = "12 34 56 78"</code>, converti in lista di interi e stampa la somma.</p>
+          <p>Output atteso: <code>180</code></p>
+        </div>`,
+      starter:`cifre = "12 34 56 78"\n# split, converti, somma\n`,
+      tests:[{name:'180', check:o=>o.trim()==='180'}],
+      hint:'sum(int(x) for x in cifre.split())',
+      solution:`cifre="12 34 56 78"\nprint(sum(int(x) for x in cifre.split()))`
+    },
+  ];
+
+  const dati = [
+    {
+      id:'dati-1', track:'dati', title:'Slicing delle liste', diff:3, xp:55,
+      theory:`<h2>✂️ Slicing</h2>
+        <p><code>lst[start:stop:step]</code> estrae una sotto-lista. Tutti i parametri sono opzionali.</p>
+        <pre><code>a = [0,1,2,3,4,5,6,7,8,9]
+a[2:5]     # [2,3,4]
+a[:3]      # [0,1,2]
+a[-3:]     # [7,8,9]
+a[::2]     # [0,2,4,6,8]
+a[::-1]    # invertita</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Da <code>a = list(range(20))</code>, stampa gli elementi dispari in ordine inverso.</p>
+          <p>Output atteso: <code>[19, 17, 15, 13, 11, 9, 7, 5, 3, 1]</code></p>
+        </div>`,
+      starter:`a = list(range(20))\n# slicing\n`,
+      tests:[{name:'Lista dispari inversa', check:o=>o.trim()==='[19, 17, 15, 13, 11, 9, 7, 5, 3, 1]'}],
+      hint:'a[1::2] sono i dispari. Poi [::-1] li inverte. Oppure a[-1::-2]',
+      solution:`a=list(range(20))\nprint(a[-1::-2])`
+    },
+    {
+      id:'dati-2', track:'dati', title:'Tuple e unpacking', diff:2, xp:45,
+      theory:`<h2>📦 Tuple</h2>
+        <p>Le tuple sono come le liste, ma <b>immutabili</b>: una volta create non cambiano.</p>
+        <pre><code>punto = (3, 5)
+x, y = punto        # unpacking
+print(x, y)         # 3 5
+
+a, b, c = 1, 2, 3
+a, b = b, a         # swap elegante</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data <code>coppia = (10, 20)</code>, scambia i due valori (swap) e stampa la nuova tupla.</p>
+          <p>Output atteso: <code>(20, 10)</code></p>
+        </div>`,
+      starter:`coppia = (10, 20)\n# fai lo swap e stampa la nuova tupla\n`,
+      tests:[{name:'(20, 10)', check:o=>o.trim()==='(20, 10)'}],
+      hint:'a, b = coppia; print((b, a))',
+      solution:`coppia = (10, 20)\na, b = coppia\nprint((b, a))`
+    },
+    {
+      id:'dati-3', track:'dati', title:'Set: insiemi', diff:3, xp:55,
+      theory:`<h2>🎲 Set</h2>
+        <p>I set contengono elementi <b>unici</b> non ordinati. Utili per de-duplicare e operazioni insiemistiche.</p>
+        <pre><code>a = {1, 2, 3}
+b = {3, 4, 5}
+print(a | b)   # unione: {1,2,3,4,5}
+print(a &amp; b)   # intersezione: {3}
+print(a - b)   # differenza: {1,2}</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Date due liste, trova quante <b>parole comuni</b> ci sono (in entrambe):</p>
+          <pre><code>l1 = ["mela","pera","kiwi","uva","banana"]
+l2 = ["arancia","uva","mela","limone","kiwi"]</code></pre>
+          <p>Output atteso: <code>3</code></p>
+        </div>`,
+      starter:`l1 = ["mela","pera","kiwi","uva","banana"]\nl2 = ["arancia","uva","mela","limone","kiwi"]\n# stampa il numero di parole comuni\n`,
+      tests:[{name:'3', check:o=>o.trim()==='3'}],
+      hint:'len(set(l1) & set(l2))',
+      solution:`l1=["mela","pera","kiwi","uva","banana"]; l2=["arancia","uva","mela","limone","kiwi"]\nprint(len(set(l1) & set(l2)))`
+    },
+    {
+      id:'dati-4', track:'dati', title:'Dizionari', diff:3, xp:60,
+      theory:`<h2>🗺️ Dizionari (key → value)</h2>
+        <pre><code>p = {"nome":"Anna", "eta":30}
+print(p["nome"])       # Anna
+p["lavoro"] = "ing"    # aggiungi
+print(p.get("citta","sconosciuta"))  # default
+for k, v in p.items():
+    print(k, v)</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea un dizionario <code>scores</code> con: Anna=85, Marco=72, Lara=91, Tom=66.</p>
+          <p>Stampa il <b>nome</b> di chi ha il punteggio più alto.</p>
+          <p>Output atteso: <code>Lara</code></p>
+        </div>`,
+      starter:`scores = {"Anna":85, "Marco":72, "Lara":91, "Tom":66}\n# stampa il nome con punteggio massimo\n`,
+      tests:[{name:'Lara', check:o=>o.trim()==='Lara'}],
+      hint:'max(scores, key=scores.get)',
+      solution:`scores={"Anna":85,"Marco":72,"Lara":91,"Tom":66}\nprint(max(scores, key=scores.get))`
+    },
+    {
+      id:'dati-5', track:'dati', title:'List comprehension', diff:3, xp:65,
+      theory:`<h2>✨ Comprehension</h2>
+        <p>Modo conciso ed elegante di costruire liste:</p>
+        <pre><code>quadrati = [x*x for x in range(1,6)]
+# [1, 4, 9, 16, 25]
+
+pari = [x for x in range(20) if x%2==0]
+# [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea una lista con i cubi dei numeri pari da 2 a 10 inclusi e stampala.</p>
+          <p>Output atteso: <code>[8, 64, 216, 512, 1000]</code></p>
+        </div>`,
+      starter:`# usa una list comprehension\n`,
+      tests:[{name:'[8, 64, 216, 512, 1000]', check:o=>o.trim()==='[8, 64, 216, 512, 1000]'}],
+      hint:'[x**3 for x in range(2,11,2)]',
+      solution:`print([x**3 for x in range(2,11,2)])`
+    },
+    {
+      id:'dati-6', track:'dati', title:'Dict comprehension', diff:3, xp:70,
+      theory:`<h2>🪄 Dict comprehension</h2>
+        <pre><code>squares = {n: n*n for n in range(1,6)}
+# {1:1, 2:4, 3:9, 4:16, 5:25}</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data <code>parole = ["python","è","facile","e","potente"]</code>, costruisci un dict che mappa ogni parola alla sua lunghezza e stampalo.</p>
+          <p>Output atteso: <code>{'python': 6, 'è': 1, 'facile': 6, 'e': 1, 'potente': 7}</code></p>
+        </div>`,
+      starter:`parole = ["python","è","facile","e","potente"]\n# dict comprehension\n`,
+      tests:[{name:'Dict lunghezze', check:o=>o.trim()==="{'python': 6, 'è': 1, 'facile': 6, 'e': 1, 'potente': 7}"}],
+      hint:'{p: len(p) for p in parole}',
+      solution:`parole=["python","è","facile","e","potente"]\nprint({p: len(p) for p in parole})`
+    },
+    {
+      id:'dati-7', track:'dati', title:'Stringhe avanzate', diff:3, xp:60,
+      theory:`<h2>🔠 Metodi delle stringhe</h2>
+        <ul>
+          <li><code>.upper() .lower() .title() .capitalize()</code></li>
+          <li><code>.strip() .replace() .split() .join()</code></li>
+          <li><code>.startswith() .endswith() .find() .count()</code></li>
+        </ul>
+        <pre><code>"  Hello World  ".strip().lower()  # 'hello world'
+"-".join(["a","b","c"])             # 'a-b-c'</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data <code>s = "il rapido lupo bruno salta sul cane"</code>, stampa la frase con ogni parola che inizia con maiuscola (output: <code>Il Rapido Lupo Bruno Salta Sul Cane</code>).</p>
+        </div>`,
+      starter:`s = "il rapido lupo bruno salta sul cane"\n# capitalizza ogni parola\n`,
+      tests:[{name:'Title case', check:o=>o.trim()==='Il Rapido Lupo Bruno Salta Sul Cane'}],
+      hint:'s.title()',
+      solution:`print("il rapido lupo bruno salta sul cane".title())`
+    },
+    {
+      id:'dati-8', track:'dati', title:'enumerate e zip', diff:3, xp:65,
+      theory:`<h2>🔗 enumerate e zip</h2>
+        <p><code>enumerate(lst)</code> dà coppie (indice, valore). <code>zip(a,b)</code> abbina elementi di due (o più) iterabili.</p>
+        <pre><code>for i, x in enumerate(["a","b","c"]):
+    print(i, x)
+
+nomi = ["Anna","Bea"]; eta = [25, 30]
+for n, e in zip(nomi, eta):
+    print(n, e)</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Date <code>citta = ["Roma","Milano","Napoli"]</code> e <code>popolazione = [2873000, 1379000, 967000]</code>, stampa una riga per coppia nel formato <code>Roma:2873000</code>, ecc.</p>
+        </div>`,
+      starter:`citta = ["Roma","Milano","Napoli"]\npopolazione = [2873000, 1379000, 967000]\n# stampa coppie con zip\n`,
+      tests:[{name:'3 righe formattate', check:o=>{
+        return o.trim()==='Roma:2873000\nMilano:1379000\nNapoli:967000';
+      }}],
+      hint:'for c, p in zip(citta, popolazione): print(f"{c}:{p}")',
+      solution:`citta=["Roma","Milano","Napoli"]; pop=[2873000,1379000,967000]\nfor c,p in zip(citta,pop): print(f"{c}:{p}")`
+    },
+    {
+      id:'dati-9', track:'dati', title:'Sorting personalizzato', diff:3, xp:70,
+      theory:`<h2>📊 Ordinare con key</h2>
+        <p><code>sorted()</code> ordina (restituisce nuova lista). <code>.sort()</code> ordina sul posto. Usa <code>key=</code> per criteri custom e <code>reverse=True</code> per discendente.</p>
+        <pre><code>nomi = ["Bea","ada","Carlo"]
+sorted(nomi, key=str.lower)
+# ['ada','Bea','Carlo']</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data una lista di tuple <code>punti = [("Anna",85),("Marco",72),("Lara",91),("Tom",66)]</code>, ordinala per <b>punteggio decrescente</b> e stampala.</p>
+          <p>Output atteso: <code>[('Lara', 91), ('Anna', 85), ('Marco', 72), ('Tom', 66)]</code></p>
+        </div>`,
+      starter:`punti = [("Anna",85),("Marco",72),("Lara",91),("Tom",66)]\n# ordina per punteggio decrescente\n`,
+      tests:[{name:'Sort descending', check:o=>o.trim()==="[('Lara', 91), ('Anna', 85), ('Marco', 72), ('Tom', 66)]"}],
+      hint:'sorted(punti, key=lambda t: t[1], reverse=True)',
+      solution:`p=[("Anna",85),("Marco",72),("Lara",91),("Tom",66)]\nprint(sorted(p, key=lambda t:t[1], reverse=True))`
+    },
+    {
+      id:'dati-10', track:'dati', title:'collections.Counter', diff:4, xp:80,
+      theory:`<h2>📈 Counter: conta tutto</h2>
+        <p><code>Counter</code> conta automaticamente le frequenze.</p>
+        <pre><code>from collections import Counter
+c = Counter("mississippi")
+print(c.most_common(2))
+# [('i', 4), ('s', 4)]</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data la frase <code>frase = "il sole splende e il mare brilla e il vento soffia"</code>, stampa la parola più frequente.</p>
+          <p>Output atteso: <code>il</code></p>
+        </div>`,
+      starter:`from collections import Counter\nfrase = "il sole splende e il mare brilla e il vento soffia"\n# stampa la parola più frequente\n`,
+      tests:[{name:'il', check:o=>o.trim()==='il'}],
+      hint:'Counter(frase.split()).most_common(1)[0][0]',
+      solution:`from collections import Counter\nfrase="il sole splende e il mare brilla e il vento soffia"\nprint(Counter(frase.split()).most_common(1)[0][0])`
+    },
+  ];
+
+  const func = [
+    {
+      id:'func-1', track:'func', title:'Funzioni base', diff:2, xp:50,
+      theory:`<h2>🧰 Definire funzioni</h2>
+        <pre><code>def saluta(nome):
+    return f"Ciao, {nome}!"
+
+print(saluta("Anna"))</code></pre>
+        <p>Una funzione può prendere parametri e restituire un valore con <code>return</code>. Se non c'è return, restituisce <code>None</code>.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi una funzione <code>area_triangolo(base, altezza)</code> che restituisce l'area. Stampa l'area di un triangolo 10×8.</p>
+          <p>Output atteso: <code>40.0</code></p>
+        </div>`,
+      starter:`def area_triangolo(base, altezza):\n    # ...\n    pass\n\nprint(area_triangolo(10, 8))\n`,
+      tests:[{name:'40.0', check:o=>o.trim()==='40.0'}],
+      hint:'return base * altezza / 2',
+      solution:`def area_triangolo(b,h): return b*h/2\nprint(area_triangolo(10,8))`
+    },
+    {
+      id:'func-2', track:'func', title:'Parametri default e keyword', diff:3, xp:60,
+      theory:`<h2>🎚️ Parametri default</h2>
+        <pre><code>def saluta(nome, formula="Ciao"):
+    return f"{formula}, {nome}"
+
+saluta("Anna")              # 'Ciao, Anna'
+saluta("Anna", "Buongiorno") # 'Buongiorno, Anna'
+saluta(nome="Anna", formula="Salve")  # keyword</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>potenza(base, esp=2)</code>. Stampa <code>potenza(5)</code> e <code>potenza(2, esp=10)</code> su due righe.</p>
+        </div>`,
+      starter:`def potenza(base, esp=2):\n    # ...\n    pass\n\nprint(potenza(5))\nprint(potenza(2, esp=10))\n`,
+      tests:[{name:'25 e 1024', check:o=>o.trim()==='25\n1024'}],
+      hint:'return base ** esp',
+      solution:`def potenza(b, esp=2): return b**esp\nprint(potenza(5)); print(potenza(2, esp=10))`
+    },
+    {
+      id:'func-3', track:'func', title:'*args e **kwargs', diff:4, xp:75,
+      theory:`<h2>🌟 Numero variabile di argomenti</h2>
+        <pre><code>def somma_tutti(*args):
+    return sum(args)
+somma_tutti(1,2,3,4)  # 10
+
+def descrivi(**kw):
+    for k,v in kw.items():
+        print(f"{k}={v}")
+descrivi(nome="Anna", eta=30)</code></pre>
+        <p><code>*args</code> raccoglie argomenti posizionali in tupla, <code>**kwargs</code> raccoglie argomenti nominati in dict.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>media(*nums)</code> che restituisce la media. Stampa <code>media(2, 4, 6, 8, 10)</code>.</p>
+          <p>Output atteso: <code>6.0</code></p>
+        </div>`,
+      starter:`def media(*nums):\n    # ...\n    pass\n\nprint(media(2, 4, 6, 8, 10))\n`,
+      tests:[{name:'6.0', check:o=>o.trim()==='6.0'}],
+      hint:'sum(nums) / len(nums)',
+      solution:`def media(*n): return sum(n)/len(n)\nprint(media(2,4,6,8,10))`
+    },
+    {
+      id:'func-4', track:'func', title:'Lambda', diff:3, xp:65,
+      theory:`<h2>λ Funzioni anonime</h2>
+        <p>Funzioni "usa e getta" su una riga. Sintassi: <code>lambda args: espressione</code>.</p>
+        <pre><code>doppio = lambda x: x*2
+print(doppio(7))  # 14
+
+sorted([1,-3,2,-5], key=lambda x: abs(x))
+# [1, 2, -3, -5]</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data <code>parole = ["python","è","linguaggio","fantastico"]</code>, ordinala per <b>lunghezza decrescente</b> e stampala.</p>
+          <p>Output atteso: <code>['linguaggio', 'fantastico', 'python', 'è']</code></p>
+        </div>`,
+      starter:`parole = ["python","è","linguaggio","fantastico"]\n# usa sorted con lambda\n`,
+      tests:[{name:'Sort by length desc', check:o=>o.trim()==="['linguaggio', 'fantastico', 'python', 'è']"}],
+      hint:'sorted(parole, key=lambda p: len(p), reverse=True)',
+      solution:`p=["python","è","linguaggio","fantastico"]\nprint(sorted(p, key=lambda x: len(x), reverse=True))`
+    },
+    {
+      id:'func-5', track:'func', title:'map, filter, reduce', diff:4, xp:80,
+      theory:`<h2>🧪 Programmazione funzionale</h2>
+        <ul>
+          <li><code>map(fn, iter)</code> applica fn a ogni elemento</li>
+          <li><code>filter(fn, iter)</code> tiene solo quelli per cui fn dà True</li>
+          <li><code>reduce(fn, iter)</code> riduce a un valore unico (da <code>functools</code>)</li>
+        </ul>
+        <pre><code>list(map(lambda x: x*2, [1,2,3]))     # [2,4,6]
+list(filter(lambda x: x&gt;2, [1,2,3,4])) # [3,4]
+from functools import reduce
+reduce(lambda a,b: a*b, [1,2,3,4])     # 24</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Dati <code>nums = [1,2,3,4,5,6,7,8,9,10]</code>, calcola la <b>somma dei quadrati dei numeri pari</b>. Output atteso: <code>220</code></p>
+        </div>`,
+      starter:`nums = [1,2,3,4,5,6,7,8,9,10]\n# somma dei quadrati dei pari\n`,
+      tests:[{name:'220', check:o=>o.trim()==='220'}],
+      hint:'sum(x*x for x in nums if x%2==0)',
+      solution:`nums=list(range(1,11))\nprint(sum(map(lambda x: x*x, filter(lambda x: x%2==0, nums))))`
+    },
+    {
+      id:'func-6', track:'func', title:'Classi e oggetti', diff:4, xp:90,
+      theory:`<h2>🏛️ Programmazione Object-Oriented</h2>
+        <pre><code>class Cane:
+    def __init__(self, nome, eta):
+        self.nome = nome
+        self.eta = eta
+
+    def abbaia(self):
+        return f"{self.nome} dice woof!"
+
+rex = Cane("Rex", 5)
+print(rex.abbaia())</code></pre>
+        <p><code>__init__</code> è il "costruttore". <code>self</code> rappresenta l'istanza corrente.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea la classe <code>Conto</code> con <code>saldo</code> iniziale (default 0), metodi <code>versa(x)</code> e <code>preleva(x)</code>. Apri conto, versa 100, preleva 30, versa 50, preleva 20. Stampa il saldo.</p>
+          <p>Output atteso: <code>100</code></p>
+        </div>`,
+      starter:`class Conto:\n    def __init__(self, saldo=0):\n        self.saldo = saldo\n    # versa e preleva\n\nc = Conto()\nc.versa(100); c.preleva(30); c.versa(50); c.preleva(20)\nprint(c.saldo)\n`,
+      tests:[{name:'100', check:o=>o.trim()==='100'}],
+      hint:'def versa(self,x): self.saldo += x',
+      solution:`class Conto:\n  def __init__(self, saldo=0): self.saldo=saldo\n  def versa(self,x): self.saldo+=x\n  def preleva(self,x): self.saldo-=x\nc=Conto(); c.versa(100); c.preleva(30); c.versa(50); c.preleva(20)\nprint(c.saldo)`
+    },
+    {
+      id:'func-7', track:'func', title:'Ereditarietà', diff:4, xp:100,
+      theory:`<h2>🧬 Ereditarietà</h2>
+        <pre><code>class Animale:
+    def __init__(self, nome):
+        self.nome = nome
+    def verso(self):
+        return "generico"
+
+class Gatto(Animale):
+    def verso(self):
+        return "miao"
+
+g = Gatto("Felix")
+print(g.nome, g.verso())</code></pre>
+        <p><code>super().metodo()</code> chiama la versione del genitore.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea <code>Veicolo</code> con metodo <code>descrivi()</code> che restituisce <code>"veicolo"</code>. Crea <code>Auto(Veicolo)</code> che fa l'override e restituisce <code>"auto su 4 ruote"</code>. Stampa le descrizioni di entrambi su 2 righe.</p>
+        </div>`,
+      starter:`class Veicolo:\n    def descrivi(self):\n        return "veicolo"\n\nclass Auto(Veicolo):\n    # override\n    pass\n\nprint(Veicolo().descrivi())\nprint(Auto().descrivi())\n`,
+      tests:[{name:'2 righe corrette', check:o=>o.trim()==='veicolo\nauto su 4 ruote'}],
+      hint:'class Auto(Veicolo):\n    def descrivi(self): return "auto su 4 ruote"',
+      solution:`class Veicolo:\n  def descrivi(self): return "veicolo"\nclass Auto(Veicolo):\n  def descrivi(self): return "auto su 4 ruote"\nprint(Veicolo().descrivi()); print(Auto().descrivi())`
+    },
+    {
+      id:'func-8', track:'func', title:'Dunder __str__ e __eq__', diff:4, xp:95,
+      theory:`<h2>🔧 Metodi speciali (dunder)</h2>
+        <p>I metodi con doppio underscore (dunder) personalizzano il comportamento di una classe:</p>
+        <ul>
+          <li><code>__str__</code>: come appare quando viene stampata</li>
+          <li><code>__eq__</code>: confronto con ==</li>
+          <li><code>__len__</code>, <code>__add__</code>, <code>__lt__</code>, ...</li>
+        </ul>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea <code>Punto(x, y)</code> con <code>__str__</code> che restituisce <code>"Punto(x, y)"</code>. Stampa <code>Punto(3, 4)</code>.</p>
+          <p>Output atteso: <code>Punto(3, 4)</code></p>
+        </div>`,
+      starter:`class Punto:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n    # __str__\n\nprint(Punto(3, 4))\n`,
+      tests:[{name:'Punto(3, 4)', check:o=>o.trim()==='Punto(3, 4)'}],
+      hint:'def __str__(self): return f"Punto({self.x}, {self.y})"',
+      solution:`class Punto:\n  def __init__(self,x,y): self.x=x; self.y=y\n  def __str__(self): return f"Punto({self.x}, {self.y})"\nprint(Punto(3,4))`
+    },
+    {
+      id:'func-9', track:'func', title:'Property (getter/setter)', diff:5, xp:115,
+      theory:`<h2>🎛️ Property</h2>
+        <p>Con <code>@property</code> trasformi un metodo in attributo. Con <code>@xxx.setter</code> permetti l'assegnazione con validazione.</p>
+        <pre><code>class Cerchio:
+    def __init__(self, r):
+        self._r = r
+    @property
+    def area(self):
+        return 3.14159 * self._r ** 2
+
+c = Cerchio(5)
+print(c.area)  # niente parentesi!</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea <code>Temperatura</code> con attributo <code>_celsius</code>. Aggiungi proprietà <code>fahrenheit</code> (sola lettura) calcolata da celsius. Stampa la temperatura in Fahrenheit di 25°C.</p>
+          <p>Output atteso: <code>77.0</code></p>
+        </div>`,
+      starter:`class Temperatura:\n    def __init__(self, c):\n        self._celsius = c\n    @property\n    def fahrenheit(self):\n        # F = C * 9/5 + 32\n        pass\n\nt = Temperatura(25)\nprint(t.fahrenheit)\n`,
+      tests:[{name:'77.0', check:o=>o.trim()==='77.0'}],
+      hint:'return self._celsius * 9/5 + 32',
+      solution:`class Temperatura:\n  def __init__(self,c): self._c=c\n  @property\n  def fahrenheit(self): return self._c*9/5+32\nprint(Temperatura(25).fahrenheit)`
+    },
+    {
+      id:'func-10', track:'func', title:'Decoratori', diff:5, xp:130,
+      theory:`<h2>🎀 Decoratori</h2>
+        <p>Un decoratore avvolge una funzione per aggiungerne comportamento, senza modificarla. Esempio: misurare tempi, log, cache, autorizzazione.</p>
+        <pre><code>def shout(fn):
+    def wrapper(*a, **kw):
+        return fn(*a, **kw).upper() + "!"
+    return wrapper
+
+@shout
+def saluta(nome):
+    return f"ciao {nome}"
+
+print(saluta("anna"))  # 'CIAO ANNA!'</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi un decoratore <code>doppio_risultato</code> che raddoppia il valore restituito dalla funzione decorata. Applicalo a <code>somma(a,b)</code> e stampa <code>somma(3,4)</code>.</p>
+          <p>Output atteso: <code>14</code></p>
+        </div>`,
+      starter:`def doppio_risultato(fn):\n    def wrapper(*a, **kw):\n        # ...\n        pass\n    return wrapper\n\n@doppio_risultato\ndef somma(a,b):\n    return a+b\n\nprint(somma(3,4))\n`,
+      tests:[{name:'14', check:o=>o.trim()==='14'}],
+      hint:'return fn(*a,**kw) * 2',
+      solution:`def doppio_risultato(fn):\n  def w(*a,**k): return fn(*a,**k)*2\n  return w\n@doppio_risultato\ndef somma(a,b): return a+b\nprint(somma(3,4))`
+    },
+  ];
+
+  const avan = [
+    {
+      id:'avan-1', track:'avan', title:'Gestione errori', diff:3, xp:70,
+      theory:`<h2>🛡️ try / except / finally</h2>
+        <pre><code>try:
+    x = int("abc")
+except ValueError as e:
+    print("Non è un numero")
+except Exception as e:
+    print("Errore generico:", e)
+finally:
+    print("Sempre eseguito")</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>safe_div(a, b)</code> che restituisce a/b oppure la stringa <code>"errore"</code> in caso di <code>ZeroDivisionError</code>. Stampa <code>safe_div(10, 0)</code>.</p>
+          <p>Output atteso: <code>errore</code></p>
+        </div>`,
+      starter:`def safe_div(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        pass\n\nprint(safe_div(10, 0))\n`,
+      tests:[{name:'errore', check:o=>o.trim()==='errore'}],
+      hint:'return "errore" in except',
+      solution:`def safe_div(a,b):\n  try: return a/b\n  except ZeroDivisionError: return "errore"\nprint(safe_div(10,0))`
+    },
+    {
+      id:'avan-2', track:'avan', title:'Context manager (with)', diff:4, xp:85,
+      theory:`<h2>🔐 Context manager</h2>
+        <p>Lo statement <code>with</code> garantisce che le risorse vengano rilasciate (file chiusi, lock liberati...).</p>
+        <pre><code># Esempio classico (file):
+with open("data.txt") as f:
+    contenuto = f.read()
+# qui il file è già chiuso
+
+# Crea il tuo:
+class Cronometro:
+    def __enter__(self):
+        import time
+        self.t = time.time()
+        return self
+    def __exit__(self, *a):
+        print(f"durata: {time.time()-self.t:.2f}s")</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Crea un context manager <code>Stampante</code> che stampi <code>"inizio"</code> all'entrata e <code>"fine"</code> all'uscita. Usalo con <code>with Stampante():</code> e stampa <code>"in mezzo"</code> dentro. Output atteso 3 righe:</p>
+          <pre><code>inizio
+in mezzo
+fine</code></pre>
+        </div>`,
+      starter:`class Stampante:\n    def __enter__(self):\n        print("inizio")\n        return self\n    def __exit__(self, *a):\n        # ...\n        pass\n\nwith Stampante():\n    print("in mezzo")\n`,
+      tests:[{name:'3 righe', check:o=>o.trim()==='inizio\nin mezzo\nfine'}],
+      hint:'def __exit__(self, *a): print("fine")',
+      solution:`class Stampante:\n  def __enter__(self): print("inizio"); return self\n  def __exit__(self,*a): print("fine")\nwith Stampante(): print("in mezzo")`
+    },
+    {
+      id:'avan-3', track:'avan', title:'Generatori (yield)', diff:4, xp:95,
+      theory:`<h2>🌀 Generatori</h2>
+        <p>Un generatore produce valori "uno per volta" con <code>yield</code>, senza tenere tutto in memoria.</p>
+        <pre><code>def conta_alla_rovescia(n):
+    while n &gt; 0:
+        yield n
+        n -= 1
+
+for x in conta_alla_rovescia(3):
+    print(x)
+# 3, 2, 1</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi un generatore <code>pari_fino_a(n)</code> che produce i numeri pari da 0 a n (inclusi). Stampa la lista dei pari fino a 10.</p>
+          <p>Output atteso: <code>[0, 2, 4, 6, 8, 10]</code></p>
+        </div>`,
+      starter:`def pari_fino_a(n):\n    # usa yield\n    pass\n\nprint(list(pari_fino_a(10)))\n`,
+      tests:[{name:'[0,2,4,6,8,10]', check:o=>o.trim()==='[0, 2, 4, 6, 8, 10]'}],
+      hint:'for i in range(0, n+1, 2): yield i',
+      solution:`def pari_fino_a(n):\n  for i in range(0, n+1, 2): yield i\nprint(list(pari_fino_a(10)))`
+    },
+    {
+      id:'avan-4', track:'avan', title:'Type hints', diff:4, xp:85,
+      theory:`<h2>📝 Type hints</h2>
+        <p>I type hint sono "annotazioni" sui tipi: non sono enforced a runtime, ma aiutano IDE, linter e team.</p>
+        <pre><code>def saluta(nome: str, eta: int = 0) -&gt; str:
+    return f"{nome}, {eta}"
+
+from typing import List, Dict, Optional
+def media(nums: List[float]) -&gt; float:
+    return sum(nums) / len(nums)</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>concatena(parole: list[str], sep: str = ", ") -&gt; str</code> che unisce le parole. Stampa <code>concatena(["a","b","c"])</code>.</p>
+          <p>Output atteso: <code>a, b, c</code></p>
+        </div>`,
+      starter:`def concatena(parole: list[str], sep: str = ", ") -> str:\n    pass\n\nprint(concatena(["a","b","c"]))\n`,
+      tests:[{name:'a, b, c', check:o=>o.trim()==='a, b, c'}],
+      hint:'return sep.join(parole)',
+      solution:`def concatena(parole: list[str], sep: str = ", ") -> str:\n  return sep.join(parole)\nprint(concatena(["a","b","c"]))`
+    },
+    {
+      id:'avan-5', track:'avan', title:'Espressioni regolari', diff:4, xp:105,
+      theory:`<h2>🔎 Regex con il modulo <code>re</code></h2>
+        <pre><code>import re
+testo = "email: anna@example.com, marco@test.it"
+mails = re.findall(r"[\\w.]+@[\\w.]+", testo)
+print(mails)
+# ['anna@example.com', 'marco@test.it']</code></pre>
+        <p>Sintassi base: <code>\\d</code> cifra, <code>\\w</code> alfanumerico, <code>+</code> uno o più, <code>*</code> zero o più, <code>{n}</code> esattamente n.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Da <code>testo = "ordine #1234 spedito il 2024-03-15, ordine #5678 il 2024-04-22"</code>, estrai TUTTI i numeri d'ordine come lista di interi.</p>
+          <p>Output atteso: <code>[1234, 5678]</code></p>
+        </div>`,
+      starter:`import re\ntesto = "ordine #1234 spedito il 2024-03-15, ordine #5678 il 2024-04-22"\n# regex per #seguito da cifre\n`,
+      tests:[{name:'[1234, 5678]', check:o=>o.trim()==='[1234, 5678]'}],
+      hint:`re.findall(r"#(\\d+)", testo)  → poi convertire a int`,
+      solution:`import re\nt="ordine #1234 spedito il 2024-03-15, ordine #5678 il 2024-04-22"\nprint([int(x) for x in re.findall(r"#(\\d+)", t)])`
+    },
+    {
+      id:'avan-6', track:'avan', title:'Datetime', diff:3, xp:75,
+      theory:`<h2>📅 Date e tempi</h2>
+        <pre><code>from datetime import date, datetime, timedelta
+oggi = date.today()
+domani = oggi + timedelta(days=1)
+print(oggi.year, oggi.month, oggi.day)
+print(domani.isoformat())</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Calcola quanti giorni separano <code>date(2024, 1, 1)</code> da <code>date(2024, 12, 31)</code> e stampa il numero.</p>
+          <p>Output atteso: <code>365</code></p>
+        </div>`,
+      starter:`from datetime import date\na = date(2024, 1, 1)\nb = date(2024, 12, 31)\n# stampa la differenza in giorni\n`,
+      tests:[{name:'365', check:o=>o.trim()==='365'}],
+      hint:'(b - a).days',
+      solution:`from datetime import date\na=date(2024,1,1); b=date(2024,12,31)\nprint((b-a).days)`
+    },
+    {
+      id:'avan-7', track:'avan', title:'JSON', diff:3, xp:70,
+      theory:`<h2>🔄 JSON: scambiare dati</h2>
+        <pre><code>import json
+d = {"nome":"Anna", "lista":[1,2,3], "ok":True}
+s = json.dumps(d)           # dict → stringa JSON
+d2 = json.loads(s)          # stringa JSON → dict</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Data la stringa JSON <code>s = '{"prodotti":[{"nome":"libro","prezzo":15},{"nome":"penna","prezzo":3}]}'</code>, calcola e stampa il totale dei prezzi.</p>
+          <p>Output atteso: <code>18</code></p>
+        </div>`,
+      starter:`import json\ns = '{"prodotti":[{"nome":"libro","prezzo":15},{"nome":"penna","prezzo":3}]}'\n# parse e somma\n`,
+      tests:[{name:'18', check:o=>o.trim()==='18'}],
+      hint:'data = json.loads(s); sum(p["prezzo"] for p in data["prodotti"])',
+      solution:`import json\ns='{"prodotti":[{"nome":"libro","prezzo":15},{"nome":"penna","prezzo":3}]}'\nd=json.loads(s)\nprint(sum(p["prezzo"] for p in d["prodotti"]))`
+    },
+    {
+      id:'avan-8', track:'avan', title:'itertools', diff:5, xp:120,
+      theory:`<h2>♾️ itertools: combinare iterabili</h2>
+        <pre><code>from itertools import combinations, permutations, product, chain
+list(combinations([1,2,3], 2))   # [(1,2),(1,3),(2,3)]
+list(permutations([1,2,3], 2))   # ordine conta
+list(product([0,1], repeat=3))   # tutte le combinazioni binarie</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Quante <b>combinazioni di 3 elementi</b> si possono fare da una lista di 10 elementi distinti? Stampa il numero (output: <code>120</code>).</p>
+        </div>`,
+      starter:`from itertools import combinations\n# stampa il numero di combinazioni di 3 elementi da 10\n`,
+      tests:[{name:'120', check:o=>o.trim()==='120'}],
+      hint:'len(list(combinations(range(10), 3)))',
+      solution:`from itertools import combinations\nprint(len(list(combinations(range(10), 3))))`
+    },
+    {
+      id:'avan-9', track:'avan', title:'functools.lru_cache', diff:5, xp:115,
+      theory:`<h2>🚀 Memoization automatica</h2>
+        <p><code>@lru_cache</code> memorizza i risultati delle chiamate. Velocizza enormemente funzioni ricorsive ripetitive come fibonacci.</p>
+        <pre><code>from functools import lru_cache
+@lru_cache(maxsize=None)
+def fib(n):
+    if n &lt; 2: return n
+    return fib(n-1) + fib(n-2)
+
+print(fib(100))  # istantaneo!</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Usa <code>@lru_cache</code> per scrivere fib(n) ricorsivo e stampa <code>fib(50)</code>.</p>
+          <p>Output atteso: <code>12586269025</code></p>
+        </div>`,
+      starter:`from functools import lru_cache\n\n@lru_cache(maxsize=None)\ndef fib(n):\n    # ...\n    pass\n\nprint(fib(50))\n`,
+      tests:[{name:'fib(50)', check:o=>o.trim()==='12586269025'}],
+      hint:'if n<2: return n; return fib(n-1) + fib(n-2)',
+      solution:`from functools import lru_cache\n@lru_cache(maxsize=None)\ndef fib(n):\n  return n if n<2 else fib(n-1)+fib(n-2)\nprint(fib(50))`
+    },
+    {
+      id:'avan-10', track:'avan', title:'Pattern matching (match/case)', diff:5, xp:125,
+      theory:`<h2>🎯 Match/Case (Python 3.10+)</h2>
+        <p>Una specie di switch evoluto: confronta strutture, non solo valori.</p>
+        <pre><code>def descrivi(punto):
+    match punto:
+        case (0, 0):
+            return "origine"
+        case (x, 0):
+            return f"asse X a {x}"
+        case (0, y):
+            return f"asse Y a {y}"
+        case (x, y):
+            return f"punto ({x},{y})"
+
+print(descrivi((0, 5)))</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>classifica(comando)</code> che data una lista come comando restituisce:</p>
+          <ul>
+            <li><code>["quit"]</code> → <code>"esci"</code></li>
+            <li><code>["go", direzione]</code> → <code>f"vado verso {direzione}"</code></li>
+            <li><code>["go", x, y]</code> → <code>f"vado a ({x},{y})"</code></li>
+            <li>altro → <code>"sconosciuto"</code></li>
+          </ul>
+          <p>Testa con <code>["go", "nord"]</code> e <code>["go", 3, 7]</code>. Output:</p>
+          <pre><code>vado verso nord
+vado a (3,7)</code></pre>
+        </div>`,
+      starter:`def classifica(c):\n    match c:\n        # case ...\n        pass\n\nprint(classifica(["go", "nord"]))\nprint(classifica(["go", 3, 7]))\n`,
+      tests:[{name:'2 righe', check:o=>o.trim()==='vado verso nord\nvado a (3,7)'}],
+      hint:'case ["go", direz]: return f"vado verso {direz}"',
+      solution:`def classifica(c):\n  match c:\n    case ["quit"]: return "esci"\n    case ["go", d]: return f"vado verso {d}"\n    case ["go", x, y]: return f"vado a ({x},{y})"\n    case _: return "sconosciuto"\nprint(classifica(["go","nord"])); print(classifica(["go",3,7]))`
+    },
+  ];
+
+  const algo = [
+    {
+      id:'algo-1', track:'algo', title:'FizzBuzz', diff:2, xp:50,
+      theory:`<h2>🎮 FizzBuzz (classico)</h2>
+        <p>Per ogni numero da 1 a 15:</p>
+        <ul>
+          <li><code>FizzBuzz</code> se multiplo di 15</li>
+          <li><code>Fizz</code> se multiplo di 3</li>
+          <li><code>Buzz</code> se multiplo di 5</li>
+          <li>il numero altrimenti</li>
+        </ul>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Esegui FizzBuzz da 1 a 15, una riga per numero.</p>
+        </div>`,
+      starter:`# FizzBuzz da 1 a 15\nfor i in range(1, 16):\n    # ...\n    pass\n`,
+      tests:[{name:'FizzBuzz 1..15', check:o=>{
+        const exp = ['1','2','Fizz','4','Buzz','Fizz','7','8','Fizz','Buzz','11','Fizz','13','14','FizzBuzz'].join('\n');
+        return o.trim()===exp;
+      }}],
+      hint:'Controlla prima il %15, poi %3, poi %5',
+      solution:`for i in range(1,16):\n  if i%15==0: print("FizzBuzz")\n  elif i%3==0: print("Fizz")\n  elif i%5==0: print("Buzz")\n  else: print(i)`
+    },
+    {
+      id:'algo-2', track:'algo', title:'Inverti stringa', diff:2, xp:55,
+      theory:`<h2>🔄 Reverse</h2>
+        <p>Inverti una stringa: <code>"hello"</code> → <code>"olleh"</code>.</p>
+        <p>In Python si fa elegantemente con lo slicing <code>s[::-1]</code>.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>reverse(s)</code> e stampa <code>reverse("CodeQuestPython")</code>.</p>
+          <p>Output atteso: <code>nohtyPtseuQedoC</code></p>
+        </div>`,
+      starter:`def reverse(s):\n    pass\n\nprint(reverse("CodeQuestPython"))\n`,
+      tests:[{name:'Reverse', check:o=>o.trim()==='nohtyPtseuQedoC'}],
+      hint:'return s[::-1]',
+      solution:`def reverse(s): return s[::-1]\nprint(reverse("CodeQuestPython"))`
+    },
+    {
+      id:'algo-3', track:'algo', title:'Palindromo', diff:3, xp:65,
+      theory:`<h2>🪞 Palindromo</h2>
+        <p>Una parola è palindroma se letta al contrario è uguale. <code>"anna"</code>, <code>"osso"</code>.</p>
+        <p>Considera case-insensitive: <code>"Anna"</code> è palindroma.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>is_pal(s)</code> case-insensitive. Stampa is_pal("Anna") e is_pal("Pippo") su due righe.</p>
+        </div>`,
+      starter:`def is_pal(s):\n    pass\n\nprint(is_pal("Anna"))\nprint(is_pal("Pippo"))\n`,
+      tests:[{name:'True/False', check:o=>o.trim()==='True\nFalse'}],
+      hint:'s = s.lower(); return s == s[::-1]',
+      solution:`def is_pal(s): s=s.lower(); return s==s[::-1]\nprint(is_pal("Anna")); print(is_pal("Pippo"))`
+    },
+    {
+      id:'algo-4', track:'algo', title:'Fibonacci iterativo', diff:3, xp:75,
+      theory:`<h2>🌀 Fibonacci</h2>
+        <p>F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2). Sequenza: 0, 1, 1, 2, 3, 5, 8, 13, 21, ...</p>
+        <p>L'approccio iterativo è O(n) ed è il più efficiente per casi standard.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Stampa il 30° numero di Fibonacci (output: <code>832040</code>).</p>
+        </div>`,
+      starter:`# calcola fib(30) in modo iterativo\n`,
+      tests:[{name:'832040', check:o=>o.trim()==='832040'}],
+      hint:'a, b = 0, 1; for _ in range(30): a, b = b, a+b',
+      solution:`a,b=0,1\nfor _ in range(30): a,b=b,a+b\nprint(a)`
+    },
+    {
+      id:'algo-5', track:'algo', title:'Bubble Sort', diff:4, xp:90,
+      theory:`<h2>🫧 Bubble Sort</h2>
+        <p>Algoritmo classico di ordinamento. O(n²).</p>
+        <pre><code>for i in range(n):
+    for j in range(n - i - 1):
+        if a[j] &gt; a[j+1]:
+            a[j], a[j+1] = a[j+1], a[j]</code></pre>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Implementa bubble sort (NON usare <code>sorted()</code> o <code>.sort()</code>) e ordina <code>[5, 2, 8, 1, 9, 3, 7]</code>. Stampa la lista risultante.</p>
+          <p>Output atteso: <code>[1, 2, 3, 5, 7, 8, 9]</code></p>
+        </div>`,
+      starter:`a = [5, 2, 8, 1, 9, 3, 7]\n# implementa bubble sort\nprint(a)\n`,
+      tests:[{name:'Ordinata', check:(o,c)=>o.trim()==='[1, 2, 3, 5, 7, 8, 9]' && !/sorted\s*\(/.test(c) && !/\.sort\s*\(/.test(c)}],
+      hint:'Doppio ciclo, scambia gli adiacenti',
+      solution:`a=[5,2,8,1,9,3,7]\nn=len(a)\nfor i in range(n):\n  for j in range(n-i-1):\n    if a[j]>a[j+1]: a[j],a[j+1]=a[j+1],a[j]\nprint(a)`
+    },
+    {
+      id:'algo-6', track:'algo', title:'Binary Search', diff:4, xp:100,
+      theory:`<h2>🔍 Binary Search</h2>
+        <p>In un array <b>ordinato</b>, trovare un elemento in O(log n) dividendo a metà ogni volta.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>bsearch(arr, target)</code> che restituisce l'indice o -1. Cerca <code>42</code> in <code>[1,3,5,7,11,15,23,42,57,89]</code>.</p>
+          <p>Output atteso: <code>7</code></p>
+        </div>`,
+      starter:`def bsearch(arr, t):\n    # ...\n    pass\n\narr = [1,3,5,7,11,15,23,42,57,89]\nprint(bsearch(arr, 42))\n`,
+      tests:[{name:'7', check:o=>o.trim()==='7'}],
+      hint:'lo, hi = 0, len(arr)-1; while lo <= hi: mid = (lo+hi)//2...',
+      solution:`def bsearch(arr, t):\n  lo, hi = 0, len(arr)-1\n  while lo <= hi:\n    mid = (lo+hi)//2\n    if arr[mid]==t: return mid\n    if arr[mid]<t: lo=mid+1\n    else: hi=mid-1\n  return -1\nprint(bsearch([1,3,5,7,11,15,23,42,57,89], 42))`
+    },
+    {
+      id:'algo-7', track:'algo', title:'Two Sum', diff:4, xp:105,
+      theory:`<h2>🎯 Two Sum (LeetCode classico)</h2>
+        <p>Dato un array e un target, trova i due indici i,j tali che <code>arr[i] + arr[j] == target</code>. Esiste sempre una soluzione unica.</p>
+        <p>Soluzione efficiente: usa un dict per memorizzare i valori già visti.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>In <code>[2, 7, 11, 15]</code> con target <code>9</code>, stampa <code>(0, 1)</code>.</p>
+        </div>`,
+      starter:`def two_sum(arr, t):\n    # ...\n    pass\n\nprint(two_sum([2,7,11,15], 9))\n`,
+      tests:[{name:'(0, 1)', check:o=>o.trim()==='(0, 1)'}],
+      hint:'visti = {}; for i, x in enumerate(arr): c = t - x; if c in visti: return (visti[c], i); visti[x] = i',
+      solution:`def two_sum(a, t):\n  v={}\n  for i, x in enumerate(a):\n    c=t-x\n    if c in v: return (v[c], i)\n    v[x]=i\nprint(two_sum([2,7,11,15], 9))`
+    },
+    {
+      id:'algo-8', track:'algo', title:'Anagrammi', diff:3, xp:75,
+      theory:`<h2>🔀 Anagrammi</h2>
+        <p>Due parole sono anagrammi se contengono le stesse lettere riarrangiate. <code>"listen"</code> e <code>"silent"</code> sì. <code>"hello"</code> e <code>"world"</code> no.</p>
+        <p>Metodo facile: ordinare i caratteri e confrontare.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Scrivi <code>is_anagram(a, b)</code> case-insensitive. Testa con <code>"Listen"</code>/<code>"silent"</code> e <code>"hello"</code>/<code>"world"</code> su due righe.</p>
+        </div>`,
+      starter:`def is_anagram(a, b):\n    # ...\n    pass\n\nprint(is_anagram("Listen", "silent"))\nprint(is_anagram("hello", "world"))\n`,
+      tests:[{name:'True/False', check:o=>o.trim()==='True\nFalse'}],
+      hint:'sorted(a.lower()) == sorted(b.lower())',
+      solution:`def is_anagram(a,b): return sorted(a.lower())==sorted(b.lower())\nprint(is_anagram("Listen","silent")); print(is_anagram("hello","world"))`
+    },
+    {
+      id:'algo-9', track:'algo', title:'Sliding Window', diff:5, xp:135,
+      theory:`<h2>🪟 Sliding window</h2>
+        <p>Tecnica per problemi su sotto-array contigui in O(n) invece di O(n*k).</p>
+        <p>Mantieni una "finestra" di k elementi che fai scorrere aggiornando la somma.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Trova la <b>somma massima di un sotto-array contiguo di lunghezza k</b>.</p>
+          <p>Input: <code>arr = [2,1,5,1,3,2,7,4,6]</code>, <code>k = 3</code>.</p>
+          <p>Output atteso: <code>17</code> (finestra [7,4,6]).</p>
+        </div>`,
+      starter:`arr = [2,1,5,1,3,2,7,4,6]\nk = 3\n# trova la somma massima della finestra di k elementi\n`,
+      tests:[{name:'17', check:o=>o.trim()==='17'}],
+      hint:'somma iniziale = sum(arr[:k]); per i in range(k, len(arr)): somma += arr[i] - arr[i-k]; tieni il massimo',
+      solution:`arr=[2,1,5,1,3,2,7,4,6]; k=3\ns=sum(arr[:k]); m=s\nfor i in range(k, len(arr)):\n  s += arr[i] - arr[i-k]\n  if s>m: m=s\nprint(m)`
+    },
+    {
+      id:'algo-10', track:'algo', title:'1000° numero primo', diff:5, xp:145,
+      theory:`<h2>🧮 Test di primalità efficiente</h2>
+        <p>Per testare se n è primo, basta verificare i divisori da 2 a √n.</p>
+        <div class="task-box"><h3>🎯 Esercizio</h3>
+          <p>Trova e stampa il <b>1000°</b> numero primo. (Sapevi che si chiama Bertrand-style? Comunque...)</p>
+          <p>Output atteso: <code>7919</code></p>
+        </div>`,
+      starter:`def is_prime(n):\n    # ...\n    pass\n\ncount = 0\nn = 1\n# trova il 1000° primo\n`,
+      tests:[{name:'7919', check:o=>o.trim()==='7919'}],
+      hint:'Loop while count < 1000: n += 1; if is_prime(n): count += 1',
+      solution:`def is_prime(n):\n  if n<2: return False\n  if n<4: return True\n  if n%2==0: return False\n  i=3\n  while i*i<=n:\n    if n%i==0: return False\n    i+=2\n  return True\nc,n=0,1\nwhile c<1000:\n  n+=1\n  if is_prime(n): c+=1\nprint(n)`
+    },
+  ];
+
+  return [...fond, ...dati, ...func, ...avan, ...algo];
+}
+
+/* ============ BADGE ============ */
+const BADGES = [
+  {id:'first', icon:'🌱', name:'Primi passi', desc:'Completa la tua prima lezione', cond: s => s.totalDone >= 1},
+  {id:'streak3', icon:'🔥', name:'In fiamme', desc:'Streak di 3 giorni', cond: s => s.streak >= 3},
+  {id:'streak7', icon:'💎', name:'Settimana perfetta', desc:'Streak di 7 giorni', cond: s => s.streak >= 7},
+  {id:'fond5', icon:'🐍', name:'Pythonista', desc:'5 fondamenti completati', cond: s => countDoneInTrack(s,'fond')>=5},
+  {id:'fondAll', icon:'📘', name:'Solide basi', desc:'Tutti i fondamenti', cond: s => countDoneInTrack(s,'fond')>=10},
+  {id:'dati5', icon:'📦', name:'Maestro dei dati', desc:'5 strutture dati', cond: s => countDoneInTrack(s,'dati')>=5},
+  {id:'func5', icon:'⚙️', name:'OOP iniziato', desc:'5 funzioni & OOP', cond: s => countDoneInTrack(s,'func')>=5},
+  {id:'avan3', icon:'🚀', name:'Avanzato', desc:'3 lezioni avanzate', cond: s => countDoneInTrack(s,'avan')>=3},
+  {id:'algo5', icon:'🧩', name:'Risolutore', desc:'5 sfide algoritmi', cond: s => countDoneInTrack(s,'algo')>=5},
+  {id:'lvl5', icon:'🏆', name:'Veterano', desc:'Raggiungi livello 5', cond: s => s.level >= 5},
+  {id:'lvl10', icon:'👑', name:'Esperto', desc:'Raggiungi livello 10', cond: s => s.level >= 10},
+  {id:'stars20', icon:'⭐', name:'Stellato', desc:'20 stelle', cond: s => s.stars >= 20},
+  {id:'stars50', icon:'🌟', name:'Brilla forte', desc:'50 stelle', cond: s => s.stars >= 50},
+  {id:'done25', icon:'📚', name:'Studioso', desc:'25 esercizi', cond: s => s.totalDone >= 25},
+  {id:'rankS', icon:'🥇', name:'Rank S', desc:'Raggiungi rank S', cond: s => rankFromXP(s.xp).letter.startsWith('S')},
+  {id:'all', icon:'💯', name:'Completista', desc:'Completa tutte le lezioni', cond: s => s.totalDone >= LESSONS.length},
+];
+function countDoneInTrack(s, track){
+  return LESSONS.filter(l=>l.track===track && s.progress[l.id]?.done).length;
+}
+
+/* ============ RENDERING ============ */
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  TRACKS.forEach((tr,idx)=>{
+    const lessons = LESSONS.filter(l=>l.track===tr.id);
+    const done = lessons.filter(l=>S.progress[l.id]?.done).length;
+    const div = document.createElement('div');
+    div.className = 'track' + (idx===0?' open':'');
+    if(S.currentLesson){
+      const cur = LESSONS.find(l=>l.id===S.currentLesson);
+      if(cur && cur.track===tr.id) div.classList.add('open');
+    }
+    div.innerHTML = `
+      <div class="track-head">
+        <div class="track-icon ${tr.cls}">${tr.icon}</div>
+        <div class="track-title">${tr.name}</div>
+        <div class="track-prog">${done}/${lessons.length}</div>
+        <span class="caret">▶</span>
+      </div>
+      <div class="track-list"></div>
+    `;
+    const list = div.querySelector('.track-list');
+    lessons.forEach((l,i)=>{
+      const prev = lessons[i-1];
+      const unlocked = (i===0) || (prev && S.progress[prev.id]?.done) || S.progress[l.id]?.done;
+      const prog = S.progress[l.id];
+      let cls = 'lesson-item';
+      if(prog?.done) cls += ' done';
+      if(prog?.stars >= 3) cls += ' star';
+      if(!unlocked) cls += ' locked';
+      if(S.currentLesson === l.id) cls += ' active';
+      const item = document.createElement('div');
+      item.className = cls;
+      item.innerHTML = `
+        <div class="ldot">${prog?.done?'✓':(unlocked?(i+1):'🔒')}</div>
+        <div class="lesson-name">${l.title}</div>
+        <div class="lesson-xp">+${l.xp}</div>
+      `;
+      if(unlocked) item.onclick = () => loadLesson(l.id);
+      list.appendChild(item);
+    });
+    div.querySelector('.track-head').onclick = ()=> div.classList.toggle('open');
+    sb.appendChild(div);
+  });
+}
+
+function renderTopStats(){
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  set('ui-name', S.name);
+  set('ui-lvl', S.level);
+  set('ui-xp', Math.max(0, Math.round(S.xp - xpTotalUpToLevel(S.level))));
+  set('ui-xpneed', xpNeededFor(S.level));
+  const fill = document.getElementById('ui-xpfill');
+  if(fill){
+    const pct = Math.min(100, 100 * (S.xp - xpTotalUpToLevel(S.level)) / xpNeededFor(S.level));
+    fill.style.width = pct + '%';
+  }
+  set('ui-streak', S.streak);
+}
+function isoDate(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function renderAll(){
+  renderTopStats();
+  renderSidebar();
+  pickDailyLessonIfNeeded();
+}
+
+/* ============ EDITOR ============ */
+let editor = null;
+function initEditor(){
+  editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    mode: 'python',
+    theme: 'dracula',
+    lineNumbers: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    extraKeys: {
+      "Ctrl-Enter": ()=> runCode(),
+      "Cmd-Enter": ()=> runCode(),
+      "Tab": cm => cm.replaceSelection("    ", "end"),
+    }
+  });
+}
+
+/* ============ ESECUZIONE ============ */
+const consoleBody = document.getElementById('console-body');
+let consoleTab = 'out';
+let outLogs = [], dbgLogs = [], testLogs = [];
+
+function logTo(tab, html, cls='log-info'){
+  const line = `<div class="log-line ${cls}">${html}</div>`;
+  if(tab==='out') outLogs.push(line);
+  else if(tab==='dbg') dbgLogs.push(line);
+  else testLogs.push(line);
+  refreshConsole();
+}
+function refreshConsole(){
+  const logs = consoleTab==='out'?outLogs:consoleTab==='dbg'?dbgLogs:testLogs;
+  consoleBody.innerHTML = logs.join('');
+  consoleBody.scrollTop = consoleBody.scrollHeight;
+}
+function clearConsole(){ outLogs = []; dbgLogs = []; testLogs = []; refreshConsole(); }
+
+document.querySelectorAll('.ctab').forEach(el=>{
+  el.onclick = ()=>{
+    document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    consoleTab = el.dataset.ctab;
+    refreshConsole();
+  };
+});
+
+function htmlEscape(s){
+  return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+let pyodide = null, pyodideReady = false, pyodideLoading = false, pyodideFailed = false;
+async function ensurePyodide(){
+  if(pyodideReady) return pyodide;
+  if(pyodideFailed) throw new Error('Pyodide non disponibile. La prima esecuzione richiede una connessione internet (~10MB).');
+  if(pyodideLoading){
+    // Attende il caricamento in corso. Esce se fallisce per evitare deadlock.
+    while(pyodideLoading && !pyodideReady && !pyodideFailed){
+      await new Promise(r=>setTimeout(r,100));
+    }
+    if(pyodideFailed) throw new Error('Pyodide non disponibile.');
+    return pyodide;
+  }
+  pyodideLoading = true;
+  document.getElementById('py-text').textContent = 'Caricamento Python…';
+  try{
+    if(typeof loadPyodide !== 'function'){
+      throw new Error('Script Pyodide non caricato (verifica la connessione internet)');
+    }
+    pyodide = await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'});
+    pyodideReady = true;
+    pyodideLoading = false;
+    document.getElementById('py-status').classList.add('ready');
+    document.getElementById('py-text').textContent = 'Python pronto';
+  }catch(e){
+    // FIX: rilascia il lock anche in caso di errore per evitare deadlock infinito
+    pyodideLoading = false;
+    pyodideFailed = true;
+    document.getElementById('py-text').textContent = 'Python non disponibile';
+    const st = document.getElementById('py-status');
+    if(st) st.style.background = 'var(--bad)';
+    logTo('out', 'Impossibile caricare Pyodide: ' + e + '\nLa prima esecuzione richiede una connessione internet (~10MB). Le successive funzionano offline.', 'log-err');
+    throw e;
+  }
+  return pyodide;
+}
+
+async function resetPythonGlobals(){
+  // Pulisce i globals dell'utente tra un'esecuzione e l'altra,
+  // così le lezioni non condividono variabili o import.
+  if(!pyodideReady) return;
+  try{
+    await pyodide.runPythonAsync(
+      "for __k in [k for k in list(globals()) if not k.startswith('_')]:\n" +
+      "    del globals()[__k]\n"
+    );
+  }catch(_){}
+}
+
+async function runPython(code, captureOut){
+  await ensurePyodide();
+  await resetPythonGlobals();
+  let buf = '';
+  pyodide.setStdout({batched: t=>{ buf += t+'\n'; if(captureOut) logTo('out', htmlEscape(t));} });
+  pyodide.setStderr({batched: t=>{ buf += t+'\n'; if(captureOut) logTo('out', htmlEscape(t), 'log-err');} });
+  try{
+    await pyodide.runPythonAsync(code);
+    return {ok:true, output:buf};
+  }catch(e){
+    const msg = String(e);
+    if(captureOut) logTo('out', htmlEscape(msg), 'log-err');
+    return {ok:false, output:buf, error:msg};
+  }finally{
+    // FIX: ripristina handler di default per evitare leak di buffer fra run
+    try{ pyodide.setStdout({}); pyodide.setStderr({}); }catch(_){}
+  }
+}
+
+/* ============ LEZIONE CORRENTE ============ */
+let currentLesson = null;
+
+function loadLesson(id){
+  const l = LESSONS.find(x=>x.id===id);
+  if(!l) return;
+  currentLesson = l;
+  S.currentLesson = id;
+  document.getElementById('lb-title').textContent = l.title;
+  // FIX: armonizzato con il colore dei pill diff-1..diff-5 e con il titolo iniziale 'FACILE'
+  const diff = ['','FACILE','BASE','MEDIO','DIFFICILE','ESPERTO'][l.diff] || 'FACILE';
+  const diffEl = document.getElementById('lb-diff');
+  diffEl.textContent = diff;
+  diffEl.className = 'diff-pill diff-' + l.diff;
+  const trackInfo = TRACKS.find(t=>t.id===l.track);
+  document.getElementById('lb-meta').textContent = trackInfo ? trackInfo.name : '';
+  document.getElementById('lb-xp').textContent = `+${l.xp} XP`;
+  const doneBefore = !!S.progress[l.id]?.done;
+  const testsHtml = (l.tests && l.tests.length)
+    ? `<ul>${l.tests.map(t=>`<li>${t.name}</li>`).join('')}</ul>`
+    : `<p class="tiny">Modalità libera (nessun test).</p>`;
+  document.getElementById('lesson-panel').innerHTML = `
+    ${l.theory}
+    ${doneBefore ? `<div class="hint" style="background:rgba(61,220,151,.08); border-color:rgba(61,220,151,.35); color:#9ce8c4;">✅ Hai già completato questa lezione. Ripassala quanto vuoi: guadagni un piccolo bonus XP ogni volta.</div>` : ''}
+    <div class="lesson-help">
+      <button class="btn btn-warn" id="btn-toggle-hint">💡 Mostra suggerimento</button>
+      <button class="btn btn-ghost" id="btn-toggle-solution">🔓 Mostra soluzione</button>
+    </div>
+    <div id="hint-box" class="help-box" hidden>
+      <h3>💡 Suggerimento</h3>
+      <p>${l.hint || 'Nessun suggerimento per questa lezione.'}</p>
+    </div>
+    <div id="solution-box" class="help-box" hidden>
+      <h3>🔓 Soluzione</h3>
+      <pre><code id="solution-code">${htmlEscape(l.solution || 'Nessuna soluzione fornita.')}</code></pre>
+      <button class="btn btn-warn" id="btn-use-solution">📋 Carica nell'editor</button>
+    </div>
+    <div class="tests-summary">
+      <h3>🧪 Cosa controlla la verifica</h3>
+      ${testsHtml}
+    </div>
+  `;
+  document.getElementById('btn-toggle-hint').onclick = ()=>{
+    const b = document.getElementById('hint-box');
+    b.hidden = !b.hidden;
+    Sfx.toggle();
+    document.getElementById('btn-toggle-hint').textContent = b.hidden ? '💡 Mostra suggerimento' : '💡 Nascondi suggerimento';
+  };
+  document.getElementById('btn-toggle-solution').onclick = ()=>{
+    const b = document.getElementById('solution-box');
+    if(b.hidden && !confirm('Sicuro di voler vedere la soluzione? Conviene provare prima da soli.')) return;
+    b.hidden = !b.hidden;
+    Sfx.toggle();
+    document.getElementById('btn-toggle-solution').textContent = b.hidden ? '🔓 Mostra soluzione' : '🔓 Nascondi soluzione';
+  };
+  const btnUse = document.getElementById('btn-use-solution');
+  if(btnUse) btnUse.onclick = useSolution;
+
+  const saved = S.progress[l.id]?.bestCode;
+  // FIX: guardia se l'editor non e' ancora inizializzato
+  if(editor){
+    editor.setValue(saved || l.starter || '');
+    setTimeout(()=>editor.refresh(), 30);
+  }
+  clearConsole();
+  renderSidebar();
+  saveState();
+}
+
+/* ============ AZIONI ============ */
+async function runCode(){
+  if(!currentLesson) { toast('Seleziona una lezione', ''); return; }
+  Sfx.click();
+  const code = editor.getValue();
+  clearConsole();
+  consoleTab = 'out';
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active', t.dataset.ctab==='out'));
+  await runPython(code, true);
+}
+
+async function debugCode(){
+  if(!currentLesson) return;
+  Sfx.click();
+  consoleTab='dbg';
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active', t.dataset.ctab==='dbg'));
+  dbgLogs = [];
+  refreshConsole();
+  const code = editor.getValue();
+  logTo('dbg','🐞 Avvio debug Python...', 'log-trace');
+  logTo('dbg','─── Codice ───','log-trace');
+  code.split('\n').forEach((line,i)=> logTo('dbg', `${String(i+1).padStart(3,' ')} │ ${htmlEscape(line)}`,'log-trace'));
+  logTo('dbg','─── Esecuzione ───','log-trace');
+  // FIX: eseguiamo il codice utente una SOLA volta, catturando contemporaneamente
+  // output, traceback e variabili. Prima si eseguiva due volte (duplicava i print).
+  const wrap =
+    "import sys, traceback, json as __cq_json\n" +
+    "__cq_err = False\n" +
+    "try:\n" +
+    code.split('\n').map(l=>'    '+l).join('\n') + "\n" +
+    "except Exception:\n" +
+    "    __cq_err = True\n" +
+    "    traceback.print_exc()\n" +
+    "try:\n" +
+    "    __cq_vars = {k: repr(v) for k,v in list(globals().items())\n" +
+    "                 if not k.startswith('_') and not callable(v)\n" +
+    "                 and k not in ('sys','traceback','__cq_json')}\n" +
+    "    print('__CQ_VARS__' + __cq_json.dumps(__cq_vars))\n" +
+    "except Exception:\n" +
+    "    pass\n";
+  const r = await runPython(wrap, false);
+  const out = r.output || '';
+  let varsObj = null;
+  const cleaned = out.split('\n').filter(line=>{
+    const m = line.match(/^__CQ_VARS__(\{.*\})$/);
+    if(m){ try{ varsObj = JSON.parse(m[1]); }catch(_){} return false; }
+    return true;
+  }).join('\n');
+  if(cleaned) cleaned.split('\n').forEach(line=> line && logTo('dbg', htmlEscape(line)));
+  if(r.error) logTo('dbg', htmlEscape(r.error), 'log-err');
+  if(r.ok) logTo('dbg','✓ Esecuzione conclusa','log-ok');
+  if(varsObj){
+    const entries = Object.entries(varsObj);
+    if(entries.length){
+      logTo('dbg','─── Variabili ───','log-trace');
+      entries.slice(0,20).forEach(([k,v])=>{
+        logTo('dbg', `  <b>${htmlEscape(k)}</b> = ${htmlEscape(v)}`, 'log-trace');
+      });
+    }
+  }
+}
+
+async function checkCode(){
+  if(!currentLesson || !currentLesson.tests || !currentLesson.tests.length){
+    toast('Nessun test in questa modalità','');
+    return;
+  }
+  Sfx.click();
+  consoleTab = 'tres';
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active', t.dataset.ctab==='tres'));
+  testLogs = [];
+  refreshConsole();
+  const code = editor.getValue();
+  logTo('tres','▶ Esecuzione test...','log-trace');
+  const res = await runPython(code, false);
+  if(!res.ok){
+    logTo('tres', `❌ Errore durante l'esecuzione:`, 'log-err');
+    logTo('tres', htmlEscape(res.error||''), 'log-err');
+    toast('Errore nel codice. Controlla la console.', 'bad');
+    return;
+  }
+  let passed = 0;
+  for(const t of currentLesson.tests){
+    let ok = false;
+    try{ ok = !!t.check(res.output||'', code); }catch{ ok = false; }
+    if(ok){ logTo('tres', `✓ ${t.name}`, 'log-ok'); passed++; }
+    else logTo('tres', `✗ ${t.name}`, 'log-err');
+  }
+  const total = currentLesson.tests.length;
+  logTo('tres', `\n— Risultato: ${passed}/${total} test passati`, passed===total?'log-ok':'log-warn');
+  if(passed === total){
+    onLessonSolved(currentLesson, code);
+  } else {
+    toast(`Test falliti: ${total-passed}/${total}`, 'bad');
+    Sfx.fail();
+  }
+}
+
+function resetCode(){
+  if(!currentLesson) return;
+  Sfx.click();
+  if(confirm('Riportare il codice al template iniziale?')){
+    editor.setValue(currentLesson.starter || '');
+    toast('Codice ripristinato', '');
+  }
+}
+
+/* ============ COMPLETAMENTO ============ */
+function onLessonSolved(lesson, code){
+  const prev = S.progress[lesson.id] || {done:false, stars:0, attempts:0, bestCode:''};
+  const isFirst = !prev.done;
+  const attempts = (prev.attempts||0) + 1;
+  let stars = 1;
+  if(attempts === 1) stars = 3;
+  else if(attempts <= 3) stars = 2;
+  stars = Math.max(prev.stars||0, stars);
+  S.progress[lesson.id] = { done:true, stars, attempts, bestCode: code };
+  let xpGain = lesson.xp;
+  if(!isFirst) xpGain = Math.round(xpGain * 0.2);
+  addXP(xpGain);
+  if(isFirst){ S.totalDone++; }
+  const deltaStars = (stars - (prev.stars||0));
+  if(deltaStars>0) S.stars += deltaStars;
+
+  const today = isoDate(new Date());
+  if(S.dailyLesson === lesson.id && S.dailyDone !== today){
+    S.dailyDone = today;
+    addXP(50);
+    toast('🎯 Sfida giornaliera! +50 XP bonus', 'gold');
+  }
+
+  updateStreak();
+  checkBadges();
+  saveState();
+  renderAll();
+  confettiBurst();
+  Sfx.success();
+  if(isFirst){
+    toast(`✅ Lezione completata! +${xpGain} XP · ${'⭐'.repeat(stars)}`, 'good');
+  } else {
+    toast(`✨ Test ripassato! +${xpGain} XP`, 'good');
+  }
+}
+
+function addXP(amount){
+  S.xp += amount;
+  while(S.xp >= xpTotalUpToLevel(S.level+1)){
+    S.level++;
+    showLevelUp(S.level);
+  }
+}
+function showLevelUp(lvl){
+  document.getElementById('lu-title').textContent = `LIVELLO ${lvl}!`;
+  document.getElementById('lu-sub').textContent = `Continui a migliorare. Bravo!`;
+  document.getElementById('levelup').classList.add('show');
+  bigConfetti();
+  Sfx.levelup();
+}
+function checkBadges(){
+  BADGES.forEach(b=>{
+    if(!S.badges.includes(b.id) && b.cond(S)){
+      S.badges.push(b.id);
+      toast(`🏆 Badge: ${b.icon} ${b.name}`, 'gold');
+      Sfx.badge();
+    }
+  });
+}
+function updateStreak(){
+  const today = isoDate(new Date());
+  if(!S.activeDays.includes(today)) S.activeDays.push(today);
+  let streak = 0;
+  const d = new Date();
+  while(true){
+    const ds = isoDate(d);
+    if(S.activeDays.includes(ds)) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  S.streak = streak;
+  S.lastActive = today;
+}
+
+/* ============ DAILY ============ */
+function pickDailyLessonIfNeeded(){
+  const today = isoDate(new Date());
+  if(!S.dailyLesson || S.dailyDate !== today){
+    const unlocked = LESSONS.filter(l=>{
+      const all = LESSONS.filter(x=>x.track===l.track);
+      const idx = all.indexOf(l);
+      if(idx===0) return true;
+      return S.progress[all[idx-1].id]?.done;
+    });
+    const undone = unlocked.filter(l=>!S.progress[l.id]?.done);
+    const pool = undone.length ? undone : unlocked;
+    if(pool.length){
+      const seed = today.split('').reduce((s,c)=>s+c.charCodeAt(0),0);
+      const pick = pool[seed % pool.length];
+      S.dailyLesson = pick.id;
+      S.dailyDate = today;
+    }
+  }
+  saveState();
+}
+
+/* ============ SUONI (Web Audio) ============ */
+const Sfx = (()=>{
+  let ctx = null;
+  let enabled = true;
+  function ac(){
+    if(!ctx){
+      try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ ctx = null; }
+    }
+    if(ctx && ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  function tone(freq, dur, type='sine', vol=0.18, t0=0){
+    const c = ac(); if(!c || !enabled) return;
+    const t = c.currentTime + t0;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function chord(freqs, dur, type='sine', vol=0.14, t0=0){
+    freqs.forEach(f => tone(f, dur, type, vol, t0));
+  }
+  return {
+    click(){ tone(880, 0.05, 'square', 0.05); },
+    success(){
+      tone(523.25, 0.16, 'triangle', 0.16, 0);
+      tone(659.25, 0.16, 'triangle', 0.16, 0.08);
+      tone(783.99, 0.20, 'triangle', 0.18, 0.16);
+      tone(1046.5, 0.30, 'triangle', 0.20, 0.26);
+    },
+    fail(){
+      tone(220, 0.18, 'sawtooth', 0.10, 0);
+      tone(155, 0.22, 'sawtooth', 0.10, 0.10);
+    },
+    levelup(){
+      tone(523.25, 0.10, 'square', 0.14, 0.00);
+      tone(659.25, 0.10, 'square', 0.14, 0.10);
+      tone(783.99, 0.10, 'square', 0.14, 0.20);
+      tone(1046.5, 0.10, 'square', 0.14, 0.30);
+      chord([523.25, 659.25, 783.99, 1046.5], 0.45, 'triangle', 0.12, 0.42);
+    },
+    badge(){
+      tone(1318.5, 0.08, 'sine', 0.14, 0.00);
+      tone(1568.0, 0.08, 'sine', 0.14, 0.07);
+      tone(1975.5, 0.12, 'sine', 0.14, 0.14);
+      tone(2349.3, 0.18, 'sine', 0.12, 0.22);
+    },
+    toggle(){
+      tone(660, 0.06, 'sine', 0.08);
+    },
+    setEnabled(v){ enabled = !!v; },
+    isEnabled(){ return enabled; }
+  };
+})();
+
+try{
+  const pref = localStorage.getItem('codequest_py_sound');
+  if(pref === '0') Sfx.setEnabled(false);
+}catch(_){}
+
+/* ============ TOAST & CONFETTI ============ */
+function toast(text, kind=''){
+  const div = document.createElement('div');
+  div.className = 'toast ' + (kind==='good'?'good': kind==='bad'?'bad':kind==='gold'?'gold':'');
+  div.innerHTML = `<span>${text}</span>`;
+  document.getElementById('toasts').appendChild(div);
+  setTimeout(()=> div.remove(), 4000);
+}
+const conf = document.getElementById('confetti');
+const ctx = conf.getContext('2d');
+function fitConf(){conf.width=innerWidth; conf.height=innerHeight;}
+fitConf(); window.addEventListener('resize', fitConf);
+let particles = [];
+let _confettiRunning = false;
+function confettiBurst(n=70){
+  for(let i=0;i<n;i++){
+    particles.push({
+      x: innerWidth/2 + (Math.random()-.5)*200,
+      y: innerHeight/2,
+      vx: (Math.random()-.5)*8,
+      vy: -Math.random()*10 - 3,
+      g: 0.25 + Math.random()*0.2,
+      size: 4 + Math.random()*6,
+      color: ['#3776ab','#ffd43b','#5fd3ff','#3ddc97','#ff7a3a'][Math.floor(Math.random()*5)],
+      life: 100 + Math.random()*50
+    });
+  }
+  // FIX: usa un flag per non perdere il riavvio quando arrivano burst sovrapposti.
+  if(!_confettiRunning){
+    _confettiRunning = true;
+    requestAnimationFrame(animateConfetti);
+  }
+}
+function bigConfetti(){ confettiBurst(200); }
+function animateConfetti(){
+  ctx.clearRect(0,0,conf.width,conf.height);
+  particles.forEach(p=>{
+    p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life--;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+  });
+  particles = particles.filter(p=> p.life>0 && p.y < conf.height+20);
+  if(particles.length){
+    requestAnimationFrame(animateConfetti);
+  } else {
+    ctx.clearRect(0,0,conf.width,conf.height);
+    _confettiRunning = false;
+  }
+}
+
+/* ============ MODAL ============ */
+function openModal(html, actions){
+  const back = document.getElementById('modal-back');
+  const c = document.getElementById('modal-content');
+  c.innerHTML = html + (actions ? `<div class="modal-actions">${actions}</div>`:'');
+  back.classList.add('show');
+  back.onclick = e=>{ if(e.target===back) back.classList.remove('show'); };
+}
+function closeModal(){ document.getElementById('modal-back').classList.remove('show'); }
+
+/* ============ DASHBOARD ============ */
+function openDashboard(){
+  const rk = rankFromXP(S.xp);
+  const byTrack = TRACKS.map(t=>{
+    const all = LESSONS.filter(l=>l.track===t.id);
+    const done = all.filter(l=>S.progress[l.id]?.done).length;
+    return {name:t.name, done, total:all.length, pct: Math.round(100*done/all.length)};
+  });
+
+  const today = new Date();
+  const dayLabels = ['L','M','M','G','V','S','D'];
+  let streakHtml = '<div class="streak-row">';
+  for(let i=6;i>=0;i--){
+    const d = new Date(today); d.setDate(today.getDate()-i);
+    const dStr = isoDate(d);
+    const on = S.activeDays.includes(dStr);
+    const isToday = (i===0);
+    streakHtml += `<div class="day-dot${on?' on':''}${isToday?' today':''}" title="${dStr}">${dayLabels[(d.getDay()+6)%7]}</div>`;
+  }
+  streakHtml += '</div>';
+
+  const badgesHtml = '<div class="badges-grid">' + BADGES.map(b=>{
+    const has = S.badges.includes(b.id);
+    return `<div class="badge-tile ${has?'unlocked':'locked'}" title="${b.name} — ${b.desc}">${b.icon}</div>`;
+  }).join('') + '</div>';
+
+  const dl = LESSONS.find(l=>l.id===S.dailyLesson);
+  const dailyDone = S.dailyDone === isoDate(new Date());
+  const dailyHtml = dl ? `
+    <div class="card daily-card" style="margin:14px 0;">
+      <h4>🎯 Sfida Giornaliera</h4>
+      <p style="font-size:13px; margin-bottom:8px; line-height:1.5;"><b>${dl.title}</b><br><span class="tiny">${(TRACKS.find(t=>t.id===dl.track)||{}).name || ''}</span></p>
+      <p class="reward">${dailyDone ? '✅ Completata oggi' : '+50 XP bonus'}</p>
+      <button class="small-btn" onclick="loadLesson('${dl.id}'); closeModal();">${dailyDone?'Rivisita':'Vai alla sfida'}</button>
+    </div>` : '';
+
+  const html = `
+    <h2>📊 Dashboard di ${S.name}</h2>
+    <p class="tiny">Membro da ${new Date(S.createdAt).toLocaleDateString('it-IT')}</p>
+    <div class="dash-stats">
+      <div class="stat-card"><div class="big">${S.level}</div><div class="lbl">Livello</div></div>
+      <div class="stat-card"><div class="big">${rk.letter}</div><div class="lbl">Rank · ${rk.label}</div></div>
+      <div class="stat-card"><div class="big">${S.totalDone}/${LESSONS.length}</div><div class="lbl">Esercizi</div></div>
+      <div class="stat-card"><div class="big">${S.stars}</div><div class="lbl">Stelle</div></div>
+      <div class="stat-card"><div class="big">${S.streak}</div><div class="lbl">🔥 Streak</div></div>
+      <div class="stat-card"><div class="big">${S.badges.length}/${BADGES.length}</div><div class="lbl">Badge</div></div>
+    </div>
+    ${dailyHtml}
+    <h3 style="margin:14px 0 10px;font-size:14px;">Progresso per traccia</h3>
+    ${byTrack.map(t=>`
+      <div class="skill-row"><span class="lbl">${t.name}</span>
+      <div class="skill-bar"><div class="skill-fill" style="width:${t.pct}%"></div></div>
+      <span class="skill-val">${t.done}/${t.total}</span></div>
+    `).join('')}
+    <h3 style="margin:14px 0 8px;font-size:14px;">🔥 Streak ultimi 7 giorni</h3>
+    ${streakHtml}
+    <h3 style="margin:14px 0 8px;font-size:14px;">🏆 Badge (${S.badges.length}/${BADGES.length})</h3>
+    ${badgesHtml}
+    <h3 style="margin:14px 0 8px;font-size:14px;">⚡ Strumenti</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+      <button class="btn btn-ghost" onclick="closeModal(); openPlayground();">🛝 Playground libero</button>
+      <button class="btn btn-ghost" onclick="closeModal(); exportProgress();">💾 Esporta progressi</button>
+      <button class="btn btn-ghost" onclick="closeModal(); document.getElementById('import-file').click();">📥 Importa progressi</button>
+    </div>
+  `;
+  openModal(html, `<button class="btn" onclick="closeModal()">Chiudi</button>`);
+}
+
+/* ============ IMPORT / EXPORT / SETTINGS ============ */
+function exportProgress(){
+  const data = JSON.stringify(S, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'codequest-python-progress.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Progressi esportati!','good');
+}
+function importProgress(file){
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const obj = JSON.parse(r.result);
+      if(obj && typeof obj === 'object'){
+        S = Object.assign(structuredClone(DEFAULT_STATE), obj);
+        saveState(); renderAll();
+        if(S.currentLesson) loadLesson(S.currentLesson);
+        toast('Progressi importati!','good');
+      }
+    }catch(e){ toast('File non valido','bad'); }
+  };
+  r.readAsText(file);
+}
+function openSettings(){
+  const soundOn = Sfx.isEnabled();
+  openModal(`
+    <h2>⚙️ Impostazioni</h2>
+    <p><b>Nome attuale:</b> ${S.name}</p>
+    <p>Cambia nome:</p>
+    <input id="set-name" type="text" value="${S.name}" style="background:var(--bg-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;width:100%;font-size:14px;outline:none;">
+    <p style="margin-top:16px;"><b>🔊 Suoni</b></p>
+    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:14px;">
+      <input type="checkbox" id="set-sound" ${soundOn ? 'checked' : ''} style="width:18px; height:18px;">
+      <span>Effetti sonori (chime, level-up, badge, ecc.)</span>
+    </label>
+    <p style="margin-top:16px;"><b>Reset progressi:</b> tutte le lezioni torneranno bloccate.</p>
+    <button class="btn btn-warn" id="set-reset">⚠️ Reset Totale</button>
+    <p class="tiny" style="margin-top:14px;">Salvataggio automatico in locale.</p>
+  `, `<button class="btn" onclick="closeModal()">Annulla</button><button class="btn btn-primary" id="set-save">Salva</button>`);
+  document.getElementById('set-save').onclick = ()=>{
+    const n = document.getElementById('set-name').value.trim();
+    if(n) S.name = n.slice(0,20);
+    const so = document.getElementById('set-sound').checked;
+    Sfx.setEnabled(so);
+    try{ localStorage.setItem('codequest_py_sound', so ? '1' : '0'); }catch(_){}
+    saveState(); renderAll(); closeModal();
+    toast('Salvato','good');
+  };
+  document.getElementById('set-reset').onclick = ()=>{
+    if(confirm('Azzerare TUTTI i progressi? Non si torna indietro.')){
+      const oldName = S.name;
+      S = structuredClone(DEFAULT_STATE);
+      S.name = oldName;
+      S.createdAt = Date.now();
+      saveState(); renderAll(); closeModal();
+      currentLesson = null;
+      document.getElementById('lesson-panel').innerHTML = `<h2>🔄 Progressi azzerati</h2><p>Riparti dalla prima lezione!</p>`;
+      editor.setValue('');
+      toast('Tutto azzerato','good');
+    }
+  };
+}
+
+/* ============ PLAYGROUND ============ */
+function openPlayground(){
+  S.currentLesson = null;
+  currentLesson = {
+    id:'__playground__', track:null, title:'Playground libero',
+    diff:1, xp:0,
+    theory:`<h2>🛝 Playground</h2>
+      <p>Sperimenta liberamente in Python. Scrivi qualsiasi codice e premi ▶ Esegui.</p>
+      <pre><code># Esempi che puoi provare:
+import math
+print(math.pi)
+print([i**2 for i in range(10)])
+
+import random
+print(random.choice(["alpha","beta","gamma"]))</code></pre>
+      <p class="tiny">Tutti i moduli standard di Python sono disponibili tramite Pyodide.</p>`,
+    starter:'',
+    tests:[]
+  };
+  document.getElementById('lb-title').textContent = 'Playground';
+  document.getElementById('lb-diff').textContent = 'LIBERO';
+  document.getElementById('lb-diff').className = 'diff-pill diff-2';
+  document.getElementById('lb-meta').textContent = 'Modalità sperimentazione';
+  document.getElementById('lb-xp').textContent = '';
+  document.getElementById('lesson-panel').innerHTML = currentLesson.theory;
+  editor.setValue('# Sperimenta liberamente!\nprint("Hello Playground")\n');
+  clearConsole();
+}
+
+function pickRandomUnlocked(){
+  const candidates = LESSONS.filter(l=>{
+    const all = LESSONS.filter(x=>x.track===l.track);
+    const idx = all.indexOf(l);
+    if(idx===0) return true;
+    return S.progress[all[idx-1].id]?.done;
+  });
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+
+/* ============ SOLUZIONE ============ */
+function useSolution(){
+  if(!currentLesson || !currentLesson.solution) return;
+  // FIX: niente doppia conferma (la prima e' gia' nel toggle "Mostra soluzione").
+  // Chiediamo solo se l'editor contiene gia' codice utente non banale.
+  const current = (editor.getValue() || '').trim();
+  const starter = (currentLesson.starter || '').trim();
+  if(current && current !== starter){
+    if(!confirm('Sostituire il tuo codice corrente con la soluzione?')) return;
+  }
+  editor.setValue(currentLesson.solution);
+  toast('Soluzione caricata. Premi ▶ per eseguirla!','');
+}
+
+/* ============ RIPASSO ============ */
+function pickRandomDone(){
+  const done = LESSONS.filter(l => S.progress[l.id]?.done);
+  if(!done.length) return null;
+  let pool = done;
+  if(currentLesson){
+    const filtered = done.filter(l => l.id !== currentLesson.id);
+    if(filtered.length) pool = filtered;
+  }
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function doRipasso(){
+  const r = pickRandomDone();
+  if(!r){
+    toast('Completa almeno una lezione per iniziare a ripassare', '');
+    return;
+  }
+  toast(`🔄 Ripasso: ${r.title}`, 'gold');
+  loadLesson(r.id);
+}
+
+/* ============ EVENTI ============ */
+document.getElementById('btn-run').onclick = runCode;
+document.getElementById('btn-check').onclick = checkCode;
+document.getElementById('btn-debug').onclick = debugCode;
+document.getElementById('btn-reset').onclick = resetCode;
+document.getElementById('btn-ripasso').onclick = doRipasso;
+document.getElementById('btn-clear-console').onclick = clearConsole;
+document.getElementById('btn-dashboard').onclick = openDashboard;
+document.getElementById('btn-settings').onclick = openSettings;
+document.getElementById('import-file').onchange = e=>{ const f=e.target.files[0]; if(f) importProgress(f); };
+
+/* ============ FULLSCREEN ============ */
+function goFullscreen(){
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if(req) req.call(el).catch(()=>{});
+}
+function toggleFullscreen(){
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+  if(isFs){
+    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if(exit) exit.call(document);
+  } else {
+    goFullscreen();
+  }
+}
+
+/* ============ START ============ */
+let _appStarted = false;
+function startApp(){
+  // FIX: previene doppia esecuzione (click + Enter)
+  if(_appStarted) return;
+  _appStarted = true;
+  const name = document.getElementById('welcome-name').value.trim() || 'Player';
+  if(S.name === 'Player' || !S.lastActive) S.name = name;
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('app').style.display = 'grid';
+  initEditor();
+  setTimeout(()=>editor && editor.refresh(), 50);
+  renderAll();
+  if(S.currentLesson && LESSONS.find(l=>l.id===S.currentLesson)){
+    loadLesson(S.currentLesson);
+  }
+  saveState();
+  goFullscreen();
+  ensurePyodide().catch(()=>{ /* gestito dentro ensurePyodide */ });
+}
+const btnFs = document.getElementById('btn-fullscreen');
+if(btnFs) btnFs.onclick = toggleFullscreen;
+
+document.getElementById('welcome-start').onclick = startApp;
+document.getElementById('welcome-name').addEventListener('keydown', e=>{ if(e.key==='Enter') startApp(); });
+if(S.lastActive){
+  // Utente di ritorno: precompila nome e personalizza il pulsante
+  document.getElementById('welcome-name').value = S.name;
+  const btn = document.getElementById('welcome-start');
+  if(btn) btn.textContent = `Continua, ${S.name} \ud83d\ude80`;
+}
+// FIX: autofocus sul campo nome (un click in meno per partire)
+setTimeout(()=>{ try{ document.getElementById('welcome-name').focus(); }catch(_){} }, 100);
+
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
