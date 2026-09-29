@@ -95,7 +95,12 @@
     } catch (_) { /* aperto da file:// o file mancante */ }
     state.published = normalize(published);
 
-    const draft = await idb.get('draft');
+    // Le bozze servono solo all'area admin senza Gestore. Online, e nel Gestore (che salva
+    // ogni modifica direttamente nel sito), fa fede data.json: una bozza rimasta in memoria
+    // nel browser mostrerebbe per sempre una versione vecchia.
+    const useDraft = isLocalHost() && !state.localServer;
+    const draft = useDraft ? await idb.get('draft') : null;
+    if (!useDraft) await idb.del('draft').catch(() => {});
     if (draft) {
       state.data = normalize(draft);
       state.hasDraft = JSON.stringify(state.data) !== JSON.stringify(state.published);
@@ -120,8 +125,10 @@
     return d;
   }
 
+  function isLocalHost() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
+
   async function detectLocalServer() {
-    if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+    if (!isLocalHost()) return;
     try {
       const res = await fetch('/api/ping', { cache: 'no-store' });
       const out = await res.json();
@@ -1440,7 +1447,8 @@
 
   (async () => {
     app.innerHTML = '<div class="empty">Caricamento…</div>';
-    await Promise.all([loadData(), detectLocalServer()]);
+    await detectLocalServer();
+    await loadData();
     render();
   })();
 })();
