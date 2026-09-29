@@ -89,7 +89,7 @@ def changes_fingerprint():
         return None
     parts = []
     for line in out.splitlines():
-        path = line[3:].split(" -> ")[-1].strip('"')
+        path = line.split(None, 1)[-1].split(" -> ")[-1].strip('"')
         try:
             st = os.stat(os.path.join(ROOT, path))
             parts.append(f"{line}|{st.st_mtime_ns}|{st.st_size}")

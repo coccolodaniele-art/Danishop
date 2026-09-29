@@ -55,20 +55,24 @@ def schedule_sync(message=None, delay=3):
 
 
 def watch_changes():
-    """Si accorge delle modifiche fatte fuori dall'area admin e le pubblica; ritenta se internet mancava."""
-    was_dirty = False
+    """Si accorge delle modifiche fatte fuori dall'area admin e le pubblica; ritenta se internet mancava.
+
+    Pubblica solo quando i file modificati sono rimasti fermi per un intero controllo, così
+    una modifica ancora in corso (più file toccati uno dopo l'altro) va online tutta insieme.
+    """
+    previous = None
     last_retry = 0.0
     while True:
         time.sleep(WATCH_INTERVAL)
         try:
-            dirty = sincronizza.has_changes()
-            if dirty and was_dirty:
+            current = sincronizza.changes_fingerprint()
+            if current and current == previous:
                 sincronizza.sync("Modifica alla struttura del sito")
-                dirty = False
-            elif not dirty and sincronizza.unpushed_commits() > 0 and time.time() - last_retry > RETRY_INTERVAL:
+                current = None
+            elif not current and sincronizza.unpushed_commits() > 0 and time.time() - last_retry > RETRY_INTERVAL:
                 last_retry = time.time()
                 sincronizza.sync()
-            was_dirty = dirty
+            previous = current
         except Exception:  # noqa: BLE001
             pass
 
