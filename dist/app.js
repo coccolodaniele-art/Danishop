@@ -274,6 +274,7 @@
     globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
     link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
     upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
     download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-4-4m4 4 4-4"/><path d="M4 18v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5 9-10"/></svg>'
   };
@@ -649,7 +650,9 @@
               <h4>${esc(p.trialLabel || 'Modalità di prova')}</h4>
               ${p.trialInfo ? `<p>${esc(p.trialInfo)}</p>` : ''}
               <div class="row">
-                ${trialUrl ? `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.download} Prova il programma</a>` : ''}
+                ${trialUrl ? (/\.(exe|msi|zip|rar|7z|dmg|apk)([?#]|$)/i.test(trialUrl)
+                  ? `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.download} Scarica il programma</a>`
+                  : `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.play} Apri il programma</a>`) : ''}
                 <a class="btn secondary small" href="#info">Contattami per informazioni</a>
               </div>
             </div>` : `<div><a class="btn secondary small" href="#info">Contattami per informazioni</a></div>`}
@@ -904,7 +907,7 @@
         <div class="form-section">Modalità di prova</div>
         ${field('trialLabel', 'Titolo della prova', p.trialLabel, { placeholder: 'Es. Prova gratuita di 30 giorni' })}
         ${field('trialInfo', 'Come funziona la prova', p.trialInfo, { textarea: true, rows: 3, placeholder: 'Es. Scarica, installa e usa tutte le funzioni per 30 giorni. Limiti della versione di prova…' })}
-        ${field('trialUrl', 'Link per scaricare / provare', p.trialUrl, { type: 'url', placeholder: 'https://…', hint: 'Facoltativo. Es. link a Google Drive, Dropbox, GitHub…' })}
+        ${field('trialUrl', 'Link per scaricare / provare', p.trialUrl, { type: 'url', placeholder: 'https://…', hint: 'Facoltativo. Link alla versione online (si apre nel browser) o al file da scaricare.' })}
 
         <div class="form-section">Altro</div>
         ${field('requirements', 'Requisiti di sistema', p.requirements, { textarea: true, rows: 3 })}
