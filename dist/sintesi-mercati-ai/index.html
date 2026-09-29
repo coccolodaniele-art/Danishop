@@ -139,7 +139,7 @@
   .sources a:hover { color: var(--cyan); }
   .sources .empty { color: var(--muted); }
   .suggest { padding: 0 18px 14px; }
-  .suggest iframe { width: 100%; border: 0; height: 64px; border-radius: 10px; background: transparent; color-scheme: normal; }
+  .suggest iframe { width: 100%; border: 0; height: 52px; border-radius: 10px; background: transparent; color-scheme: dark; }
   .hint { color: #7d7ca8; font-size: .78rem; padding: 0 20px 12px; margin: 0; }
 
   .article { background: var(--field); padding: 26px 32px 30px; min-height: 280px; }
@@ -471,7 +471,7 @@
       const f = document.createElement('iframe');
       f.title = 'Ricerche Google correlate';
       f.setAttribute('sandbox', 'allow-popups allow-popups-to-escape-sandbox');
-      f.srcdoc = '<base target="_blank"><style>body{margin:0;background:transparent}</style>' + rendered;
+      f.srcdoc = '<meta name="color-scheme" content="dark"><base target="_blank"><style>html,body{margin:0;background:transparent}*{scrollbar-width:none}::-webkit-scrollbar{display:none}</style>' + rendered;
       els.suggest.appendChild(f);
     }
     return list.length;
