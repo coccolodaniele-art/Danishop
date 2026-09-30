@@ -1,0 +1,1014 @@
+{
+ "source_file": "sp500_vertical_thermometer.py",
+ "APP_TITLE": "S&P 500 SMA200 Thermometer",
+ "USER_AGENT": "SP500VerticalThermometer/1.1 desktop-contact",
+ "PRICE_FILTER_NO_BOUND": "Tutti",
+ "PRICE_FILTER_OPTIONS": [
+  "Tutti",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+  "1000"
+ ],
+ "VOTE_FILTER_CHOICES": [
+  7,
+  8,
+  9,
+  10
+ ],
+ "SMA_DISTANCE_THRESHOLD": 0.1,
+ "SMA_THRESHOLD_OPTIONS": [
+  0.1,
+  0.2,
+  0.3
+ ],
+ "EDGAR_SPY_URL": "https://data.sec.gov/submissions/CIK0000884394.json",
+ "EDGAR_TICKERS_URL": "https://www.sec.gov/files/company_tickers.json",
+ "EDGAR_TICKERS_EXCHANGE_URL": "https://www.sec.gov/files/company_tickers_exchange.json",
+ "EDGAR_COMPANYFACTS_URL": "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik10}.json",
+ "SP500_WIKI_URL": "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
+ "CONSTITUENTS_CACHE_MAX_AGE_DAYS": 30.0,
+ "GEMINI_MODEL": "gemini-2.5-flash",
+ "GEMINI_API_URL": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+ "GEMINI_API_KEY_INFO_URL": "https://aistudio.google.com/apikey",
+ "GEMINI_SEARCH_MODELS": [
+  "gemini-2.5-flash",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite"
+ ],
+ "GEMINI_SEARCH_MAX": 8,
+ "SEARCH_MAX_RESULTS": 12,
+ "YAHOO_SEARCH_URL": "https://query1.finance.yahoo.com/v1/finance/search?q={q}&quotesCount=8&newsCount=0",
+ "YAHOO_SEARCH_MAX": 6,
+ "NASDAQ_HISTORY_URL": "https://api.nasdaq.com/api/quote/{symbol}/historical?assetclass={asset}&fromdate={start}&limit=400",
+ "NASDAQ_INDEX_SYMBOLS": {
+  "^IXIC": "COMP",
+  "^NDX": "NDX",
+  "^GSPC": "SPX",
+  "^DJI": "DJI",
+  "^RUT": "RUT"
+ },
+ "MAIN_ASSET": [
+  "^GSPC",
+  "S&P 500",
+  "SPY",
+  "index"
+ ],
+ "COMMODITY_SECTOR": [
+  "Materie prime e altri asset",
+  [
+   [
+    "GC=F",
+    "Oro",
+    "",
+    "commodity"
+   ],
+   [
+    "SI=F",
+    "Argento",
+    "",
+    "commodity"
+   ],
+   [
+    "CL=F",
+    "Petrolio WTI",
+    "",
+    "commodity"
+   ],
+   [
+    "BTC-USD",
+    "Bitcoin",
+    "",
+    "commodity"
+   ]
+  ]
+ ],
+ "FALLBACK_SECTORS": [
+  [
+   "Tecnologia",
+   [
+    [
+     "AAPL",
+     "Apple",
+     "",
+     "equity"
+    ],
+    [
+     "MSFT",
+     "Microsoft",
+     "",
+     "equity"
+    ],
+    [
+     "NVDA",
+     "NVIDIA",
+     "",
+     "equity"
+    ],
+    [
+     "AVGO",
+     "Broadcom",
+     "",
+     "equity"
+    ],
+    [
+     "ORCL",
+     "Oracle",
+     "",
+     "equity"
+    ],
+    [
+     "CRM",
+     "Salesforce",
+     "",
+     "equity"
+    ],
+    [
+     "ADBE",
+     "Adobe",
+     "",
+     "equity"
+    ],
+    [
+     "AMD",
+     "AMD",
+     "",
+     "equity"
+    ],
+    [
+     "INTC",
+     "Intel",
+     "",
+     "equity"
+    ],
+    [
+     "CSCO",
+     "Cisco",
+     "",
+     "equity"
+    ],
+    [
+     "IBM",
+     "IBM",
+     "",
+     "equity"
+    ],
+    [
+     "QCOM",
+     "Qualcomm",
+     "",
+     "equity"
+    ],
+    [
+     "TXN",
+     "Texas Instruments",
+     "",
+     "equity"
+    ],
+    [
+     "NOW",
+     "ServiceNow",
+     "",
+     "equity"
+    ],
+    [
+     "INTU",
+     "Intuit",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Finanza",
+   [
+    [
+     "JPM",
+     "JPMorgan",
+     "",
+     "equity"
+    ],
+    [
+     "BAC",
+     "Bank of America",
+     "",
+     "equity"
+    ],
+    [
+     "WFC",
+     "Wells Fargo",
+     "",
+     "equity"
+    ],
+    [
+     "GS",
+     "Goldman Sachs",
+     "",
+     "equity"
+    ],
+    [
+     "MS",
+     "Morgan Stanley",
+     "",
+     "equity"
+    ],
+    [
+     "C",
+     "Citigroup",
+     "",
+     "equity"
+    ],
+    [
+     "BRK-B",
+     "Berkshire Hathaway",
+     "",
+     "equity"
+    ],
+    [
+     "V",
+     "Visa",
+     "",
+     "equity"
+    ],
+    [
+     "MA",
+     "Mastercard",
+     "",
+     "equity"
+    ],
+    [
+     "AXP",
+     "American Express",
+     "",
+     "equity"
+    ],
+    [
+     "BLK",
+     "BlackRock",
+     "",
+     "equity"
+    ],
+    [
+     "SCHW",
+     "Charles Schwab",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Salute",
+   [
+    [
+     "LLY",
+     "Eli Lilly",
+     "",
+     "equity"
+    ],
+    [
+     "UNH",
+     "UnitedHealth",
+     "",
+     "equity"
+    ],
+    [
+     "JNJ",
+     "Johnson & Johnson",
+     "",
+     "equity"
+    ],
+    [
+     "ABBV",
+     "AbbVie",
+     "",
+     "equity"
+    ],
+    [
+     "MRK",
+     "Merck",
+     "",
+     "equity"
+    ],
+    [
+     "PFE",
+     "Pfizer",
+     "",
+     "equity"
+    ],
+    [
+     "TMO",
+     "Thermo Fisher",
+     "",
+     "equity"
+    ],
+    [
+     "ABT",
+     "Abbott",
+     "",
+     "equity"
+    ],
+    [
+     "DHR",
+     "Danaher",
+     "",
+     "equity"
+    ],
+    [
+     "BMY",
+     "Bristol-Myers Squibb",
+     "",
+     "equity"
+    ],
+    [
+     "AMGN",
+     "Amgen",
+     "",
+     "equity"
+    ],
+    [
+     "GILD",
+     "Gilead Sciences",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Beni di consumo ciclici",
+   [
+    [
+     "AMZN",
+     "Amazon",
+     "",
+     "equity"
+    ],
+    [
+     "TSLA",
+     "Tesla",
+     "",
+     "equity"
+    ],
+    [
+     "HD",
+     "Home Depot",
+     "",
+     "equity"
+    ],
+    [
+     "MCD",
+     "McDonald's",
+     "",
+     "equity"
+    ],
+    [
+     "NKE",
+     "Nike",
+     "",
+     "equity"
+    ],
+    [
+     "LOW",
+     "Lowe's",
+     "",
+     "equity"
+    ],
+    [
+     "SBUX",
+     "Starbucks",
+     "",
+     "equity"
+    ],
+    [
+     "BKNG",
+     "Booking Holdings",
+     "",
+     "equity"
+    ],
+    [
+     "TJX",
+     "TJX Companies",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Beni di consumo difensivi",
+   [
+    [
+     "WMT",
+     "Walmart",
+     "",
+     "equity"
+    ],
+    [
+     "PG",
+     "Procter & Gamble",
+     "",
+     "equity"
+    ],
+    [
+     "KO",
+     "Coca-Cola",
+     "",
+     "equity"
+    ],
+    [
+     "PEP",
+     "PepsiCo",
+     "",
+     "equity"
+    ],
+    [
+     "COST",
+     "Costco",
+     "",
+     "equity"
+    ],
+    [
+     "PM",
+     "Philip Morris",
+     "",
+     "equity"
+    ],
+    [
+     "MO",
+     "Altria",
+     "",
+     "equity"
+    ],
+    [
+     "CL",
+     "Colgate-Palmolive",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Comunicazioni",
+   [
+    [
+     "GOOGL",
+     "Alphabet",
+     "",
+     "equity"
+    ],
+    [
+     "META",
+     "Meta",
+     "",
+     "equity"
+    ],
+    [
+     "NFLX",
+     "Netflix",
+     "",
+     "equity"
+    ],
+    [
+     "DIS",
+     "Disney",
+     "",
+     "equity"
+    ],
+    [
+     "CMCSA",
+     "Comcast",
+     "",
+     "equity"
+    ],
+    [
+     "T",
+     "AT&T",
+     "",
+     "equity"
+    ],
+    [
+     "VZ",
+     "Verizon",
+     "",
+     "equity"
+    ],
+    [
+     "TMUS",
+     "T-Mobile US",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Industriali",
+   [
+    [
+     "GE",
+     "General Electric",
+     "",
+     "equity"
+    ],
+    [
+     "CAT",
+     "Caterpillar",
+     "",
+     "equity"
+    ],
+    [
+     "HON",
+     "Honeywell",
+     "",
+     "equity"
+    ],
+    [
+     "UNP",
+     "Union Pacific",
+     "",
+     "equity"
+    ],
+    [
+     "RTX",
+     "RTX Corp",
+     "",
+     "equity"
+    ],
+    [
+     "BA",
+     "Boeing",
+     "",
+     "equity"
+    ],
+    [
+     "UPS",
+     "UPS",
+     "",
+     "equity"
+    ],
+    [
+     "LMT",
+     "Lockheed Martin",
+     "",
+     "equity"
+    ],
+    [
+     "DE",
+     "Deere",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Energia",
+   [
+    [
+     "XOM",
+     "Exxon Mobil",
+     "",
+     "equity"
+    ],
+    [
+     "CVX",
+     "Chevron",
+     "",
+     "equity"
+    ],
+    [
+     "COP",
+     "ConocoPhillips",
+     "",
+     "equity"
+    ],
+    [
+     "SLB",
+     "Schlumberger",
+     "",
+     "equity"
+    ],
+    [
+     "EOG",
+     "EOG Resources",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Materiali",
+   [
+    [
+     "LIN",
+     "Linde",
+     "",
+     "equity"
+    ],
+    [
+     "SHW",
+     "Sherwin-Williams",
+     "",
+     "equity"
+    ],
+    [
+     "FCX",
+     "Freeport-McMoRan",
+     "",
+     "equity"
+    ],
+    [
+     "ECL",
+     "Ecolab",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Immobiliare",
+   [
+    [
+     "PLD",
+     "Prologis",
+     "",
+     "equity"
+    ],
+    [
+     "AMT",
+     "American Tower",
+     "",
+     "equity"
+    ],
+    [
+     "EQIX",
+     "Equinix",
+     "",
+     "equity"
+    ],
+    [
+     "O",
+     "Realty Income",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Utility",
+   [
+    [
+     "NEE",
+     "NextEra Energy",
+     "",
+     "equity"
+    ],
+    [
+     "DUK",
+     "Duke Energy",
+     "",
+     "equity"
+    ],
+    [
+     "SO",
+     "Southern Company",
+     "",
+     "equity"
+    ]
+   ]
+  ],
+  [
+   "Materie prime e altri asset",
+   [
+    [
+     "GC=F",
+     "Oro",
+     "",
+     "commodity"
+    ],
+    [
+     "SI=F",
+     "Argento",
+     "",
+     "commodity"
+    ],
+    [
+     "CL=F",
+     "Petrolio WTI",
+     "",
+     "commodity"
+    ],
+    [
+     "BTC-USD",
+     "Bitcoin",
+     "",
+     "commodity"
+    ]
+   ]
+  ]
+ ],
+ "GICS_TO_ITALIAN": [
+  [
+   "Information Technology",
+   "Tecnologia"
+  ],
+  [
+   "Financials",
+   "Finanza"
+  ],
+  [
+   "Health Care",
+   "Salute"
+  ],
+  [
+   "Consumer Discretionary",
+   "Beni di consumo ciclici"
+  ],
+  [
+   "Consumer Staples",
+   "Beni di consumo difensivi"
+  ],
+  [
+   "Communication Services",
+   "Comunicazioni"
+  ],
+  [
+   "Industrials",
+   "Industriali"
+  ],
+  [
+   "Energy",
+   "Energia"
+  ],
+  [
+   "Materials",
+   "Materiali"
+  ],
+  [
+   "Real Estate",
+   "Immobiliare"
+  ],
+  [
+   "Utilities",
+   "Utility"
+  ]
+ ],
+ "EDGAR_FUNDAMENTAL_TAGS": {
+  "revenue": [
+   "Revenues",
+   "RevenueFromContractWithCustomerExcludingAssessedTax",
+   "SalesRevenueNet"
+  ],
+  "net_income": [
+   "NetIncomeLoss"
+  ],
+  "equity": [
+   "StockholdersEquity"
+  ],
+  "liabilities": [
+   "Liabilities"
+  ],
+  "operating_cash_flow": [
+   "NetCashProvidedByUsedInOperatingActivities",
+   "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"
+  ],
+  "capex": [
+   "PaymentsToAcquirePropertyPlantAndEquipment",
+   "PaymentsToAcquireProductiveAssets"
+  ]
+ },
+ "DEFAULT_SECTOR_PROFILE": {
+  "growth_good": 0.05,
+  "growth_bad": -0.05,
+  "margin_good": 0.06,
+  "margin_bad": 0.0,
+  "leverage_good": 1.5,
+  "leverage_bad": 3.5,
+  "fcf_margin_good": 0.03,
+  "fcf_margin_bad": -0.05
+ },
+ "SECTOR_PROFILES": {
+  "Tecnologia": {
+   "growth_good": 0.1,
+   "growth_bad": -0.05,
+   "margin_good": 0.15,
+   "margin_bad": 0.0,
+   "leverage_good": 1.0,
+   "leverage_bad": 3.0,
+   "fcf_margin_good": 0.1,
+   "fcf_margin_bad": -0.05
+  },
+  "Comunicazioni": {
+   "growth_good": 0.06,
+   "growth_bad": -0.05,
+   "margin_good": 0.08,
+   "margin_bad": 0.0,
+   "leverage_good": 2.0,
+   "leverage_bad": 4.0,
+   "fcf_margin_good": 0.03,
+   "fcf_margin_bad": -0.05
+  },
+  "Beni di consumo ciclici": {
+   "growth_good": 0.08,
+   "growth_bad": -0.05,
+   "margin_good": 0.05,
+   "margin_bad": 0.0,
+   "leverage_good": 1.5,
+   "leverage_bad": 3.5,
+   "fcf_margin_good": 0.04,
+   "fcf_margin_bad": -0.05
+  },
+  "Beni di consumo difensivi": {
+   "growth_good": 0.03,
+   "growth_bad": -0.03,
+   "margin_good": 0.05,
+   "margin_bad": 0.0,
+   "leverage_good": 1.5,
+   "leverage_bad": 3.5,
+   "fcf_margin_good": 0.04,
+   "fcf_margin_bad": -0.03
+  },
+  "Salute": {
+   "growth_good": 0.05,
+   "growth_bad": -0.03,
+   "margin_good": 0.08,
+   "margin_bad": 0.0,
+   "leverage_good": 1.5,
+   "leverage_bad": 3.5,
+   "fcf_margin_good": 0.06,
+   "fcf_margin_bad": -0.03
+  },
+  "Utility": {
+   "growth_good": 0.02,
+   "growth_bad": -0.03,
+   "margin_good": 0.08,
+   "margin_bad": 0.0,
+   "leverage_good": 3.0,
+   "leverage_bad": 6.0,
+   "fcf_margin_good": -0.02,
+   "fcf_margin_bad": -0.15
+  },
+  "Finanza": {
+   "growth_good": 0.05,
+   "growth_bad": -0.05,
+   "margin_good": 0.12,
+   "margin_bad": 0.0,
+   "leverage_good": null,
+   "leverage_bad": null,
+   "fcf_margin_good": null,
+   "fcf_margin_bad": null
+  },
+  "Immobiliare": {
+   "growth_good": 0.03,
+   "growth_bad": -0.05,
+   "margin_good": 0.1,
+   "margin_bad": 0.0,
+   "leverage_good": 2.5,
+   "leverage_bad": 5.0,
+   "fcf_margin_good": null,
+   "fcf_margin_bad": null
+  },
+  "Industriali": {
+   "growth_good": 0.05,
+   "growth_bad": -0.05,
+   "margin_good": 0.06,
+   "margin_bad": 0.0,
+   "leverage_good": 1.5,
+   "leverage_bad": 3.5,
+   "fcf_margin_good": 0.04,
+   "fcf_margin_bad": -0.05
+  },
+  "Energia": {
+   "growth_good": 0.05,
+   "growth_bad": -0.1,
+   "margin_good": 0.06,
+   "margin_bad": -0.03,
+   "leverage_good": 1.5,
+   "leverage_bad": 3.5,
+   "fcf_margin_good": 0.02,
+   "fcf_margin_bad": -0.1
+  },
+  "Materiali": {
+   "growth_good": 0.05,
+   "growth_bad": -0.08,
+   "margin_good": 0.06,
+   "margin_bad": -0.03,
+   "leverage_good": 1.5,
+   "leverage_bad": 3.5,
+   "fcf_margin_good": 0.02,
+   "fcf_margin_bad": -0.08
+  }
+ },
+ "YAHOO_QUOTE_TYPES": {
+  "EQUITY": [
+   "azione",
+   "equity"
+  ],
+  "ETF": [
+   "etf",
+   "equity"
+  ],
+  "MUTUALFUND": [
+   "fondo",
+   "equity"
+  ],
+  "INDEX": [
+   "indice",
+   "equity"
+  ],
+  "FUTURE": [
+   "future",
+   "commodity"
+  ],
+  "CRYPTOCURRENCY": [
+   "cripto",
+   "commodity"
+  ],
+  "CURRENCY": [
+   "valuta",
+   "commodity"
+  ]
+ },
+ "YAHOO_SECTOR_TO_ITALIAN": {
+  "Technology": "Tecnologia",
+  "Financial Services": "Finanza",
+  "Healthcare": "Salute",
+  "Consumer Cyclical": "Beni di consumo ciclici",
+  "Consumer Defensive": "Beni di consumo difensivi",
+  "Communication Services": "Comunicazioni",
+  "Industrials": "Industriali",
+  "Energy": "Energia",
+  "Basic Materials": "Materiali",
+  "Real Estate": "Immobiliare",
+  "Utilities": "Utility"
+ },
+ "QUERY_STOPWORDS": [
+  "and",
+  "azione",
+  "azioni",
+  "by",
+  "da",
+  "degli",
+  "dei",
+  "del",
+  "della",
+  "delle",
+  "dello",
+  "di",
+  "e",
+  "gli",
+  "i",
+  "il",
+  "la",
+  "le",
+  "lo",
+  "of",
+  "shares",
+  "societa",
+  "stock",
+  "the",
+  "titolo"
+ ],
+ "NAME_GENERIC_WORDS": [
+  "a",
+  "ag",
+  "and",
+  "class",
+  "co",
+  "company",
+  "corp",
+  "corporation",
+  "de",
+  "di",
+  "etf",
+  "fund",
+  "group",
+  "holding",
+  "holdings",
+  "inc",
+  "international",
+  "limited",
+  "ltd",
+  "n",
+  "nv",
+  "of",
+  "p",
+  "plc",
+  "s",
+  "sa",
+  "se",
+  "shares",
+  "spa",
+  "technologies",
+  "technology",
+  "the",
+  "trust",
+  "v"
+ ],
+ "PROMPT_EXPLANATION": "Sei un analista fondamentale che parla con qualcuno senza background finanziario. Rispondi in italiano semplice e diretto, frasi brevi, senza gergo tecnico non spiegato, in massimo 170 parole, strutturato in due parti brevi:\n1) Perche' il prezzo di @@LABEL@@ (@@SYMBOL@@) si trova nella posizione attuale rispetto a questi livelli di mercato delle ultime 200 sedute giornaliere (usali solo come riferimento della posizione attuale del prezzo, non come base dell'analisi):\n- Prezzo attuale: @@PRICE@@\n- Media mobile SMA200: @@SMA@@\n- Minimo 200 periodi: @@LOW@@\n- Massimo 200 periodi: @@HIGH@@\n- POC Volume Profile 200 periodi (livello di prezzo con piu' volume scambiato): @@POC@@\nNon mettere in discussione, contestare o ricalcolare questi valori: dai per corretti i dati forniti e limitati a motivarne il significato in modo semplice.2) Se in questo momento uno stesse valutando di aprire una posizione LONG (comprare aspettandosi un rialzo), cosa potrebbe aspettarsi in base a questi elementi fondamentali? Di' chiaramente se la situazione attuale sembra piu' interessante o piu' sconveniente per entrare long adesso, e perche', in modo semplice e diretto - non startene sulle generali. Chiarisci che e' una lettura informativa basata sui dati forniti, non un consiglio di investimento personalizzato.\nBasa tutto su fondamentali - utili, crescita, valutazione, qualita' del business, contesto macroeconomico e di settore - usando la tua conoscenza generale dell'azienda o dell'indice, non su pattern grafici o segnali tecnici. Se non conosci con certezza dati recenti specifici (risultati trimestrali, notizie puntuali) che non ti ho fornito sopra, dillo esplicitamente invece di inventarli.",
+ "PROMPT_EXPLANATION_EDGAR": "Sei un analista fondamentale che parla con qualcuno senza background finanziario. Rispondi in italiano semplice e diretto, frasi brevi, senza gergo tecnico non spiegato, in massimo 170 parole, strutturato in due parti brevi:\n1) Perche' il prezzo di @@LABEL@@ (@@SYMBOL@@) si trova nella posizione attuale rispetto a questi livelli di mercato delle ultime 200 sedute giornaliere (usali solo come riferimento della posizione attuale del prezzo, non come base dell'analisi):\n- Prezzo attuale: @@PRICE@@\n- Media mobile SMA200: @@SMA@@\n- Minimo 200 periodi: @@LOW@@\n- Massimo 200 periodi: @@HIGH@@\n- POC Volume Profile 200 periodi (livello di prezzo con piu' volume scambiato): @@POC@@\nNon mettere in discussione, contestare o ricalcolare questi valori: dai per corretti i dati forniti e limitati a motivarne il significato in modo semplice.\nDati fondamentali reali da SEC EDGAR (bilanci ufficiali depositati alla SEC, in USD):\n@@EDGAR@@\nUsa questi dati concreti come base principale dell'analisi (trend di ricavi/utili, indebitamento rispetto al patrimonio netto, flusso di cassa operativo e flusso di cassa libero al netto del CapEx), integrandoli con la tua conoscenza generale dell'azienda per una spiegazione piu' mirata ed esaustiva.\n2) Se in questo momento uno stesse valutando di aprire una posizione LONG (comprare aspettandosi un rialzo), cosa potrebbe aspettarsi in base a questi elementi fondamentali? Di' chiaramente se la situazione attuale sembra piu' interessante o piu' sconveniente per entrare long adesso, e perche', in modo semplice e diretto - non startene sulle generali. Chiarisci che e' una lettura informativa basata sui dati forniti, non un consiglio di investimento personalizzato.\nBasa tutto su fondamentali - utili, crescita, valutazione, qualita' del business, contesto macroeconomico e di settore - usando la tua conoscenza generale dell'azienda o dell'indice, non su pattern grafici o segnali tecnici. Se non conosci con certezza dati recenti specifici (risultati trimestrali, notizie puntuali) che non ti ho fornito sopra, dillo esplicitamente invece di inventarli.",
+ "PROMPT_SEARCH": "Sei un motore di ricerca di strumenti finanziari. L'utente cerca: \"@@QUERY@@\"\nRestituisci fino a 8 strumenti quotati realmente esistenti che corrispondono meglio alla ricerca (azioni di qualsiasi borsa mondiale, ETF, indici, materie prime, criptovalute, valute).\nSe la ricerca identifica un singolo strumento (un ticker o il nome di un'azienda/indice/materia prima), restituisci quello per primo, seguito solo dalle sue altre quotazioni (altre borse, ADR); NON aggiungere strumenti diversi o semplicemente correlati. Se invece la ricerca e' generica (un settore, un tema, un paese), restituisci gli strumenti piu' rappresentativi.\nPer ciascuno usa ESATTAMENTE il simbolo di Yahoo Finance (esempi: AAPL, RACE.MI, ENI.MI, SAP.DE, MC.PA, 7203.T, ^GSPC, ^IXIC, FTSEMIB.MI, GC=F, CL=F, BTC-USD, EURUSD=X).\nIl tuo unico compito e' individuare il ticker giusto e il nome dello strumento: NON fornire prezzi, valori, dati di mercato o altre informazioni.\nRispondi SOLO con un array JSON di oggetti con questi campi:\n- \"symbol\": simbolo Yahoo Finance\n- \"nome\": nome dello strumento\n- \"sec_ticker\": ticker con cui la societa' deposita i bilanci alla SEC americana, se lo fa (anche tramite ADR), altrimenti \"\"\nNon inventare simboli: se non sei sicuro che un simbolo esista su Yahoo Finance, non includerlo. Se non trovi nulla restituisci [].",
+ "PROMPT_SEARCH_CTX": "Sei un motore di ricerca di strumenti finanziari. L'utente cerca: \"@@QUERY@@\"\nRestituisci fino a 8 strumenti quotati realmente esistenti che corrispondono meglio alla ricerca (azioni di qualsiasi borsa mondiale, ETF, indici, materie prime, criptovalute, valute).\nSe la ricerca identifica un singolo strumento (un ticker o il nome di un'azienda/indice/materia prima), restituisci quello per primo, seguito solo dalle sue altre quotazioni (altre borse, ADR); NON aggiungere strumenti diversi o semplicemente correlati. Se invece la ricerca e' generica (un settore, un tema, un paese), restituisci gli strumenti piu' rappresentativi.\nPer ciascuno usa ESATTAMENTE il simbolo di Yahoo Finance (esempi: AAPL, RACE.MI, ENI.MI, SAP.DE, MC.PA, 7203.T, ^GSPC, ^IXIC, FTSEMIB.MI, GC=F, CL=F, BTC-USD, EURUSD=X).\nIl tuo unico compito e' individuare il ticker giusto e il nome dello strumento: NON fornire prezzi, valori, dati di mercato o altre informazioni.\nRispondi SOLO con un array JSON di oggetti con questi campi:\n- \"symbol\": simbolo Yahoo Finance\n- \"nome\": nome dello strumento\n- \"sec_ticker\": ticker con cui la societa' deposita i bilanci alla SEC americana, se lo fa (anche tramite ADR), altrimenti \"\"\nNon inventare simboli: se non sei sicuro che un simbolo esista su Yahoo Finance, non includerlo. Se non trovi nulla restituisci [].\nRisultati aggiornati di oggi dalla ricerca di Yahoo Finance per questa richiesta (simbolo | nome | tipo e borsa):\n- @@CTX@@\nLe tue conoscenze potrebbero essere ferme a prima di quotazioni recenti (IPO): se uno di questi risultati corrisponde a cio' che l'utente cerca, consideralo quotato e mettilo per primo, anche se non lo conoscevi come societa' quotata.\n"
+}
