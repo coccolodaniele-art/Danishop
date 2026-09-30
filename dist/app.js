@@ -48,7 +48,7 @@
     published: clone(DEFAULT_DATA),
     hasDraft: false,
     isAdmin: sessionGet('admin_ok') === '1' || isRemembered(),
-    route: 'shop',
+    route: 'programmi',
     shop: { q: '', cat: 'Tutte', showSold: false },
     adminTab: 'articoli',
     editing: null,
@@ -333,7 +333,7 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    return ['shop', 'programmi', 'info', 'admin'].includes(r) ? r : 'shop';
+    return ['shop', 'programmi', 'info', 'admin'].includes(r) ? r : 'programmi';
   }
 
   function render() {
@@ -735,7 +735,7 @@
 
   function renderAdmin() {
     if (!IS_LOCAL) {
-      return `<div class="login card"><h2>Area riservata</h2><p class="item-meta" style="margin:0">Questa sezione non è disponibile online.</p><p><a class="btn secondary" href="#shop">Torna al sito</a></p></div>`;
+      return `<div class="login card"><h2>Area riservata</h2><p class="item-meta" style="margin:0">Questa sezione non è disponibile online.</p><p><a class="btn secondary" href="#programmi">Torna al sito</a></p></div>`;
     }
     if (!state.isAdmin) return renderLogin();
     const d = state.data;
@@ -751,7 +751,7 @@
       <div class="admin-head">
         <h1>Area admin</h1>
         <div class="row">
-          <a class="btn secondary small" href="#shop">Vedi il sito</a>
+          <a class="btn secondary small" href="#programmi">Vedi il sito</a>
           <button class="btn ghost small" data-action="logout">Esci</button>
         </div>
       </div>
@@ -1250,7 +1250,7 @@
     'buy': (el) => openCheckout(el.dataset.id),
     'copy': (el) => copy(el.dataset.value),
 
-    'logout': () => { sessionSet('admin_ok', null); localSet('admin_remember', null); state.isAdmin = false; state.editing = null; location.hash = '#shop'; },
+    'logout': () => { sessionSet('admin_ok', null); localSet('admin_remember', null); state.isAdmin = false; state.editing = null; location.hash = '#programmi'; },
     'tab': (el, e) => { e.preventDefault(); state.adminTab = el.dataset.tab; state.editing = null; render(); },
 
     'new-item': () => {
