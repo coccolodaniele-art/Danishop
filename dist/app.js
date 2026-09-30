@@ -13,6 +13,7 @@
       shopIntro: 'Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.',
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
       tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
+      gamesIntro: 'Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.',
       ownerName: '',
       email: '',
       phone: '',
@@ -41,10 +42,11 @@
     { value: 'venduto', label: 'Venduto' }
   ];
   const MAX_PHOTOS = 6;
-  // Sezioni della pagina Programmi: ogni programma appartiene a una delle due schede.
+  // Sezioni della pagina Programmi: ogni programma appartiene a una delle schede.
   const PROGRAM_SECTIONS = [
     { value: 'apprendimento', route: 'programmi', nav: 'Apprendimento', title: "Programmi per l'apprendimento", introKey: 'programsIntro' },
-    { value: 'finanza', route: 'trading', nav: 'Trading e finanza', title: 'Programmi per trading e finanza', introKey: 'tradingIntro' }
+    { value: 'finanza', route: 'trading', nav: 'Trading e finanza', title: 'Programmi per trading e finanza', introKey: 'tradingIntro' },
+    { value: 'giochi', route: 'giochi', nav: 'Giochi', title: 'Giochi', introKey: 'gamesIntro' }
   ];
   const sectionByValue = (v) => PROGRAM_SECTIONS.find((s) => s.value === v) || PROGRAM_SECTIONS[0];
   // L'area admin esiste solo sulla copia del sito in questo PC, mai su quella online.
@@ -340,7 +342,7 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    return ['shop', 'programmi', 'trading', 'info', 'admin'].includes(r) ? r : 'programmi';
+    return ['shop', 'programmi', 'trading', 'giochi', 'info', 'admin'].includes(r) ? r : 'programmi';
   }
 
   function render() {
@@ -348,7 +350,8 @@
     updateChrome();
     const views = {
       shop: renderShop, info: renderInfo, admin: renderAdmin,
-      programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1])
+      programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1]),
+      giochi: () => renderPrograms(PROGRAM_SECTIONS[2])
     };
     app.innerHTML = views[state.route]();
     afterRender();
@@ -358,7 +361,7 @@
     const s = state.data.settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { shop: 'Shop usato', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { shop: 'Shop usato', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -647,8 +650,38 @@
         <h1>${esc(section.title)}</h1>
         <p>${esc(s[section.introKey])}</p>
       </section>
-      ${list.length ? `<div class="programs">${list.map(renderProgram).join('')}</div>`
-        : '<div class="empty"><strong>Nessun programma pubblicato</strong>A breve troverai qui i miei programmi.</div>'}`;
+      ${list.length ? `<div class="programs">${list.map(section.value === 'giochi' ? renderGame : renderProgram).join('')}</div>`
+        : section.value === 'giochi' ? '<div class="empty"><strong>Nessun gioco pubblicato</strong>A breve troverai qui i miei giochi.</div>'
+          : '<div class="empty"><strong>Nessun programma pubblicato</strong>A breve troverai qui i miei programmi.</div>'}`;
+  }
+
+  // Scheda di un gioco: immagine, breve descrizione a lato e pulsante "Gioca ora".
+  function renderGame(p) {
+    const img = safeImg(p.image);
+    const features = String(p.features || '').split('\n').map((x) => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+    const playUrl = safeUrl(p.trialUrl);
+    return `
+      <article class="program game" id="prog-${esc(p.id)}">
+        <div class="program-media${img ? ' has-shot' : ''}">${img ? `
+          <button type="button" class="shot" data-action="zoom-shot" data-id="${esc(p.id)}" aria-label="Ingrandisci l'immagine di ${esc(p.name)}">
+            <span class="shot-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+            <img src="${img}" alt="${esc(p.name)}" loading="lazy">
+            <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
+          </button>` : `<span class="initial">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`}</div>
+        <div class="program-body">
+          <div>
+            <h2>${esc(p.name)}</h2>
+            ${p.tagline ? `<p class="tagline">${esc(p.tagline)}</p>` : ''}
+          </div>
+          ${p.description ? `<div class="text">${linkify(p.description)}</div>` : ''}
+          ${features.length ? `<ul class="features">${features.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+          ${p.trialInfo ? `<p class="item-meta">${linkify(p.trialInfo)}</p>` : ''}
+          <div class="row">
+            ${playUrl ? `<a class="btn play-now" href="${esc(playUrl)}" target="_blank" rel="noopener">${ICONS.play} ${esc(p.trialLabel || 'Gioca ora')}</a>` : ''}
+          </div>
+          ${p.requirements ? `<p class="item-meta">${linkify(p.requirements)}</p>` : ''}
+        </div>
+      </article>`;
   }
 
   function renderProgram(p) {
@@ -1036,6 +1069,7 @@
         ${field('shopIntro', 'Testo introduttivo dello Shop usato', s.shopIntro, { textarea: true, rows: 2 })}
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
         ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
+        ${field('gamesIntro', 'Testo introduttivo della scheda Giochi', s.gamesIntro, { textarea: true, rows: 2 })}
 
         <div class="form-section">Pagamento con bonifico</div>
         <div class="notice ok">Questi dati compaiono nella finestra di acquisto, con i pulsanti per copiarli.</div>

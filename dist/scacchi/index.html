@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scacchi</title>
+<meta name="description" content="Gioca a scacchi contro il computer (6 livelli), online con gli altri visitatori o con un amico sullo stesso dispositivo.">
+<meta name="theme-color" content="#11151f">
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23b58863"/><rect x="0" y="0" width="50" height="50" rx="0" fill="%23f0d9b5"/><rect x="50" y="50" width="50" height="50" fill="%23f0d9b5"/><text x="50" y="76" font-size="72" text-anchor="middle" fill="%2311151f" font-family="Segoe UI Symbol,DejaVu Sans,sans-serif">&#9822;</text></svg>'>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="top">
+  <button id="btnHome" class="top-btn" type="button" hidden>&larr; Menu</button>
+  <h1 class="brand"><span class="brand-icon" aria-hidden="true"></span>Scacchi</h1>
+  <button id="btnSettings" class="top-btn icon" type="button" aria-label="Impostazioni" title="Impostazioni">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2.1-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+  </button>
+</header>
+
+<main>
+  <!-- MENU -->
+  <section id="scrMenu" class="screen">
+    <div class="hero">
+      <div id="heroBoard" class="hero-board" aria-hidden="true"></div>
+      <div>
+        <h2>Una partita a scacchi?</h2>
+        <p>Sfida il computer scegliendo la difficoltà, gioca online con chi è sul sito in questo momento o con un amico sullo stesso dispositivo.</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <article class="card">
+        <h3><span class="card-ico">🤖</span> Contro il computer</h3>
+        <div class="label">Difficoltà</div>
+        <div id="levels" class="levels"></div>
+        <p id="levelDesc" class="muted small"></p>
+        <div class="label">Giochi con</div>
+        <div id="colorPick" class="seg">
+          <button type="button" data-color="w" class="on">Bianco</button>
+          <button type="button" data-color="r">Casuale</button>
+          <button type="button" data-color="b">Nero</button>
+        </div>
+        <div class="card-actions">
+          <button id="btnPlayAI" class="btn primary" type="button">Gioca</button>
+          <button id="btnResumeAI" class="btn" type="button" hidden>Riprendi la partita</button>
+        </div>
+        <p id="aiStats" class="muted small"></p>
+      </article>
+
+      <article class="card">
+        <h3><span class="card-ico">🌐</span> Online</h3>
+        <p>Gioca in tempo reale con gli altri visitatori presenti nella sala: sfidali, scegli il tempo e via!</p>
+        <p id="onlineInfo" class="online-info"><span class="dot"></span><span>Controllo in corso…</span></p>
+        <label class="label" for="nameMenu">Il tuo nome in sala</label>
+        <input id="nameMenu" class="input" maxlength="16" autocomplete="nickname" placeholder="Es. Daniele">
+        <div class="card-actions">
+          <button id="btnLobby" class="btn primary" type="button">Entra nella sala</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3><span class="card-ico">👥</span> Due giocatori</h3>
+        <p>Sulla stessa scacchiera, a turno: perfetto per giocare con un amico seduto accanto a te.</p>
+        <label class="check"><input type="checkbox" id="flipLocal"> Gira la scacchiera a ogni mossa</label>
+        <div class="card-actions">
+          <button id="btnPlayLocal" class="btn primary" type="button">Gioca</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SALA ONLINE -->
+  <section id="scrLobby" class="screen" hidden>
+    <div class="lobby">
+      <div class="lobby-head">
+        <div>
+          <h2>Sala giochi</h2>
+          <p id="netState" class="online-info"><span class="dot"></span><span>Connessione…</span></p>
+        </div>
+        <div class="lobby-me">
+          <label class="label" for="nameLobby">Il tuo nome</label>
+          <div class="row">
+            <input id="nameLobby" class="input" maxlength="16" autocomplete="nickname">
+            <button id="btnSaveName" class="btn small" type="button">Salva</button>
+          </div>
+        </div>
+      </div>
+      <div id="inviteArea"></div>
+      <h3 class="list-title">Giocatori presenti <span id="playerCount" class="pill">0</span></h3>
+      <div id="players" class="players"></div>
+      <p class="muted small">Tocca <b>Sfida</b> accanto a un giocatore libero per invitarlo. Quando qualcuno ti sfida, l'invito compare qui sopra. Lascia aperta questa pagina: se entra qualcuno lo vedrai subito.</p>
+    </div>
+  </section>
+
+  <!-- PARTITA -->
+  <section id="scrGame" class="screen" hidden>
+    <div class="game">
+      <div class="board-col">
+        <div id="barTop" class="pbar"></div>
+        <div class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="Scacchiera"></div>
+          <div id="boardBanner" class="board-banner" hidden></div>
+        </div>
+        <div id="barBottom" class="pbar"></div>
+      </div>
+      <aside class="side">
+        <div id="gameStatus" class="game-status"></div>
+        <div id="offer" class="offer" hidden></div>
+        <div class="moves-box">
+          <div id="moves" class="moves"></div>
+          <div class="nav">
+            <button type="button" data-nav="first" title="Inizio" aria-label="Inizio">⏮</button>
+            <button type="button" data-nav="prev" title="Mossa precedente" aria-label="Mossa precedente">◀</button>
+            <button type="button" data-nav="next" title="Mossa successiva" aria-label="Mossa successiva">▶</button>
+            <button type="button" data-nav="last" title="Posizione attuale" aria-label="Posizione attuale">⏭</button>
+          </div>
+        </div>
+        <div id="actions" class="actions"></div>
+        <div id="chat" class="chat" hidden>
+          <div id="chatLog" class="chat-log"></div>
+          <div id="chatQuick" class="chat-quick"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal" hidden><div id="modalBox" class="modal-box" role="dialog" aria-modal="true"></div></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="motore.js"></script>
+<script src="gioco.js"></script>
+</body>
+</html>
