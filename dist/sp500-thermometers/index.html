@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>SP500 Vertical Thermometers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Termometri SMA200 e POC per tutti i componenti dell'S&P 500, voto fondamentale da SEC EDGAR e spiegazioni con Gemini.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23ff2d6e'/><stop offset='.5' stop-color='%23ffd60a'/><stop offset='1' stop-color='%2300ff96'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='%2307061a'/><rect x='24' y='6' width='16' height='52' rx='8' fill='url(%23g)'/><rect x='18' y='30' width='28' height='4' rx='2' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --app-bg: #07061a; --header-bg: #0c0a24; --header-fg: #f4f2ff; --header-sub: #8f8cc4;
+    --card-bg: #121033; --card-bg-2: #1a1244; --card-border: #2c2766; --text: #eef0ff; --muted: #8f8cc4;
+    --accent: #00e5ff; --magenta: #ff2bd6; --violet: #8a5cff; --purple: #c77dff; --good: #2cffa0; --bad: #ff4d7e;
+    --sma: #ffd60a; --button-bg: #1d1a45; --button-active: #2b2663; --field-bg: #15123a;
+    --strip: linear-gradient(90deg, #00e5ff, #8a5cff, #ff2bd6);
+    --font: "Segoe UI", "Outfit", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--app-bg); color: var(--text); font-family: var(--font); }
+  body { min-height: 100vh; }
+  button, input, select { font: inherit; color: inherit; }
+  a { color: var(--accent); }
+
+  /* ---------- testata ---------- */
+  header.top { background: var(--header-bg); }
+  .row1 { display: flex; align-items: center; gap: 16px 20px; padding: 15px 26px; flex-wrap: wrap; }
+  .title { font-size: 26px; font-weight: 700; line-height: 1.15; white-space: nowrap; }
+  .title .a { color: var(--accent); } .title .b { color: var(--magenta); }
+  .subtitle { color: var(--header-sub); font-size: 13.5px; margin-top: 3px; }
+  .back { font-size: 12.5px; color: var(--header-sub); text-decoration: none; }
+  .back:hover { color: var(--accent); }
+  .search { flex: 1 1 280px; min-width: 240px; display: flex; align-items: center; background: var(--field-bg);
+    border: 2px solid var(--violet); padding: 3px; }
+  .search:focus-within { border-color: var(--accent); }
+  .search .ico { color: var(--accent); padding: 0 4px 0 10px; font-size: 15px; }
+  .search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; padding: 8px 6px; font-size: 15px; color: var(--text); }
+  .search input::placeholder { color: var(--muted); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn { border: 0; cursor: pointer; font-weight: 700; font-size: 13.5px; padding: 11px 18px; white-space: nowrap;
+    background: var(--button-bg); color: #c9c7ff; transition: background .15s, color .15s; }
+  .btn:hover { background: var(--button-active); color: var(--text); }
+  .btn:disabled { cursor: default; opacity: .6; }
+  .btn.accent { background: var(--accent); color: #04121a; } .btn.accent:hover { background: #7df3ff; }
+  .btn.accent:disabled { background: #1f5560; color: #7fa9b3; opacity: 1; }
+  .btn.magenta { background: var(--magenta); color: #1a0314; } .btn.magenta:hover { background: #ff7be6; }
+  .btn.magenta:disabled { background: #5e1f52; color: #c79bbd; opacity: 1; }
+  .btn.search-btn { background: var(--violet); color: #fff; padding: 9px 16px; } .btn.search-btn:hover { background: #a88bff; }
+  .btn.small { padding: 11px 14px; min-width: 44px; }
+  .row2 { display: flex; align-items: center; gap: 10px 16px; padding: 10px 26px 14px; flex-wrap: wrap; }
+  .group { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .group .lbl { color: var(--header-sub); font-size: 12.5px; margin-right: 4px; }
+  select.combo { background: var(--field-bg); color: var(--text); border: 1px solid #3b3580; padding: 7px 6px; font-size: 13.5px; }
+  .strip { height: 3px; background: var(--strip); }
+  .status { color: var(--muted); font-size: 13.5px; padding: 12px 26px 0; min-height: 30px; white-space: pre-line; }
+
+  /* ---------- corpo ---------- */
+  main { padding: 12px 18px 40px; }
+  .main-card { margin: 18px auto 0; max-width: 1080px; border-radius: 22px; overflow: hidden;
+    background: linear-gradient(180deg, var(--card-bg-2), var(--card-bg)); border: 1.2px solid #6e4fd6;
+    box-shadow: 0 0 0 2px rgba(138, 92, 255, .25), 0 0 18px rgba(138, 92, 255, .45), 0 0 40px rgba(138, 92, 255, .2); }
+  .main-card svg { display: block; width: 100%; height: auto; }
+  .section-head { max-width: 1080px; margin: 44px auto 18px; display: flex; gap: 12px; }
+  .section-head .bar { width: 4px; background: linear-gradient(180deg, var(--accent) 50%, var(--magenta) 50%); flex: none; }
+  .section-head h2 { margin: 0; font-size: 20px; font-weight: 700; }
+  .section-head p { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
+  .sector { max-width: var(--grid-w, 100%); margin: 8px auto 0; }
+  .sector h3 { margin: 0; font-size: 16px; font-weight: 700; }
+  .sector .line { height: 1.5px; background: var(--strip); margin: 8px 0 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(162px, 196px)); gap: 18px; justify-content: center; margin-bottom: 28px; }
+  .empty { text-align: center; color: var(--muted); font-size: 16px; padding: 20px; white-space: pre-line; }
+  .tile { position: relative; border-radius: 14px; cursor: pointer; content-visibility: auto; contain-intrinsic-size: 196px 214px;
+    background: linear-gradient(180deg, var(--card-bg-2), var(--card-bg)); border: 1.2px solid var(--gl-border);
+    box-shadow: 0 0 0 2px var(--gl-1), 0 0 10px var(--gl-2), 0 0 20px var(--gl-3); transition: transform .12s; }
+  .tile:hover { transform: translateY(-2px); }
+  .tile svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: var(--font); }
+  svg .help { cursor: pointer; }
+
+  /* ---------- finestre ---------- */
+  .overlay { position: fixed; inset: 0; background: rgba(3, 2, 16, .72); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .win { position: relative; background: var(--app-bg); border: 1.2px solid #4a3b99; box-shadow: 0 0 30px rgba(138, 92, 255, .35);
+    max-width: 100%; max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+  .win .close { position: absolute; top: 8px; right: 10px; z-index: 2; background: transparent; border: 0; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 6px; }
+  .win .close:hover { color: var(--text); }
+  .win-body { overflow: auto; }
+  .detail { width: 780px; }
+  .detail svg { display: block; width: 100%; height: auto; }
+  .card-win { width: 500px; background: var(--card-bg); padding: 18px 20px 20px; }
+  .card-win h3 { margin: 0 30px 6px 0; font-size: 18px; }
+  .card-win .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 12px; }
+  .card-win .txt { font-size: 15px; white-space: pre-wrap; line-height: 1.45; overflow-wrap: anywhere; }
+  .card-win .txt.muted { color: var(--muted); } .card-win .txt.bad { color: var(--bad); }
+  .card-win input { width: 100%; background: var(--field-bg); color: var(--text); border: 2px solid var(--violet); outline: 0; padding: 9px 10px; margin: 10px 0 4px; }
+  .card-win input:focus { border-color: var(--accent); }
+  .card-win .foot { color: var(--muted); font-size: 12.5px; margin-top: 12px; }
+  .card-win .btns { display: flex; justify-content: center; margin-top: 16px; }
+  .search-win { width: 980px; height: calc(100vh - 32px); }
+  .search-win .shead { background: var(--header-bg); display: flex; align-items: center; gap: 12px 16px; padding: 12px 50px 12px 22px; flex-wrap: wrap; }
+  .search-win .shead h3 { margin: 0; font-size: 20px; flex: 1 1 260px; }
+  .search-win .search { flex: 0 1 380px; min-width: 220px; }
+  .search-win .srow { display: flex; align-items: flex-start; gap: 10px; padding: 10px 22px 0; }
+  .search-win .srow .st { flex: 1; color: var(--muted); font-size: 13.5px; white-space: pre-line; }
+  .search-win .srow .st.bad { color: var(--bad); }
+  .search-win .win-body { flex: 1; padding: 16px 12px 20px; }
+  .loading { text-align: center; padding-top: 90px; }
+  .loading b { color: var(--accent); font-size: 20px; display: block; }
+  .loading span, .loading small { color: var(--muted); font-size: 13.5px; }
+  .loading.none b { color: var(--text); }
+
+  @media (max-width: 700px) {
+    .row1, .row2 { padding-left: 14px; padding-right: 14px; }
+    .status { padding-left: 14px; padding-right: 14px; }
+    main { padding: 8px 10px 30px; }
+    .title { font-size: 22px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .search-win { height: calc(100vh - 16px); } .overlay { padding: 8px; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="row1">
+    <div>
+      <div class="title"><span class="a">Market</span><span class="b"> Thermometers</span></div>
+      <div class="subtitle">S&amp;P 500 &nbsp;·&nbsp; SMA200 &nbsp;·&nbsp; Volume Profile POC &nbsp;·&nbsp; spiegazioni IA</div>
+      <a class="back" href="../">← Torna al sito</a>
+    </div>
+    <form class="search" id="searchForm" autocomplete="off">
+      <span class="ico">🔍</span>
+      <input id="searchInput" type="search" placeholder="Cerca un termometro: ticker, azienda, indice, materia prima…" enterkeyhint="search">
+      <button class="btn search-btn" id="searchBtn" type="submit">Cerca</button>
+    </form>
+    <div class="actions">
+      <button class="btn" id="keyBtn" type="button" title="Chiave API di Gemini">🔑 Gemini</button>
+      <button class="btn magenta" id="semaphoreBtn" type="button">📊 Voto fondamentali</button>
+      <button class="btn accent" id="refreshBtn" type="button">⟳&nbsp; Aggiorna</button>
+    </div>
+  </div>
+  <div class="row2">
+    <button class="btn" id="filterBtn" type="button"></button>
+    <div class="group"><span class="lbl">Distanza SMA200</span><span id="thresholds"></span></div>
+    <div class="group"><span class="lbl">Prezzo €</span><span class="lbl">da</span><select class="combo" id="priceMin"></select>
+      <span class="lbl" style="margin-left:6px">a</span><select class="combo" id="priceMax"></select>
+      <button class="btn small" id="priceReset" type="button" style="margin-left:6px">✕</button></div>
+    <div class="group"><span class="lbl">Voto</span><span id="votes"></span></div>
+  </div>
+  <div class="strip"></div>
+</header>
+<div class="status" id="status">Caricamento dati...</div>
+<main>
+  <div class="main-card" id="mainCard"></div>
+  <div class="section-head"><div class="bar"></div><div><h2 id="sectionTitle"></h2><p id="sectionSub"></p></div></div>
+  <div id="grids"></div>
+</main>
+
+<script>
+/* Logica di SP500 Vertical Thermometers: traduzione per il browser, riga per riga,
+   di sp500_vertical_thermometer.py (programma desktop). Costanti, elenchi e testi dei
+   prompt NON sono riscritti qui: arrivano da dati_programma.json, esportato dal file
+   Python con esporta_dati.py. Questo file non tocca la pagina (niente DOM): viene
+   incluso nella pagina da crea_pagina.py e usato anche dai test (test_logica.js).
+
+   Differenze obbligate dal browser (la logica non cambia):
+   - le fonti (Yahoo Finance, SEC EDGAR, Nasdaq.com) si leggono tramite l'intermediario
+     PROXY_URL, perche' i browser non permettono di scaricarle direttamente;
+   - l'elenco S&P 500 si legge da Wikipedia tramite la sua API pubblica (stessa tabella
+     "constituents" della pagina), la cache di 30 giorni sta nel browser;
+   - se www.sec.gov rifiuta l'intermediario, gli elenchi ufficiali dei ticker SEC si
+     leggono dalla copia pubblicata insieme alla pagina (sec_tickers.json);
+   - la chiave Gemini resta nel browser del visitatore. */
+'use strict';
+
+const T = {};  // spazio dei nomi esportato (anche per i test in Node)
+
+(function (T) {
+  let D = null;           // dati_programma.json
+  let PROXY_URL = '';
+  let SEC_SNAPSHOT_URL = 'sec_tickers.json';
+  let storage = null;     // localStorage (o finto nei test)
+  let fetchImpl = (...a) => fetch(...a);
+
+  T.init = function (data, opts = {}) {
+    D = data;
+    PROXY_URL = (opts.proxy || '').replace(/\/+$/, '');
+    if (opts.secSnapshotUrl) SEC_SNAPSHOT_URL = opts.secSnapshotUrl;
+    storage = opts.storage || null;
+    if (opts.fetch) fetchImpl = opts.fetch;
+    T.D = D;
+  };
+
+  /* ---------- numeri e testi (come Python) ---------- */
+
+  // Arrotondamento come round() di Python (metà al pari).
+  function pyRound(x) {
+    const r = Math.round(x);
+    return (Math.abs(x % 1) === 0.5) ? 2 * Math.round(x / 2) : r;
+  }
+  // Come f"{x:.{d}f}" di Python: arrotonda il valore binario esatto, metà al pari.
+  function pyFixed(x, d) {
+    let s = x.toFixed(d);
+    const exact = Math.abs(x).toFixed(Math.min(100, d + 60));
+    const tail = exact.slice(exact.indexOf('.') + 1 + d);
+    if (/^50*$/.test(tail)) {                      // pareggio esatto
+      const kept = Math.trunc(Math.abs(x) * Math.pow(10, d) + 1e-9);
+      if (kept % 2 === 0) {                          // Python tiene la cifra pari
+        const down = (Math.sign(x) < 0 ? '-' : '') + (kept / Math.pow(10, d)).toFixed(d);
+        s = down;
+      }
+    }
+    return s;
+  }
+  function groupThousands(fixed) {
+    const neg = fixed.startsWith('-');
+    const body = neg ? fixed.slice(1) : fixed;
+    const [i, f] = body.split('.');
+    const g = i.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg ? '-' : '') + g + (f !== undefined ? '.' + f : '');
+  }
+  function swapSeparators(s) { return s.replace(/,/g, '_').replace(/\./g, ',').replace(/_/g, '.'); }
+  function isFiniteNum(v) { return v !== null && v !== undefined && Number.isFinite(v); }
+
+  function fmtNumber(value) {
+    if (!isFiniteNum(value)) return 'N/D';
+    return swapSeparators(groupThousands(pyFixed(value, 2)));
+  }
+  function fmtPct(value) {
+    if (!isFiniteNum(value)) return 'N/D';
+    const sign = value >= 0 ? '+' : '';
+    return (sign + pyFixed(value * 100, 1) + '%').replace(/\./g, ',');
+  }
+  function fmtBillions(value) { return swapSeparators(groupThousands(pyFixed(value / 1e9, 2))) + ' Mld USD'; }
+  function nowStamp() {
+    const d = new Date(), p = (n) => String(n).padStart(2, '0');
+    return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+  Object.assign(T, { pyRound, pyFixed, fmtNumber, fmtPct, fmtBillions, nowStamp });
+
+  /* ---------- rete ---------- */
+  const HTTP_REASONS = {
+    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found', 413: 'Payload Too Large',
+    429: 'Too Many Requests', 500: 'Internal Server Error', 502: 'Bad Gateway', 503: 'Service Unavailable',
+    504: 'Gateway Timeout',
+  };
+  class HTTPError extends Error {
+    constructor(code) { super(`HTTP Error ${code}: ${HTTP_REASONS[code] || ''}`.trim()); this.code = code; }
+  }
+  async function timedFetch(url, options, timeout) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeout);
+    try {
+      return await fetchImpl(url, { ...options, signal: ctrl.signal });
+    } catch (err) {
+      if (err && err.name === 'AbortError') throw new Error('timed out');
+      throw new Error('Connessione non riuscita (' + (err && err.message || err) + ')');
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  // Come http_get_json del desktop, ma passando dall'intermediario.
+  async function httpGetText(url, timeout = 25000) {
+    if (!PROXY_URL) throw new Error('Il servizio per leggere le fonti non e\' configurato.');
+    const res = await timedFetch(PROXY_URL + '/?url=' + encodeURIComponent(url), {}, timeout);
+    if (!res.ok) throw new HTTPError(res.status);
+    return await res.text();
+  }
+  async function httpGetJson(url, timeout = 25000) { return JSON.parse(await httpGetText(url, timeout)); }
+
+  // Elenchi ufficiali dei ticker SEC: prima dal vivo, poi dalla copia pubblicata con la pagina.
+  let secSnapshot = null;
+  async function secFileJson(url) {
+    try {
+      return await httpGetJson(url, 40000);
+    } catch (liveError) {
+      try {
+        if (!secSnapshot) {
+          const res = await timedFetch(SEC_SNAPSHOT_URL, {}, 40000);
+          if (!res.ok) throw new HTTPError(res.status);
+          secSnapshot = await res.json();
+        }
+        const name = url.slice(url.lastIndexOf('/') + 1);
+        if (secSnapshot.files && secSnapshot.files[name]) return secSnapshot.files[name];
+      } catch (_) { /* nessuna copia disponibile: vale l'errore originale */ }
+      throw liveError;
+    }
+  }
+  Object.assign(T, { HTTPError, httpGetText, httpGetJson, secFileJson });
+
+  // Esegue fn su tutti gli elementi con al massimo `limit` in parallelo (ThreadPoolExecutor);
+  // onDone(risultato, elemento) viene chiamato man mano che finiscono (as_completed).
+  async function poolMap(items, limit, fn, onDone, shouldStop) {
+    const results = new Array(items.length);
+    let next = 0;
+    async function worker() {
+      while (next < items.length) {
+        if (shouldStop && shouldStop()) return;
+        const i = next++;
+        let r, err = null;
+        try { r = await fn(items[i]); } catch (e) { err = e; }
+        results[i] = err ? { error: err } : { value: r };
+        if (onDone) onDone(err ? null : r, items[i], err);
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+    return results;
+  }
+  T.poolMap = poolMap;
+
+  /* ---------- asset e settori ---------- */
+  const asSpec = (a) => ({ symbol: a[0], label: a[1], edgar_symbol: a[2] || '', kind: a[3] || 'equity' });
+  function spec(symbol, label, edgar_symbol = '', kind = 'equity') { return { symbol, label, edgar_symbol, kind }; }
+  function commoditySector() { return [D.COMMODITY_SECTOR[0], D.COMMODITY_SECTOR[1].map(asSpec)]; }
+  function dedupSectors(sectors) {
+    const seen = new Set(), result = [];
+    for (const [name, specs] of sectors) {
+      const kept = [];
+      for (const s of specs) if (!seen.has(s.symbol)) { seen.add(s.symbol); kept.push(s); }
+      if (kept.length) result.push([name, kept]);
+    }
+    return result;
+  }
+  function flattenSectors(sectors) { return sectors.flatMap(([, specs]) => specs); }
+  function fallbackSectors() { return dedupSectors(D.FALLBACK_SECTORS.map(([n, items]) => [n, items.map(asSpec)])); }
+  function mainAsset() { return asSpec(D.MAIN_ASSET); }
+  Object.assign(T, { spec, dedupSectors, flattenSectors, fallbackSectors, commoditySector, mainAsset });
+
+  // Righe (ticker, nome, settore GICS) della tabella "constituents" (vedi _WikiTableParser).
+  function parseConstituentsHtml(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const table = doc.getElementById('constituents');
+    const rows = [];
+    if (table && table.tagName === 'TABLE') {
+      for (const tr of table.querySelectorAll('tr')) {
+        const cells = [...tr.querySelectorAll('td, th')].map((c) => c.textContent.trim());
+        if (cells.length) rows.push(cells);
+      }
+    }
+    if (rows.length < 2) throw new Error('Tabella dei componenti S&P 500 non trovata sulla pagina Wikipedia');
+    const header = rows[0].map((h) => h.trim().toLowerCase());
+    const colIndex = (...names) => {
+      for (const n of names) if (header.includes(n)) return header.indexOf(n);
+      throw new Error(`Colonna non trovata tra ${JSON.stringify(names)} (intestazioni: ${JSON.stringify(header)})`);
+    };
+    const iSymbol = colIndex('symbol'), iName = colIndex('security'), iSector = colIndex('gics sector');
+    const result = [];
+    for (const row of rows.slice(1)) {
+      if (row.length <= Math.max(iSymbol, iName, iSector)) continue;
+      const ticker = row[iSymbol].trim().toUpperCase().replace(/\./g, '-');
+      const name = row[iName].trim(), sector = row[iSector].trim();
+      if (ticker && name && sector) result.push([ticker, name, sector]);
+    }
+    return result;
+  }
+  async function fetchSp500ConstituentsTable() {
+    // Stessa pagina del desktop (SP500_WIKI_URL), letta tramite l'API di Wikipedia che
+    // consente l'accesso dai browser.
+    const page = decodeURIComponent(D.SP500_WIKI_URL.split('/wiki/')[1]);
+    const api = 'https://en.wikipedia.org/w/api.php?action=parse&prop=text&format=json&formatversion=2&origin=*&page='
+      + encodeURIComponent(page);
+    const res = await timedFetch(api, {}, 25000);
+    if (!res.ok) throw new HTTPError(res.status);
+    const data = await res.json();
+    if (!data.parse || !data.parse.text) throw new Error('Pagina Wikipedia non disponibile');
+    return parseConstituentsHtml(data.parse.text);
+  }
+  function buildSp500Sectors(rows) {
+    const gics = new Map(D.GICS_TO_ITALIAN);
+    const bySector = new Map();
+    for (const [ticker, name, g] of rows) {
+      const label = gics.get(g) || g;
+      if (!bySector.has(label)) bySector.set(label, []);
+      bySector.get(label).push(spec(ticker, name));
+    }
+    const orderedNames = D.GICS_TO_ITALIAN.map(([, it]) => it);
+    const ordered = orderedNames.filter((n) => bySector.get(n) && bySector.get(n).length).map((n) => [n, bySector.get(n)]);
+    for (const [n, specs] of bySector) if (!orderedNames.includes(n)) ordered.push([n, specs]);
+    ordered.push(commoditySector());
+    return dedupSectors(ordered);
+  }
+  const CACHE_KEY = 'termometri_sp500_constituents_cache';
+  const sectorsToCache = (sectors) => sectors.map(([n, specs]) => [n, specs.map((s) => [s.symbol, s.label, s.edgar_symbol, s.kind])]);
+  const sectorsFromCache = (data) => data.map(([n, items]) => [n, items.map(asSpec)]);
+  function readCache() {
+    try { const raw = storage && storage.getItem(CACHE_KEY); return raw ? JSON.parse(raw) : null; } catch (_) { return null; }
+  }
+  async function loadSp500Sectors() {
+    const cache = readCache();
+    if (cache) {
+      const ageDays = (Date.now() - cache.mtime) / 86400000;
+      if (ageDays < D.CONSTITUENTS_CACHE_MAX_AGE_DAYS) {
+        try { return sectorsFromCache(cache.data); } catch (_) { /* cache corrotta */ }
+      }
+    }
+    try {
+      const sectors = buildSp500Sectors(await fetchSp500ConstituentsTable());
+      try { storage && storage.setItem(CACHE_KEY, JSON.stringify({ mtime: Date.now(), data: sectorsToCache(sectors) })); } catch (_) { }
+      return sectors;
+    } catch (exc) {
+      console.warn(`[constituents] scaricamento lista S&P 500 da Wikipedia fallito (${exc.message})`);
+      if (cache) {
+        try { console.warn('[constituents] uso la cache locale (anche se scaduta)'); return sectorsFromCache(cache.data); } catch (_) { }
+      }
+      console.warn("[constituents] uso l'elenco ridotto integrato nel programma come fallback");
+      return fallbackSectors();
+    }
+  }
+  Object.assign(T, { parseConstituentsHtml, buildSp500Sectors, loadSp500Sectors });
+
+  /* ---------- calcoli sui prezzi ---------- */
+  function financeUrl(symbol) {
+    return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1y&interval=1d`;
+  }
+  function computePoc(highs, lows, volumes, nBuckets = 100) {
+    const valid = [];
+    const n = Math.min(highs.length, lows.length, volumes.length);
+    for (let i = 0; i < n; i++) {
+      const h = highs[i], l = lows[i], v = volumes[i];
+      if (v && v > 0 && h > l) valid.push([h, l, v]);
+    }
+    if (!valid.length) return null;
+    let priceMin = Infinity, priceMax = -Infinity;
+    for (const [h, l] of valid) { if (l < priceMin) priceMin = l; if (h > priceMax) priceMax = h; }
+    if (priceMax <= priceMin) return null;
+    const bucketSize = (priceMax - priceMin) / nBuckets;
+    const bucketVolume = new Array(nBuckets).fill(0.0);
+    for (const [h, l, v] of valid) {
+      const loIdx = Math.min(Math.max(Math.trunc((l - priceMin) / bucketSize), 0), nBuckets - 1);
+      let hiIdx = Math.min(Math.max(Math.trunc((h - priceMin) / bucketSize), 0), nBuckets - 1);
+      if (hiIdx < loIdx) hiIdx = loIdx;
+      const share = v / (hiIdx - loIdx + 1);
+      for (let i = loIdx; i <= hiIdx; i++) bucketVolume[i] += share;
+    }
+    let pocIdx = 0;
+    for (let i = 1; i < nBuckets; i++) if (bucketVolume[i] > bucketVolume[pocIdx]) pocIdx = i;
+    return priceMin + (pocIdx + 0.5) * bucketSize;
+  }
+  function newMetrics(fields = {}) {
+    return Object.assign({
+      symbol: '', label: '', price: null, sma200: null, low200: null, high200: null, poc200: null,
+      finance_points: 0, edgar_name: '', edgar_ticker: '', cik: '', source_note: '', updated_at: '', error: '',
+      rating: null, rating_source: '',
+    }, fields);
+  }
+  function hasCoreValues(m) { return [m.price, m.sma200, m.low200, m.high200].every(isFiniteNum); }
+  function distanceFromSma(m) {
+    if (m.price === null || m.sma200 === null || m.sma200 === 0) return null;
+    return m.price / m.sma200 - 1.0;
+  }
+  function distanceFromHigh200(m) {
+    if (m.price === null || m.high200 === null || m.high200 === 0) return null;
+    return m.price / m.high200 - 1.0;
+  }
+  function isBelowSmaAndPoc(m, threshold = D.SMA_DISTANCE_THRESHOLD) {
+    if (!hasCoreValues(m) || m.poc200 === null) return false;
+    const distance = distanceFromSma(m);
+    if (distance === null || distance > -threshold + 1e-9) return false;
+    return m.price < m.poc200;
+  }
+  async function computeMetrics(sp, edgarMap, chartData = null) {
+    try {
+      const data = chartData !== null ? chartData : await httpGetJson(financeUrl(sp.symbol));
+      const result = data.chart.result[0];
+      const quote = result.indicators.quote[0];
+      const close = quote.close;
+      const high = ('high' in quote) ? quote.high : close;
+      const low = ('low' in quote) ? quote.low : close;
+      const volume = (quote.volume && quote.volume.length) ? quote.volume : new Array(close.length).fill(null);
+      const rows = [];
+      const n = Math.min(close.length, high.length, low.length, volume.length);
+      for (let i = 0; i < n; i++) {
+        const c = close[i], h = high[i], l = low[i], v = volume[i];
+        if (c === null || c === undefined) continue;
+        rows.push([h !== null && h !== undefined ? Number(h) : Number(c), l !== null && l !== undefined ? Number(l) : Number(c),
+          v !== null && v !== undefined ? Number(v) : 0.0, Number(c)]);
+      }
+      if (rows.length < 200) throw new Error(`Finance ha restituito solo ${rows.length} chiusure valide.`);
+      const last = rows.slice(-200);
+      const closes = last.map((r) => r[3]), highs = last.map((r) => r[0]), lows = last.map((r) => r[1]), volumes = last.map((r) => r[2]);
+      const price = Number(result.meta.regularMarketPrice || closes[closes.length - 1]);
+      let sum = 0; for (const c of closes) sum += c;
+      const sma200 = sum / closes.length;
+      const low200 = Math.min(...closes), high200 = Math.max(...closes);
+      const poc200 = computePoc(highs, lows, volumes);
+      const edgarKey = (sp.edgar_symbol || sp.symbol).toUpperCase();
+      const [edgarName, cik] = edgarMap.get(edgarKey) || ['', ''];
+      let sourceNote;
+      if (sp.kind === 'commodity') sourceNote = `Finance: ${sp.symbol} | EDGAR: non applicabile (materia prima/cripto)`;
+      else if (sp.kind === 'index') sourceNote = `Finance: ^GSPC | EDGAR proxy: SPY CIK ${cik}`;
+      else sourceNote = cik ? `Finance: ${sp.symbol} | EDGAR: ${edgarKey} CIK ${cik}` : `Finance: ${sp.symbol} | EDGAR: non trovato`;
+      return newMetrics({
+        symbol: sp.symbol, label: sp.label, price, sma200, low200, high200, poc200, finance_points: closes.length,
+        edgar_name: edgarName, edgar_ticker: sp.kind !== 'commodity' ? edgarKey : '',
+        cik: sp.kind !== 'commodity' ? cik : '', source_note: sourceNote, updated_at: nowStamp(),
+      });
+    } catch (exc) {
+      return newMetrics({ symbol: sp.symbol, label: sp.label, error: String(exc && exc.message || exc), updated_at: nowStamp() });
+    }
+  }
+  async function loadEdgarTickerMap() {
+    const data = await secFileJson(D.EDGAR_TICKERS_URL);
+    const result = new Map();
+    for (const item of Object.values(data)) {
+      const ticker = String(item.ticker ?? '').toUpperCase();
+      const title = String(item.title ?? '');
+      const cik = String(item.cik_str ?? '').padStart(10, '0');
+      if (ticker) result.set(ticker, [title, cik]);
+    }
+    const spy = await httpGetJson(D.EDGAR_SPY_URL);
+    result.set('SPY', [spy.name || 'SPDR S&P 500 ETF TRUST', '0000884394']);
+    result.set('^GSPC', [spy.name || 'SPDR S&P 500 ETF TRUST', '0000884394']);
+    return result;
+  }
+  async function loadDashboard(assets, onProgress) {
+    const edgarMap = await loadEdgarTickerMap();
+    const main = await computeMetrics(mainAsset(), edgarMap);
+    const bySymbol = new Map();
+    let done = 0;
+    await poolMap(assets, 24, (sp) => computeMetrics(sp, edgarMap), (metric) => {
+      if (metric) bySymbol.set(metric.symbol, metric);
+      done += 1;
+      if (onProgress) onProgress(done, assets.length);
+    });
+    for (const sp of assets) if (!bySymbol.has(sp.symbol)) bySymbol.set(sp.symbol, newMetrics({ symbol: sp.symbol, label: sp.label, error: 'Non caricato' }));
+    return [main, bySymbol];
+  }
+  Object.assign(T, {
+    financeUrl, computePoc, newMetrics, hasCoreValues, distanceFromSma, distanceFromHigh200, isBelowSmaAndPoc,
+    computeMetrics, loadEdgarTickerMap, loadDashboard,
+  });
+
+  /* ---------- fondamentali SEC EDGAR ---------- */
+  const edgarFactsCache = new Map();
+  function parseIsoDate(s) {
+    const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
+    if (!m) return null;
+    const t = Date.UTC(+m[1], +m[2] - 1, +m[3]);
+    const d = new Date(t);
+    if (d.getUTCFullYear() !== +m[1] || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return null;
+    return t;
+  }
+  function periodSeries(facts, tags, limit = 4, instant = false, minDays = 80, maxDays = 100,
+    forms = ['10-Q', '10-Q/A', '10-K', '10-K/A']) {
+    const byEnd = new Map();
+    for (const tag of tags) {
+      let units;
+      try { units = facts.facts['us-gaap'][tag].units.USD; } catch (_) { continue; }
+      if (!Array.isArray(units)) continue;
+      for (const item of units) {
+        if (!forms.includes(item.form)) continue;
+        const end = item.end, val = item.val;
+        if (end === null || end === undefined || val === null || val === undefined) continue;
+        if (!instant) {
+          const start = item.start;
+          if (!start) continue;
+          const d0 = parseIsoDate(start), d1 = parseIsoDate(end);
+          if (d0 === null || d1 === null) continue;
+          const days = Math.round((d1 - d0) / 86400000);
+          if (!(minDays <= days && days <= maxDays)) continue;
+        }
+        byEnd.set(end, Number(val));
+      }
+    }
+    if (!byEnd.size) return [];
+    return [...byEnd.entries()].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).slice(-limit);
+  }
+  async function edgarFacts(cik) {
+    const cik10 = cik.padStart(10, '0');
+    let facts = edgarFactsCache.get(cik10);
+    if (facts === undefined || facts === null) {
+      try { facts = await httpGetJson(D.EDGAR_COMPANYFACTS_URL.replace('{cik10}', cik10), 60000); } catch (_) { return null; }
+      edgarFactsCache.set(cik10, facts);
+    }
+    return facts;
+  }
+  const TAGS = () => D.EDGAR_FUNDAMENTAL_TAGS;
+  const lookup = (series, key) => { for (const [k, v] of series) if (k === key) return v; return undefined; };
+  async function fetchEdgarFundamentalsSummary(cik) {
+    if (!cik) return null;
+    const facts = await edgarFacts(cik);
+    if (!facts) return null;
+    const t = TAGS();
+    const revenue = periodSeries(facts, t.revenue, 4);
+    const netIncome = periodSeries(facts, t.net_income, 4);
+    const equity = periodSeries(facts, t.equity, 1, true);
+    const liabilities = periodSeries(facts, t.liabilities, 1, true);
+    const ocf = periodSeries(facts, t.operating_cash_flow, 4);
+    const capex = periodSeries(facts, t.capex, 4);
+    const lines = [];
+    const trims = (s) => s.map(([end, val]) => `trim. chiuso ${end}: ${fmtBillions(val)}`).join(', ');
+    if (revenue.length) lines.push("Ricavi trimestrali piu' recenti (10-Q/10-K): " + trims(revenue));
+    if (netIncome.length) lines.push("Utile netto trimestrale piu' recente (10-Q/10-K): " + trims(netIncome));
+    if (equity.length) { const [end, val] = equity[equity.length - 1]; lines.push(`Patrimonio netto (ultimo trimestre disponibile, chiuso ${end}): ${fmtBillions(val)}`); }
+    if (liabilities.length) { const [end, val] = liabilities[liabilities.length - 1]; lines.push(`Passivita' totali - debito incluso (ultimo trimestre disponibile, chiuso ${end}): ${fmtBillions(val)}`); }
+    if (ocf.length) lines.push("Flusso di cassa operativo trimestrale piu' recente (10-Q/10-K): " + trims(ocf));
+    if (capex.length) {
+      lines.push("Spese in conto capitale - CapEx - trimestrali piu' recenti (10-Q/10-K): " + trims(capex));
+      if (ocf.length) {
+        const [lastEnd, lastOcf] = ocf[ocf.length - 1];
+        const lastCapex = lookup(capex, lastEnd);
+        if (lastCapex !== undefined) lines.push(`Flusso di cassa libero stimato (operativo - CapEx) nel trimestre chiuso ${lastEnd}: ${fmtBillions(lastOcf - lastCapex)}`);
+      }
+    }
+    return lines.length ? lines.join('\n') : null;
+  }
+  async function fetchEdgarFundamentalsData(cik) {
+    if (!cik) return null;
+    const facts = await edgarFacts(cik);
+    if (!facts) return null;
+    const t = TAGS();
+    const revenue = periodSeries(facts, t.revenue, 4);
+    const netIncome = periodSeries(facts, t.net_income, 4);
+    const equity = periodSeries(facts, t.equity, 1, true);
+    const liabilities = periodSeries(facts, t.liabilities, 1, true);
+    const ocf = periodSeries(facts, t.operating_cash_flow, 4);
+    const capex = periodSeries(facts, t.capex, 4);
+    if (!revenue.length && !netIncome.length && !equity.length) return null;
+    return {
+      revenue, net_income: netIncome,
+      equity: equity.length ? equity[equity.length - 1][1] : null,
+      liabilities: liabilities.length ? liabilities[liabilities.length - 1][1] : null,
+      operating_cash_flow: ocf, capex,
+    };
+  }
+  function normalize(value, bad, good) {
+    if (good === bad) return 0.5;
+    const t = (value - bad) / (good - bad);
+    return Math.max(0.0, Math.min(1.0, t));
+  }
+  function computeLocalRating(data, sector) {
+    if (data === null || (!data.revenue.length && !data.net_income.length && data.equity === null)) {
+      return [null, 'Dati fondamentali SEC EDGAR non disponibili per questo asset.'];
+    }
+    const profile = D.SECTOR_PROFILES[sector] || D.DEFAULT_SECTOR_PROFILE;
+    const dims = [], facts = [];
+    let growth = null;
+    if (data.revenue.length >= 2) {
+      const firstVal = data.revenue[0][1], lastVal = data.revenue[data.revenue.length - 1][1];
+      if (firstVal) growth = (lastVal - firstVal) / Math.abs(firstVal);
+    }
+    if (growth !== null) {
+      dims.push(normalize(growth, profile.growth_bad, profile.growth_good));
+      const n = data.revenue.length;
+      if (growth >= profile.growth_good) facts.push(`ricavi in crescita (${fmtPct(growth)} su ${n} trimestri)`);
+      else if (growth <= profile.growth_bad) facts.push(`ricavi in calo (${fmtPct(growth)} su ${n} trimestri)`);
+      else facts.push(`ricavi stabili (${fmtPct(growth)} su ${n} trimestri)`);
+    }
+    let margin = null;
+    if (data.net_income.length && data.revenue.length) {
+      const [lastNiEnd, lastNi] = data.net_income[data.net_income.length - 1];
+      const lastRev = lookup(data.revenue, lastNiEnd);
+      if (lastRev) margin = lastNi / lastRev;
+    }
+    if (margin !== null) {
+      dims.push(normalize(margin, profile.margin_bad, profile.margin_good));
+      if (margin >= profile.margin_good) facts.push(`margine netto solido (${fmtPct(margin)})`);
+      else if (margin <= profile.margin_bad) facts.push(`margine netto debole o in perdita (${fmtPct(margin)})`);
+      else facts.push(`margine netto nella media (${fmtPct(margin)})`);
+    }
+    if (profile.leverage_good !== null && data.liabilities !== null && data.equity !== null) {
+      if (data.equity <= 0) {
+        dims.push(0.0);
+        facts.push('patrimonio netto negativo o nullo');
+      } else {
+        const leverage = data.liabilities / data.equity;
+        dims.push(normalize(leverage, profile.leverage_bad, profile.leverage_good));
+        const lv = pyFixed(leverage, 1);
+        if (leverage <= profile.leverage_good) facts.push(`indebitamento contenuto (${lv}x il patrimonio netto)`);
+        else if (leverage >= profile.leverage_bad) facts.push(`indebitamento elevato (${lv}x il patrimonio netto)`);
+        else facts.push(`indebitamento nella media (${lv}x il patrimonio netto)`);
+      }
+    }
+    if (data.net_income.length >= 2) {
+      const n = data.net_income.length;
+      const positive = data.net_income.filter(([, v]) => v > 0).length;
+      dims.push(positive / n);
+      if (positive === n) facts.push(`utile positivo in tutti gli ultimi ${n} trimestri disponibili`);
+      else if (positive <= Math.floor(n / 2)) facts.push(`utile in perdita in ${n - positive} degli ultimi ${n} trimestri`);
+    }
+    if (profile.fcf_margin_good !== null && data.operating_cash_flow.length && data.capex.length && data.revenue.length) {
+      const [lastOcfEnd, lastOcf] = data.operating_cash_flow[data.operating_cash_flow.length - 1];
+      const lastCapex = lookup(data.capex, lastOcfEnd);
+      const lastRev = lookup(data.revenue, lastOcfEnd);
+      if (lastCapex !== undefined && lastRev) {
+        const fcfMargin = (lastOcf - lastCapex) / lastRev;
+        dims.push(normalize(fcfMargin, profile.fcf_margin_bad, profile.fcf_margin_good));
+        if (fcfMargin >= profile.fcf_margin_good) facts.push(`flusso di cassa libero solido (${fmtPct(fcfMargin)} sui ricavi)`);
+        else if (fcfMargin <= profile.fcf_margin_bad) facts.push(`flusso di cassa libero negativo o debole (${fmtPct(fcfMargin)} sui ricavi)`);
+        else facts.push(`flusso di cassa libero nella media (${fmtPct(fcfMargin)} sui ricavi)`);
+      }
+    }
+    if (!dims.length) return [null, 'Dati fondamentali SEC EDGAR insufficienti per calcolare un punteggio.'];
+    let sum = 0; for (const d of dims) sum += d;
+    const avg = sum / dims.length;
+    const rating = Math.max(1, Math.min(10, pyRound(1 + avg * 9)));
+    let verdict;
+    if (rating >= 7) verdict = "fondamentali solidi: il ribasso attuale sembra piu' un'opportunita' che un campanello d'allarme";
+    else if (rating <= 3) verdict = 'fondamentali deboli: il ribasso attuale sembra giustificato, prudenza';
+    else verdict = 'segnali fondamentali misti: serve valutare caso per caso';
+    const sectorTxt = sector ? ` (settore: ${sector})` : '';
+    return [rating, `Valutazione rapida locale${sectorTxt}, senza IA - voto ${rating}/10: ` + facts.join('; ') + `. ${verdict}.`];
+  }
+  Object.assign(T, { periodSeries, edgarFactsCache, fetchEdgarFundamentalsSummary, fetchEdgarFundamentalsData, computeLocalRating });
+
+  /* ---------- Gemini ---------- */
+  class GeminiAuthError extends Error { }
+  class GeminiQuotaError extends Error { }
+  class GeminiUnavailableError extends Error { }
+  function fillTemplate(template, values) {
+    return template.replace(/@@([A-Z]+)@@/g, (all, key) => (key in values ? values[key] : all));
+  }
+  function buildExplanationPrompt(metric, edgarSummary = null) {
+    const values = {
+      LABEL: metric.label, SYMBOL: metric.symbol, PRICE: fmtNumber(metric.price), SMA: fmtNumber(metric.sma200),
+      LOW: fmtNumber(metric.low200), HIGH: fmtNumber(metric.high200),
+      POC: metric.poc200 !== null ? fmtNumber(metric.poc200) : 'non disponibile', EDGAR: edgarSummary || '',
+    };
+    return fillTemplate(edgarSummary ? D.PROMPT_EXPLANATION_EDGAR : D.PROMPT_EXPLANATION, values);
+  }
+  async function geminiGenerate(prompt, apiKey, generationConfig = null, model = D.GEMINI_MODEL) {
+    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+    if (generationConfig) payload.generationConfig = generationConfig;
+    const apiUrl = model === D.GEMINI_MODEL ? D.GEMINI_API_URL : D.GEMINI_API_URL.replace(D.GEMINI_MODEL, model);
+    const res = await timedFetch(`${apiUrl}?key=${encodeURIComponent(apiKey)}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+    }, 30000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const serverMessage = (data && data.error && data.error.message) || '';
+      if (res.status === 429) throw new GeminiQuotaError('Quota/limite di richieste Gemini esaurito per ora.' + (serverMessage ? ` (${serverMessage})` : ''));
+      if ([400, 401, 403].includes(res.status)) throw new GeminiAuthError('API key di Gemini non valida o mancante');
+      const Cls = res.status >= 500 ? GeminiUnavailableError : Error;
+      throw new Cls(`Gemini ha risposto con errore HTTP ${res.status}` + (serverMessage ? `: ${serverMessage}` : ''));
+    }
+    const candidates = data.candidates || [];
+    if (!candidates.length) throw new Error('Gemini non ha restituito alcuna spiegazione');
+    const parts = (candidates[0].content || {}).parts || [];
+    if (!parts.length || !parts[0].text) throw new Error('Risposta di Gemini vuota');
+    return parts[0].text.trim();
+  }
+  async function askGemini(metric, apiKey, edgarSummary = null) {
+    return geminiGenerate(buildExplanationPrompt(metric, edgarSummary), apiKey);
+  }
+  Object.assign(T, { GeminiAuthError, GeminiQuotaError, GeminiUnavailableError, buildExplanationPrompt, geminiGenerate, askGemini });
+
+  /* ---------- motore di ricerca (SEC EDGAR + Yahoo Finance + Gemini) ---------- */
+  let edgarIndexCache = null;
+  let edgarIndexPromise = null;
+  async function loadEdgarCompanyIndex() {
+    if (edgarIndexCache) return edgarIndexCache;
+    if (!edgarIndexPromise) {
+      edgarIndexPromise = (async () => {
+        let companies = [];
+        try {
+          const data = await secFileJson(D.EDGAR_TICKERS_EXCHANGE_URL);
+          const fields = (data.fields || []).map((f) => String(f).toLowerCase());
+          const iCik = fields.indexOf('cik'), iName = fields.indexOf('name'), iTicker = fields.indexOf('ticker');
+          if (iCik < 0 || iName < 0 || iTicker < 0) throw new Error('campi mancanti');
+          const iEx = fields.indexOf('exchange');
+          for (const row of data.data || []) {
+            const ticker = String(row[iTicker] || '').toUpperCase();
+            if (ticker) companies.push({ ticker, name: String(row[iName] || ''), cik: String(row[iCik] || '').padStart(10, '0'), exchange: iEx >= 0 ? String(row[iEx] || '') : '' });
+          }
+        } catch (_) { companies = []; }
+        if (!companies.length) {
+          const data = await secFileJson(D.EDGAR_TICKERS_URL);
+          for (const item of Object.values(data)) {
+            const ticker = String(item.ticker ?? '').toUpperCase();
+            if (ticker) companies.push({ ticker, name: String(item.title ?? ''), cik: String(item.cik_str ?? '').padStart(10, '0'), exchange: '' });
+          }
+        }
+        edgarIndexCache = companies;
+        return companies;
+      })();
+      edgarIndexPromise.catch(() => { edgarIndexPromise = null; });
+    }
+    return edgarIndexPromise;
+  }
+  function normText(text) {
+    let out = '';
+    for (const ch of String(text)) out += /[\p{L}\p{N}]/u.test(ch) ? ch.toLowerCase() : ' ';
+    return out.split(/\s+/).filter(Boolean).join(' ');
+  }
+  const stripTicker = (s) => s.replaceAll('-', '').replaceAll('.', '');
+  function nameMatchScore(queryNorm, words, ticker, name) {
+    const qTicker = queryNorm.replaceAll(' ', '').toUpperCase();
+    if (stripTicker(ticker) === stripTicker(qTicker)) return 100;
+    const nameNorm = normText(name);
+    if (nameNorm === queryNorm) return 95;
+    if (nameNorm.startsWith(queryNorm + ' ') || nameNorm.startsWith(queryNorm)) return 80 - Math.min(Math.floor(nameNorm.length / 8), 10);
+    const nameWords = nameNorm.split(' ').filter(Boolean);
+    if (words.length && words.every((w) => nameWords.some((nw) => nw.startsWith(w)))) return 60 - Math.min(Math.floor(nameNorm.length / 8), 10);
+    if (qTicker.length >= 2 && ticker.startsWith(qTicker)) return 40;
+    return 0;
+  }
+  function searchEdgar(query, index, limit = D.SEARCH_MAX_RESULTS) {
+    const queryNorm = normText(query);
+    if (!queryNorm) return [];
+    const words = queryNorm.split(' ');
+    const scored = [];
+    index.forEach((c, pos) => { const s = nameMatchScore(queryNorm, words, c.ticker, c.name); if (s) scored.push([s, pos, c]); });
+    scored.sort((a, b) => (b[0] - a[0]) || (a[1] - b[1]));
+    const result = [], seenCik = new Set();
+    for (const [, , c] of scored) {
+      if (seenCik.has(c.cik)) continue;
+      seenCik.add(c.cik);
+      result.push(c);
+      if (result.length >= limit) break;
+    }
+    return result;
+  }
+  function buildSearchPrompt(query, yahooContext = null) {
+    if (yahooContext && yahooContext.length) {
+      return fillTemplate(D.PROMPT_SEARCH_CTX, { QUERY: query }).replace('- @@CTX@@', yahooContext.map((l) => `- ${l}`).join('\n'));
+    }
+    return fillTemplate(D.PROMPT_SEARCH, { QUERY: query });
+  }
+  function parseJsonArray(text) {
+    text = text.trim();
+    if (text.startsWith('```')) {
+      text = text.replace(/^`+|`+$/g, '');
+      if (text.toLowerCase().startsWith('json')) text = text.slice(4);
+    }
+    const start = text.indexOf('['), end = text.lastIndexOf(']');
+    if (start < 0 || end < start) return [];
+    try { const data = JSON.parse(text.slice(start, end + 1)); return Array.isArray(data) ? data : []; } catch (_) { return []; }
+  }
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function geminiFindInstruments(query, apiKey, yahooContext = null) {
+    let raw = '';
+    const models = D.GEMINI_SEARCH_MODELS;
+    const cfg = { temperature: 0.1, responseMimeType: 'application/json' };
+    for (let attempt = 0; attempt < models.length; attempt++) {
+      const model = models[attempt];
+      try {
+        raw = await geminiGenerate(buildSearchPrompt(query, yahooContext), apiKey, cfg, model);
+        break;
+      } catch (exc) {
+        if (exc instanceof GeminiUnavailableError) {
+          if (attempt === models.length - 1) throw exc;
+          await sleep(1500 * (attempt + 1));
+        } else if (exc instanceof GeminiQuotaError) {
+          if (model === models[models.length - 1]) throw exc;
+          try {
+            raw = await geminiGenerate(buildSearchPrompt(query, yahooContext), apiKey, cfg, models[models.length - 1]);
+          } catch (e2) {
+            if (e2 instanceof GeminiUnavailableError) throw new GeminiQuotaError(e2.message);
+            throw e2;
+          }
+          break;
+        } else {
+          throw exc;
+        }
+      }
+    }
+    const items = [], seen = new Set();
+    for (const item of parseJsonArray(raw)) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+      const symbol = String(item.symbol ?? '').trim().toUpperCase();
+      if (!symbol || seen.has(symbol) || symbol.length > 24 || symbol.includes(' ')) continue;
+      seen.add(symbol);
+      items.push({
+        symbol, nome: String(item.nome || symbol).trim(),
+        sec_ticker: String(item.sec_ticker || '').trim().toUpperCase().replaceAll('.', '-'),
+      });
+      if (items.length >= D.GEMINI_SEARCH_MAX) break;
+    }
+    return items;
+  }
+  async function yahooResolveSymbol(sp) {
+    let data;
+    try { data = await httpGetJson(D.YAHOO_SEARCH_URL.replace('{q}', encodeURIComponent(sp.label))); } catch (_) { return null; }
+    let symbols = (data.quotes || []).filter((q) => q.symbol).map((q) => String(q.symbol).toUpperCase());
+    symbols = symbols.filter((s) => s !== sp.symbol);
+    if (!symbols.length) return null;
+    const suffix = sp.symbol.includes('.') ? sp.symbol.slice(sp.symbol.lastIndexOf('.')) : '';
+    if (suffix) {
+      const same = symbols.filter((s) => s.endsWith(suffix));
+      if (same.length) return same[0];
+    }
+    return symbols[0];
+  }
+  // Nasdaq.com: fonte di riserva dei prezzi, solo per il motore di ricerca.
+  function nasdaqNumber(text) {
+    const cleaned = String(text ?? '').replaceAll('$', '').replaceAll(',', '').trim();
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(cleaned)) return null;
+    return parseFloat(cleaned);
+  }
+  async function nasdaqChartData(symbol) {
+    let candidates;
+    if (symbol in D.NASDAQ_INDEX_SYMBOLS) candidates = [[D.NASDAQ_INDEX_SYMBOLS[symbol], 'index']];
+    else if (symbol && [...symbol].every((ch) => /\p{L}/u.test(ch) || ch === '-')) {
+      const ns = symbol.replaceAll('-', '.');
+      candidates = [[ns, 'stocks'], [ns, 'etf']];
+    } else return null;
+    const startDate = new Date(Date.now() - 420 * 86400000);
+    const start = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+    for (const [ns, asset] of candidates) {
+      let data;
+      try {
+        data = await httpGetJson(D.NASDAQ_HISTORY_URL.replace('{symbol}', encodeURIComponent(ns)).replace('{asset}', asset).replace('{start}', start));
+      } catch (_) { continue; }
+      const rows = (((data || {}).data || {}).tradesTable || {}).rows || [];
+      const closes = [], highs = [], lows = [], volumes = [];
+      for (const row of [...rows].reverse()) {
+        const close = nasdaqNumber(row.close);
+        if (close === null) continue;
+        closes.push(close); highs.push(nasdaqNumber(row.high)); lows.push(nasdaqNumber(row.low)); volumes.push(nasdaqNumber(row.volume));
+      }
+      if (closes.length) {
+        return { chart: { result: [{ meta: { regularMarketPrice: closes[closes.length - 1] }, indicators: { quote: [{ close: closes, high: highs, low: lows, volume: volumes }] } }] } };
+      }
+    }
+    return null;
+  }
+  async function computeMetricsNasdaq(sp, edgarMap) {
+    const data = await nasdaqChartData(sp.symbol);
+    if (data === null) return null;
+    const metric = await computeMetrics(sp, edgarMap, data);
+    metric.source_note = metric.source_note.replace('Finance:', 'Nasdaq.com (riserva):');
+    return metric;
+  }
+  const stopwords = () => new Set(D.QUERY_STOPWORDS);
+  function yahooQueryVariants(query) {
+    const words = normText(query).split(' ').filter(Boolean);
+    const sw = stopwords();
+    let core = words.filter((w) => !sw.has(w));
+    if (!core.length) core = words;
+    const merged = [];
+    for (const w of core) {
+      if ([...w].length === 1 && merged.length) merged[merged.length - 1] += w;
+      else merged.push(w);
+    }
+    const variants = [query.trim(), core.join(' '), merged.join(' '), core.slice(0, 2).join(''), merged.length ? merged[0] : ''];
+    const result = [];
+    for (const v of variants) if (v && !result.some((r) => r.toLowerCase() === v.toLowerCase())) result.push(v);
+    return result;
+  }
+  async function searchYahooSingle(query, limit = D.YAHOO_SEARCH_MAX) {
+    const data = await httpGetJson(D.YAHOO_SEARCH_URL.replace('{q}', encodeURIComponent(query)));
+    const result = [], seen = new Set();
+    for (const quote of data.quotes || []) {
+      const symbol = String(quote.symbol || '').toUpperCase();
+      const quoteType = String(quote.quoteType || '').toUpperCase();
+      if (!symbol || seen.has(symbol) || !(quoteType in D.YAHOO_QUOTE_TYPES)) continue;
+      seen.add(symbol);
+      const [typeLabel, kind] = D.YAHOO_QUOTE_TYPES[quoteType];
+      const name = String(quote.longname || quote.shortname || symbol).trim();
+      const sector = D.YAHOO_SECTOR_TO_ITALIAN[String(quote.sector || '')] || '';
+      const exchange = String(quote.exchDisp || quote.exchange || '').trim();
+      const note = [typeLabel, exchange].filter(Boolean).join(' · ');
+      result.push([spec(symbol, name, '', kind), sector, note]);
+      if (result.length >= limit) break;
+    }
+    return result;
+  }
+  async function searchYahoo(query, limit = D.YAHOO_SEARCH_MAX) {
+    for (const variant of yahooQueryVariants(query)) {
+      const found = await searchYahooSingle(variant, limit);
+      if (found.length) return found;
+    }
+    return [];
+  }
+  function namesMatch(nameA, nameB) {
+    const generic = new Set(D.NAME_GENERIC_WORDS);
+    const wa = new Set(normText(nameA).split(' ').filter((w) => w && !generic.has(w) && [...w].length >= 3));
+    const wb = new Set(normText(nameB).split(' ').filter((w) => w && !generic.has(w) && [...w].length >= 3));
+    if (!wa.size || !wb.size) return true;
+    for (const a of wa) if (wb.has(a)) return true;
+    for (const a of wa) for (const b of wb) if ([...a].length >= 4 && [...b].length >= 4 && (b.includes(a) || a.includes(b))) return true;
+    return false;
+  }
+  async function yahooOfficialInfo(symbol) {
+    try {
+      for (const [sp, sector, note] of await searchYahooSingle(symbol, 8)) if (sp.symbol === symbol) return [sp, sector, note];
+    } catch (_) { }
+    return null;
+  }
+  const knownSource = (sector) => (sector === D.COMMODITY_SECTOR[0] ? 'Dashboard' : 'S&P 500');
+  const hit = (sp, source, sector = '', note = '') => ({ spec: sp, source, sector, note });
+  async function searchThermometers(query, apiKey, known) {
+    const notes = [];
+    const queryNorm = normText(query);
+    const words = queryNorm.split(' ').filter(Boolean);
+
+    const localScored = [];
+    for (const [symbol, [sp, sector]] of known) {
+      const score = nameMatchScore(queryNorm, words, symbol, sp.label);
+      if (score) localScored.push([score, hit(sp, knownSource(sector), sector)]);
+    }
+    localScored.sort((a, b) => b[0] - a[0]);
+
+    const edgarHits = [];
+    let edgarByTicker = new Map();
+    try {
+      const index = await loadEdgarCompanyIndex();
+      edgarByTicker = new Map(index.map((c) => [c.ticker, c]));
+      for (const c of searchEdgar(query, index)) {
+        const score = nameMatchScore(queryNorm, words, c.ticker, c.name);
+        const note = `SEC CIK ${c.cik.replace(/^0+/, '')}` + (c.exchange ? ` · ${c.exchange}` : '');
+        edgarHits.push([score, hit(spec(c.ticker, c.name), 'SEC EDGAR', '', note)]);
+      }
+    } catch (exc) {
+      notes.push(`SEC EDGAR non raggiungibile (${exc.message}).`);
+    }
+
+    const yahooHits = [], yahooContext = [], yahooInfo = new Map();
+    try {
+      for (const [sp, sector, note] of await searchYahoo(query)) {
+        yahooInfo.set(sp.symbol, [sp, sector, note]);
+        let h;
+        if (known.has(sp.symbol)) {
+          const [ks, ksec] = known.get(sp.symbol);
+          h = hit(ks, knownSource(ksec), ksec);
+        } else h = hit(sp, 'Yahoo Finance', sector, note);
+        let score = Math.min(nameMatchScore(queryNorm, words, sp.symbol, sp.label), 94) || 1;
+        if (stripTicker(sp.symbol) === queryNorm.replaceAll(' ', '').toUpperCase()) score = 100;
+        yahooHits.push([score, h]);
+        yahooContext.push(`${sp.symbol} | ${sp.label} | ${note}`);
+      }
+      yahooHits.sort((a, b) => b[0] - a[0]);
+    } catch (exc) {
+      notes.push(`Ricerca Yahoo Finance non raggiungibile (${exc.message}).`);
+    }
+
+    const geminiHits = [];
+    if (!apiKey) {
+      notes.push('Gemini non configurato: risultati solo da SEC EDGAR, Yahoo Finance e S&P 500.');
+    } else {
+      try {
+        for (const item of await geminiFindInstruments(query, apiKey, yahooContext)) {
+          const symbol = item.symbol;
+          if (known.has(symbol)) {
+            const [sp, sector] = known.get(symbol);
+            geminiHits.push(hit(sp, knownSource(sector), sector));
+            continue;
+          }
+          let secTicker = edgarByTicker.has(item.sec_ticker) ? item.sec_ticker : '';
+          if (!secTicker && edgarByTicker.has(symbol)) secTicker = symbol;
+          const edgarSymbol = secTicker !== symbol ? secTicker : '';
+          if (yahooInfo.has(symbol)) {
+            const [ys, ysec, ynote] = yahooInfo.get(symbol);
+            geminiHits.push(hit(spec(symbol, ys.label, edgarSymbol, ys.kind), 'Gemini', ysec, ynote));
+          } else {
+            geminiHits.push(hit(spec(symbol, item.nome, edgarSymbol), 'Gemini'));
+          }
+        }
+      } catch (exc) {
+        if (exc instanceof GeminiAuthError) notes.push('API key di Gemini non valida: risultati solo da SEC EDGAR, Yahoo Finance e S&P 500.');
+        else if (exc instanceof GeminiQuotaError) notes.push('Quota Gemini esaurita per ora: risultati solo da SEC EDGAR, Yahoo Finance e S&P 500.');
+        else notes.push(`Gemini non disponibile (${exc.message}).`);
+      }
+    }
+
+    const exact = [...localScored.filter(([s]) => s >= 95), ...edgarHits.filter(([s]) => s >= 95), ...yahooHits.filter(([s]) => s >= 95)].map(([, h]) => h);
+    const rest = [...localScored.filter(([s]) => s < 95), ...edgarHits.filter(([s]) => s < 95)].map(([, h]) => h);
+    const ordered = [...exact, ...geminiHits, ...yahooHits.filter(([s]) => s < 95).map(([, h]) => h), ...rest];
+    const result = [], seen = new Set();
+    for (const h of ordered) {
+      if (seen.has(h.spec.symbol)) continue;
+      seen.add(h.spec.symbol);
+      result.push(h);
+      if (result.length >= D.SEARCH_MAX_RESULTS) break;
+    }
+    return [result, notes];
+  }
+  // Risoluzione di un risultato di ricerca in termometro (resolve() del desktop).
+  async function resolveSearchHit(h, existing, edgarMap) {
+    const reused = existing.get(h.spec.symbol);
+    if ((h.source === 'S&P 500' || h.source === 'Dashboard') && reused && hasCoreValues(reused)) return reused;
+    if (h.source === 'Gemini' && !h.note) {
+      let official = await yahooOfficialInfo(h.spec.symbol);
+      const wrongTicker = official !== null && !namesMatch(h.spec.label, official[0].label);
+      if (official === null || wrongTicker) {
+        const alt = await yahooResolveSymbol(h.spec);
+        official = alt ? await yahooOfficialInfo(alt) : null;
+        if (official !== null && !namesMatch(h.spec.label, official[0].label)) official = null;
+        if (official === null) {
+          if (wrongTicker) return null;
+          if (alt) h.spec = spec(alt, h.spec.label, h.spec.edgar_symbol);
+        }
+      }
+      if (official !== null) {
+        const [os, osec, onote] = official;
+        h.sector = osec; h.note = onote;
+        h.spec = spec(os.symbol, os.label, h.spec.edgar_symbol, os.kind);
+      }
+    }
+    let metric = await computeMetrics(h.spec, edgarMap);
+    if (!hasCoreValues(metric)) {
+      const backup = await computeMetricsNasdaq(h.spec, edgarMap);
+      if (backup !== null && (hasCoreValues(backup) || metric.error.includes('404'))) metric = backup;
+    }
+    if (h.source === 'Gemini' && metric.error.includes('404')) return null;
+    if (metric.cik && hasCoreValues(metric)) {
+      const [rating] = computeLocalRating(await fetchEdgarFundamentalsData(metric.cik), h.sector);
+      if (rating !== null) { metric.rating = rating; metric.rating_source = 'locale'; }
+    }
+    return metric;
+  }
+  function friendlyError(error) {
+    const found = error.split(/\s+/).filter((t) => /^\d+$/.test(t)).map(Number);
+    if (error.includes('chiusure valide') && found.length) {
+      const sessions = found[0] === 1 ? `${found[0]} seduta` : `${found[0]} sedute`;
+      return `Quotato da ${sessions}:\nne servono 200 per SMA200,\nminimo e massimo a 200`;
+    }
+    if (error.includes('404')) return 'Simbolo non trovato\nnelle fonti di prezzo';
+    return error.length <= 80 ? error : error.slice(0, 79) + '…';
+  }
+  Object.assign(T, {
+    loadEdgarCompanyIndex, normText, nameMatchScore, searchEdgar, buildSearchPrompt, parseJsonArray,
+    geminiFindInstruments, yahooResolveSymbol, nasdaqChartData, computeMetricsNasdaq, yahooQueryVariants,
+    searchYahooSingle, searchYahoo, namesMatch, yahooOfficialInfo, searchThermometers, resolveSearchHit, friendlyError,
+  });
+})(T);
+
+if (typeof module !== 'undefined') module.exports = T;
+
+</script>
+<script>
+'use strict';
+(function () {
+  T.init({"source_file": "sp500_vertical_thermometer.py", "APP_TITLE": "S&P 500 SMA200 Thermometer", "USER_AGENT": "SP500VerticalThermometer/1.1 desktop-contact", "PRICE_FILTER_NO_BOUND": "Tutti", "PRICE_FILTER_OPTIONS": ["Tutti", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"], "VOTE_FILTER_CHOICES": [7, 8, 9, 10], "SMA_DISTANCE_THRESHOLD": 0.1, "SMA_THRESHOLD_OPTIONS": [0.1, 0.2, 0.3], "EDGAR_SPY_URL": "https://data.sec.gov/submissions/CIK0000884394.json", "EDGAR_TICKERS_URL": "https://www.sec.gov/files/company_tickers.json", "EDGAR_TICKERS_EXCHANGE_URL": "https://www.sec.gov/files/company_tickers_exchange.json", "EDGAR_COMPANYFACTS_URL": "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik10}.json", "SP500_WIKI_URL": "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", "CONSTITUENTS_CACHE_MAX_AGE_DAYS": 30.0, "GEMINI_MODEL": "gemini-2.5-flash", "GEMINI_API_URL": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", "GEMINI_API_KEY_INFO_URL": "https://aistudio.google.com/apikey", "GEMINI_SEARCH_MODELS": ["gemini-2.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"], "GEMINI_SEARCH_MAX": 8, "SEARCH_MAX_RESULTS": 12, "YAHOO_SEARCH_URL": "https://query1.finance.yahoo.com/v1/finance/search?q={q}&quotesCount=8&newsCount=0", "YAHOO_SEARCH_MAX": 6, "NASDAQ_HISTORY_URL": "https://api.nasdaq.com/api/quote/{symbol}/historical?assetclass={asset}&fromdate={start}&limit=400", "NASDAQ_INDEX_SYMBOLS": {"^IXIC": "COMP", "^NDX": "NDX", "^GSPC": "SPX", "^DJI": "DJI", "^RUT": "RUT"}, "MAIN_ASSET": ["^GSPC", "S&P 500", "SPY", "index"], "COMMODITY_SECTOR": ["Materie prime e altri asset", [["GC=F", "Oro", "", "commodity"], ["SI=F", "Argento", "", "commodity"], ["CL=F", "Petrolio WTI", "", "commodity"], ["BTC-USD", "Bitcoin", "", "commodity"]]], "FALLBACK_SECTORS": [["Tecnologia", [["AAPL", "Apple", "", "equity"], ["MSFT", "Microsoft", "", "equity"], ["NVDA", "NVIDIA", "", "equity"], ["AVGO", "Broadcom", "", "equity"], ["ORCL", "Oracle", "", "equity"], ["CRM", "Salesforce", "", "equity"], ["ADBE", "Adobe", "", "equity"], ["AMD", "AMD", "", "equity"], ["INTC", "Intel", "", "equity"], ["CSCO", "Cisco", "", "equity"], ["IBM", "IBM", "", "equity"], ["QCOM", "Qualcomm", "", "equity"], ["TXN", "Texas Instruments", "", "equity"], ["NOW", "ServiceNow", "", "equity"], ["INTU", "Intuit", "", "equity"]]], ["Finanza", [["JPM", "JPMorgan", "", "equity"], ["BAC", "Bank of America", "", "equity"], ["WFC", "Wells Fargo", "", "equity"], ["GS", "Goldman Sachs", "", "equity"], ["MS", "Morgan Stanley", "", "equity"], ["C", "Citigroup", "", "equity"], ["BRK-B", "Berkshire Hathaway", "", "equity"], ["V", "Visa", "", "equity"], ["MA", "Mastercard", "", "equity"], ["AXP", "American Express", "", "equity"], ["BLK", "BlackRock", "", "equity"], ["SCHW", "Charles Schwab", "", "equity"]]], ["Salute", [["LLY", "Eli Lilly", "", "equity"], ["UNH", "UnitedHealth", "", "equity"], ["JNJ", "Johnson & Johnson", "", "equity"], ["ABBV", "AbbVie", "", "equity"], ["MRK", "Merck", "", "equity"], ["PFE", "Pfizer", "", "equity"], ["TMO", "Thermo Fisher", "", "equity"], ["ABT", "Abbott", "", "equity"], ["DHR", "Danaher", "", "equity"], ["BMY", "Bristol-Myers Squibb", "", "equity"], ["AMGN", "Amgen", "", "equity"], ["GILD", "Gilead Sciences", "", "equity"]]], ["Beni di consumo ciclici", [["AMZN", "Amazon", "", "equity"], ["TSLA", "Tesla", "", "equity"], ["HD", "Home Depot", "", "equity"], ["MCD", "McDonald's", "", "equity"], ["NKE", "Nike", "", "equity"], ["LOW", "Lowe's", "", "equity"], ["SBUX", "Starbucks", "", "equity"], ["BKNG", "Booking Holdings", "", "equity"], ["TJX", "TJX Companies", "", "equity"]]], ["Beni di consumo difensivi", [["WMT", "Walmart", "", "equity"], ["PG", "Procter & Gamble", "", "equity"], ["KO", "Coca-Cola", "", "equity"], ["PEP", "PepsiCo", "", "equity"], ["COST", "Costco", "", "equity"], ["PM", "Philip Morris", "", "equity"], ["MO", "Altria", "", "equity"], ["CL", "Colgate-Palmolive", "", "equity"]]], ["Comunicazioni", [["GOOGL", "Alphabet", "", "equity"], ["META", "Meta", "", "equity"], ["NFLX", "Netflix", "", "equity"], ["DIS", "Disney", "", "equity"], ["CMCSA", "Comcast", "", "equity"], ["T", "AT&T", "", "equity"], ["VZ", "Verizon", "", "equity"], ["TMUS", "T-Mobile US", "", "equity"]]], ["Industriali", [["GE", "General Electric", "", "equity"], ["CAT", "Caterpillar", "", "equity"], ["HON", "Honeywell", "", "equity"], ["UNP", "Union Pacific", "", "equity"], ["RTX", "RTX Corp", "", "equity"], ["BA", "Boeing", "", "equity"], ["UPS", "UPS", "", "equity"], ["LMT", "Lockheed Martin", "", "equity"], ["DE", "Deere", "", "equity"]]], ["Energia", [["XOM", "Exxon Mobil", "", "equity"], ["CVX", "Chevron", "", "equity"], ["COP", "ConocoPhillips", "", "equity"], ["SLB", "Schlumberger", "", "equity"], ["EOG", "EOG Resources", "", "equity"]]], ["Materiali", [["LIN", "Linde", "", "equity"], ["SHW", "Sherwin-Williams", "", "equity"], ["FCX", "Freeport-McMoRan", "", "equity"], ["ECL", "Ecolab", "", "equity"]]], ["Immobiliare", [["PLD", "Prologis", "", "equity"], ["AMT", "American Tower", "", "equity"], ["EQIX", "Equinix", "", "equity"], ["O", "Realty Income", "", "equity"]]], ["Utility", [["NEE", "NextEra Energy", "", "equity"], ["DUK", "Duke Energy", "", "equity"], ["SO", "Southern Company", "", "equity"]]], ["Materie prime e altri asset", [["GC=F", "Oro", "", "commodity"], ["SI=F", "Argento", "", "commodity"], ["CL=F", "Petrolio WTI", "", "commodity"], ["BTC-USD", "Bitcoin", "", "commodity"]]]], "GICS_TO_ITALIAN": [["Information Technology", "Tecnologia"], ["Financials", "Finanza"], ["Health Care", "Salute"], ["Consumer Discretionary", "Beni di consumo ciclici"], ["Consumer Staples", "Beni di consumo difensivi"], ["Communication Services", "Comunicazioni"], ["Industrials", "Industriali"], ["Energy", "Energia"], ["Materials", "Materiali"], ["Real Estate", "Immobiliare"], ["Utilities", "Utility"]], "EDGAR_FUNDAMENTAL_TAGS": {"revenue": ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet"], "net_income": ["NetIncomeLoss"], "equity": ["StockholdersEquity"], "liabilities": ["Liabilities"], "operating_cash_flow": ["NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"], "capex": ["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets"]}, "DEFAULT_SECTOR_PROFILE": {"growth_good": 0.05, "growth_bad": -0.05, "margin_good": 0.06, "margin_bad": 0.0, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.03, "fcf_margin_bad": -0.05}, "SECTOR_PROFILES": {"Tecnologia": {"growth_good": 0.1, "growth_bad": -0.05, "margin_good": 0.15, "margin_bad": 0.0, "leverage_good": 1.0, "leverage_bad": 3.0, "fcf_margin_good": 0.1, "fcf_margin_bad": -0.05}, "Comunicazioni": {"growth_good": 0.06, "growth_bad": -0.05, "margin_good": 0.08, "margin_bad": 0.0, "leverage_good": 2.0, "leverage_bad": 4.0, "fcf_margin_good": 0.03, "fcf_margin_bad": -0.05}, "Beni di consumo ciclici": {"growth_good": 0.08, "growth_bad": -0.05, "margin_good": 0.05, "margin_bad": 0.0, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.04, "fcf_margin_bad": -0.05}, "Beni di consumo difensivi": {"growth_good": 0.03, "growth_bad": -0.03, "margin_good": 0.05, "margin_bad": 0.0, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.04, "fcf_margin_bad": -0.03}, "Salute": {"growth_good": 0.05, "growth_bad": -0.03, "margin_good": 0.08, "margin_bad": 0.0, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.06, "fcf_margin_bad": -0.03}, "Utility": {"growth_good": 0.02, "growth_bad": -0.03, "margin_good": 0.08, "margin_bad": 0.0, "leverage_good": 3.0, "leverage_bad": 6.0, "fcf_margin_good": -0.02, "fcf_margin_bad": -0.15}, "Finanza": {"growth_good": 0.05, "growth_bad": -0.05, "margin_good": 0.12, "margin_bad": 0.0, "leverage_good": null, "leverage_bad": null, "fcf_margin_good": null, "fcf_margin_bad": null}, "Immobiliare": {"growth_good": 0.03, "growth_bad": -0.05, "margin_good": 0.1, "margin_bad": 0.0, "leverage_good": 2.5, "leverage_bad": 5.0, "fcf_margin_good": null, "fcf_margin_bad": null}, "Industriali": {"growth_good": 0.05, "growth_bad": -0.05, "margin_good": 0.06, "margin_bad": 0.0, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.04, "fcf_margin_bad": -0.05}, "Energia": {"growth_good": 0.05, "growth_bad": -0.1, "margin_good": 0.06, "margin_bad": -0.03, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.02, "fcf_margin_bad": -0.1}, "Materiali": {"growth_good": 0.05, "growth_bad": -0.08, "margin_good": 0.06, "margin_bad": -0.03, "leverage_good": 1.5, "leverage_bad": 3.5, "fcf_margin_good": 0.02, "fcf_margin_bad": -0.08}}, "YAHOO_QUOTE_TYPES": {"EQUITY": ["azione", "equity"], "ETF": ["etf", "equity"], "MUTUALFUND": ["fondo", "equity"], "INDEX": ["indice", "equity"], "FUTURE": ["future", "commodity"], "CRYPTOCURRENCY": ["cripto", "commodity"], "CURRENCY": ["valuta", "commodity"]}, "YAHOO_SECTOR_TO_ITALIAN": {"Technology": "Tecnologia", "Financial Services": "Finanza", "Healthcare": "Salute", "Consumer Cyclical": "Beni di consumo ciclici", "Consumer Defensive": "Beni di consumo difensivi", "Communication Services": "Comunicazioni", "Industrials": "Industriali", "Energy": "Energia", "Basic Materials": "Materiali", "Real Estate": "Immobiliare", "Utilities": "Utility"}, "QUERY_STOPWORDS": ["and", "azione", "azioni", "by", "da", "degli", "dei", "del", "della", "delle", "dello", "di", "e", "gli", "i", "il", "la", "le", "lo", "of", "shares", "societa", "stock", "the", "titolo"], "NAME_GENERIC_WORDS": ["a", "ag", "and", "class", "co", "company", "corp", "corporation", "de", "di", "etf", "fund", "group", "holding", "holdings", "inc", "international", "limited", "ltd", "n", "nv", "of", "p", "plc", "s", "sa", "se", "shares", "spa", "technologies", "technology", "the", "trust", "v"], "PROMPT_EXPLANATION": "Sei un analista fondamentale che parla con qualcuno senza background finanziario. Rispondi in italiano semplice e diretto, frasi brevi, senza gergo tecnico non spiegato, in massimo 170 parole, strutturato in due parti brevi:\n1) Perche' il prezzo di @@LABEL@@ (@@SYMBOL@@) si trova nella posizione attuale rispetto a questi livelli di mercato delle ultime 200 sedute giornaliere (usali solo come riferimento della posizione attuale del prezzo, non come base dell'analisi):\n- Prezzo attuale: @@PRICE@@\n- Media mobile SMA200: @@SMA@@\n- Minimo 200 periodi: @@LOW@@\n- Massimo 200 periodi: @@HIGH@@\n- POC Volume Profile 200 periodi (livello di prezzo con piu' volume scambiato): @@POC@@\nNon mettere in discussione, contestare o ricalcolare questi valori: dai per corretti i dati forniti e limitati a motivarne il significato in modo semplice.2) Se in questo momento uno stesse valutando di aprire una posizione LONG (comprare aspettandosi un rialzo), cosa potrebbe aspettarsi in base a questi elementi fondamentali? Di' chiaramente se la situazione attuale sembra piu' interessante o piu' sconveniente per entrare long adesso, e perche', in modo semplice e diretto - non startene sulle generali. Chiarisci che e' una lettura informativa basata sui dati forniti, non un consiglio di investimento personalizzato.\nBasa tutto su fondamentali - utili, crescita, valutazione, qualita' del business, contesto macroeconomico e di settore - usando la tua conoscenza generale dell'azienda o dell'indice, non su pattern grafici o segnali tecnici. Se non conosci con certezza dati recenti specifici (risultati trimestrali, notizie puntuali) che non ti ho fornito sopra, dillo esplicitamente invece di inventarli.", "PROMPT_EXPLANATION_EDGAR": "Sei un analista fondamentale che parla con qualcuno senza background finanziario. Rispondi in italiano semplice e diretto, frasi brevi, senza gergo tecnico non spiegato, in massimo 170 parole, strutturato in due parti brevi:\n1) Perche' il prezzo di @@LABEL@@ (@@SYMBOL@@) si trova nella posizione attuale rispetto a questi livelli di mercato delle ultime 200 sedute giornaliere (usali solo come riferimento della posizione attuale del prezzo, non come base dell'analisi):\n- Prezzo attuale: @@PRICE@@\n- Media mobile SMA200: @@SMA@@\n- Minimo 200 periodi: @@LOW@@\n- Massimo 200 periodi: @@HIGH@@\n- POC Volume Profile 200 periodi (livello di prezzo con piu' volume scambiato): @@POC@@\nNon mettere in discussione, contestare o ricalcolare questi valori: dai per corretti i dati forniti e limitati a motivarne il significato in modo semplice.\nDati fondamentali reali da SEC EDGAR (bilanci ufficiali depositati alla SEC, in USD):\n@@EDGAR@@\nUsa questi dati concreti come base principale dell'analisi (trend di ricavi/utili, indebitamento rispetto al patrimonio netto, flusso di cassa operativo e flusso di cassa libero al netto del CapEx), integrandoli con la tua conoscenza generale dell'azienda per una spiegazione piu' mirata ed esaustiva.\n2) Se in questo momento uno stesse valutando di aprire una posizione LONG (comprare aspettandosi un rialzo), cosa potrebbe aspettarsi in base a questi elementi fondamentali? Di' chiaramente se la situazione attuale sembra piu' interessante o piu' sconveniente per entrare long adesso, e perche', in modo semplice e diretto - non startene sulle generali. Chiarisci che e' una lettura informativa basata sui dati forniti, non un consiglio di investimento personalizzato.\nBasa tutto su fondamentali - utili, crescita, valutazione, qualita' del business, contesto macroeconomico e di settore - usando la tua conoscenza generale dell'azienda o dell'indice, non su pattern grafici o segnali tecnici. Se non conosci con certezza dati recenti specifici (risultati trimestrali, notizie puntuali) che non ti ho fornito sopra, dillo esplicitamente invece di inventarli.", "PROMPT_SEARCH": "Sei un motore di ricerca di strumenti finanziari. L'utente cerca: \"@@QUERY@@\"\nRestituisci fino a 8 strumenti quotati realmente esistenti che corrispondono meglio alla ricerca (azioni di qualsiasi borsa mondiale, ETF, indici, materie prime, criptovalute, valute).\nSe la ricerca identifica un singolo strumento (un ticker o il nome di un'azienda/indice/materia prima), restituisci quello per primo, seguito solo dalle sue altre quotazioni (altre borse, ADR); NON aggiungere strumenti diversi o semplicemente correlati. Se invece la ricerca e' generica (un settore, un tema, un paese), restituisci gli strumenti piu' rappresentativi.\nPer ciascuno usa ESATTAMENTE il simbolo di Yahoo Finance (esempi: AAPL, RACE.MI, ENI.MI, SAP.DE, MC.PA, 7203.T, ^GSPC, ^IXIC, FTSEMIB.MI, GC=F, CL=F, BTC-USD, EURUSD=X).\nIl tuo unico compito e' individuare il ticker giusto e il nome dello strumento: NON fornire prezzi, valori, dati di mercato o altre informazioni.\nRispondi SOLO con un array JSON di oggetti con questi campi:\n- \"symbol\": simbolo Yahoo Finance\n- \"nome\": nome dello strumento\n- \"sec_ticker\": ticker con cui la societa' deposita i bilanci alla SEC americana, se lo fa (anche tramite ADR), altrimenti \"\"\nNon inventare simboli: se non sei sicuro che un simbolo esista su Yahoo Finance, non includerlo. Se non trovi nulla restituisci [].", "PROMPT_SEARCH_CTX": "Sei un motore di ricerca di strumenti finanziari. L'utente cerca: \"@@QUERY@@\"\nRestituisci fino a 8 strumenti quotati realmente esistenti che corrispondono meglio alla ricerca (azioni di qualsiasi borsa mondiale, ETF, indici, materie prime, criptovalute, valute).\nSe la ricerca identifica un singolo strumento (un ticker o il nome di un'azienda/indice/materia prima), restituisci quello per primo, seguito solo dalle sue altre quotazioni (altre borse, ADR); NON aggiungere strumenti diversi o semplicemente correlati. Se invece la ricerca e' generica (un settore, un tema, un paese), restituisci gli strumenti piu' rappresentativi.\nPer ciascuno usa ESATTAMENTE il simbolo di Yahoo Finance (esempi: AAPL, RACE.MI, ENI.MI, SAP.DE, MC.PA, 7203.T, ^GSPC, ^IXIC, FTSEMIB.MI, GC=F, CL=F, BTC-USD, EURUSD=X).\nIl tuo unico compito e' individuare il ticker giusto e il nome dello strumento: NON fornire prezzi, valori, dati di mercato o altre informazioni.\nRispondi SOLO con un array JSON di oggetti con questi campi:\n- \"symbol\": simbolo Yahoo Finance\n- \"nome\": nome dello strumento\n- \"sec_ticker\": ticker con cui la societa' deposita i bilanci alla SEC americana, se lo fa (anche tramite ADR), altrimenti \"\"\nNon inventare simboli: se non sei sicuro che un simbolo esista su Yahoo Finance, non includerlo. Se non trovi nulla restituisci [].\nRisultati aggiornati di oggi dalla ricerca di Yahoo Finance per questa richiesta (simbolo | nome | tipo e borsa):\n- @@CTX@@\nLe tue conoscenze potrebbero essere ferme a prima di quotazioni recenti (IPO): se uno di questi risultati corrisponde a cio' che l'utente cerca, consideralo quotato e mettilo per primo, anche se non lo conoscevi come societa' quotata.\n"}, { proxy: "https://formal-goose-2584.coccolodaniele-art.deno.net", storage: (() => { try { return window.localStorage; } catch (_) { return null; } })() });
+  const D = T.D;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ---------- colori (stessa tavolozza del desktop) ---------- */
+  const C = {
+    APP_BG: '#07061a', HEADER_BG: '#0c0a24', HEADER_FG: '#f4f2ff', CARD_BG: '#121033', CARD_BG_2: '#1a1244',
+    CARD_BORDER: '#2c2766', SHADOW: '#030210', TEXT: '#eef0ff', MUTED: '#8f8cc4', ACCENT: '#00e5ff', MAGENTA: '#ff2bd6',
+    VIOLET: '#8a5cff', PURPLE: '#c77dff', GOOD: '#2cffa0', BAD: '#ff4d7e', TUBE_BORDER: '#3b3580',
+    MARK_HIGH: '#ff4d7e', MARK_LOW: '#2cffa0', MARK_SMA: '#ffd60a', PRICE: '#ffffff',
+  };
+  const GRAD_RED = [255, 45, 110], GRAD_YELLOW = [255, 214, 10], GRAD_GREEN = [0, 255, 150];
+  const hexRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const rgbHex = (c) => '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
+  const lerp = (a, b, t) => { t = Math.min(Math.max(t, 0), 1); return a.map((v, i) => Math.round(v + (b[i] - v) * t)); };
+  const blend = (bg, fg, t) => rgbHex(lerp(hexRgb(bg), hexRgb(fg), t));
+  function gradientColorForValue(value, low, mid, high) {
+    if (value >= mid) return rgbHex(lerp(GRAD_YELLOW, GRAD_RED, high <= mid ? 0 : (value - mid) / (high - mid)));
+    return rgbHex(lerp(GRAD_YELLOW, GRAD_GREEN, mid <= low ? 0 : (mid - value) / (mid - low)));
+  }
+  const rgba = (hex, a) => { const [r, g, b] = hexRgb(hex); return `rgba(${r},${g},${b},${a})`; };
+
+  /* ---------- disegno SVG (stesse coordinate del Canvas Tk) ---------- */
+  const PT = 4 / 3;  // i caratteri Tk sono in punti
+  let uid = 0;
+  function text(x, y, s, { size = 10, bold = false, fill = C.TEXT, anchor = 'w' } = {}) {
+    const ta = anchor === 'e' || anchor === 'ne' ? 'end' : (anchor === 'center' ? 'middle' : 'start');
+    const db = anchor === 'nw' || anchor === 'ne' ? 'hanging' : 'central';
+    return `<text x="${x}" y="${y}" font-size="${(size * PT).toFixed(1)}" ${bold ? 'font-weight="700"' : ''} fill="${fill}" text-anchor="${ta}" dominant-baseline="${db}">${esc(s)}</text>`;
+  }
+  function multiline(x, y, s, opts, lineH) {
+    return s.split('\n').map((ln, i) => text(x, y + i * lineH, ln, opts)).join('');
+  }
+  function glowRect(x1, y1, x2, y2, r, color, bg, layers = 4, spread = 2.5, strength = 0.55) {
+    let out = '';
+    for (let i = layers; i >= 1; i--) {
+      const t = strength * Math.pow(1 - (i - 1) / layers, 1.6), g = i * spread;
+      out += `<rect x="${x1 - g}" y="${y1 - g}" width="${x2 - x1 + 2 * g}" height="${y2 - y1 + 2 * g}" rx="${r + g}" fill="none" stroke="${blend(bg, color, t)}" stroke-width="${spread + 0.6}"/>`;
+    }
+    return out;
+  }
+  function glowCircle(cx, cy, r, color, bg, layers = 3, spread = 2, strength = 0.5) {
+    let out = '';
+    for (let i = layers; i >= 1; i--) {
+      const t = strength * Math.pow(1 - (i - 1) / layers, 1.6);
+      out += `<circle cx="${cx}" cy="${cy}" r="${r + i * spread}" fill="none" stroke="${blend(bg, color, t)}" stroke-width="${spread + 0.6}"/>`;
+    }
+    return out;
+  }
+  function neonStrip(x1, y1, x2, y2) {
+    const id = 'st' + (++uid);
+    return `<defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="#00e5ff"/><stop offset=".5" stop-color="#8a5cff"/><stop offset="1" stop-color="#ff2bd6"/></linearGradient></defs><rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="url(#${id})"/>`;
+  }
+  // Tubo del termometro: rosso in alto, giallo attorno alla media (SMA200), verde in basso.
+  function tube(left, right, top, bottom, low, sma, high, price, bg, glowLayers, glowSpread, glowStrength) {
+    const id = 'tb' + (++uid);
+    const smaOff = Math.min(Math.max((high - sma) / (high - low), 0), 1);
+    const capR = (right - left) / 2;
+    return glowRect(left, top, right, bottom, capR, gradientColorForValue(price, low, sma, high), bg, glowLayers, glowSpread, glowStrength)
+      + `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${rgbHex(GRAD_RED)}"/><stop offset="${smaOff}" stop-color="${rgbHex(GRAD_YELLOW)}"/><stop offset="1" stop-color="${rgbHex(GRAD_GREEN)}"/></linearGradient></defs>`
+      + `<rect x="${left}" y="${top}" width="${right - left}" height="${bottom - top}" rx="${capR}" fill="url(#${id})" stroke="${C.TUBE_BORDER}" stroke-width="1"/>`;
+  }
+  function priceLine(x1, x2, y) {
+    return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${C.SHADOW}" stroke-width="6"/>`
+      + `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${blend(C.SHADOW, C.PRICE, 0.35)}" stroke-width="4"/>`
+      + `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${C.PRICE}" stroke-width="2"/>`;
+  }
+  function arrowLine(x1, y, x2, color, arrowAt) {  // freccia sottile verso il tubo
+    const tip = arrowAt === 'first' ? x1 : x2, dir = arrowAt === 'first' ? 1 : -1;
+    return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${color}" stroke-width="1.4"/>`
+      + `<polygon points="${tip},${y} ${tip + dir * 9},${y - 3.5} ${tip + dir * 9},${y + 3.5}" fill="${color}"/>`;
+  }
+  function helpButton(cx, cy, key, bg, r = 12, size = 11) {
+    return `<g class="help" data-help="${esc(key)}">${glowCircle(cx, cy, r, C.ACCENT, bg, 3, 1.8, 0.55)}`
+      + `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${blend(C.CARD_BG, C.ACCENT, 0.18)}" stroke="${C.ACCENT}" stroke-width="1.5"/>`
+      + text(cx, cy, '?', { size, bold: true, fill: C.ACCENT, anchor: 'center' }) + '</g>';
+  }
+  const ratingColor = (r) => (r >= 7 ? C.GOOD : r <= 3 ? C.BAD : C.MARK_SMA);
+  function ratingDot(cx, cy, m, r = 9) {
+    if (m.rating === null) return '';
+    return text(cx, cy, String(m.rating), { size: r >= 9 ? 11 : 9, bold: true, fill: ratingColor(m.rating), anchor: 'center' });
+  }
+  function statPanel(x1, y1, x2, y2, color, bg) {
+    const id = 'sp' + (++uid);
+    return glowRect(x1, y1, x2, y2, 14, color, bg, 3, 2, 0.35)
+      + `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${blend(C.APP_BG, color, 0.10)}"/><stop offset="1" stop-color="${C.APP_BG}"/></linearGradient></defs>`
+      + `<rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" rx="14" fill="url(#${id})" stroke="${blend(bg, color, 0.55)}" stroke-width="1"/>`
+      + `<rect x="${x1 + 1}" y="${y1 + 14}" width="3" height="${y2 - y1 - 28}" fill="${color}"/>`;
+  }
+  const yForValue = (v, top, bottom, low, high) => (high <= low ? (top + bottom) / 2 : bottom - ((v - low) / (high - low)) * (bottom - top));
+  function scaleFor(m) {
+    const low = m.low200, high = m.high200;
+    const lowB = m.poc200 !== null ? Math.min(low, m.poc200) : low, highB = m.poc200 !== null ? Math.max(high, m.poc200) : high;
+    const pad = Math.max((highB - lowB) * 0.08, 1.0);
+    return [lowB - pad, highB + pad];
+  }
+  function drawMarker(label, value, y, x1, x2, color, align) {
+    const textX = align === 'left' ? x2 + 12 : x1 - 12, anchor = align === 'left' ? 'w' : 'e';
+    return arrowLine(x1, y, x2, color, align === 'left' ? 'first' : 'last')
+      + text(textX, y - 10, label, { size: 11, bold: true, anchor }) + text(textX, y + 12, T.fmtNumber(value), { size: 13, bold: true, fill: color, anchor });
+  }
+
+  /* ---------- stato (come la classe App del desktop) ---------- */
+  const S = {
+    main: T.newMetrics({ label: 'S&P 500', symbol: '^GSPC' }),
+    assetMetrics: new Map(),
+    sectors: T.fallbackSectors(),
+    assets: null, sectorBySymbol: new Map(),
+    filterActive: true, threshold: D.SMA_DISTANCE_THRESHOLD,
+    priceMin: null, priceMax: null, voteFilter: null,
+    semRunning: false, semCancel: false, refreshing: false,
+  };
+  S.assets = T.flattenSectors(S.sectors);
+  S.sectorBySymbol = new Map(S.sectors.flatMap(([n, specs]) => specs.map((s) => [s.symbol, n])));
+  // chiave -> metrica (help_boxes / tile_boxes del desktop): un registro per finestra
+  const helpTargets = new Map();
+  let helpSeq = 0;
+  function registerMetric(m, reg = helpTargets) { const k = 'm' + (++helpSeq); reg.set(k, m); return k; }
+
+  function setStatus(t) { $('status').textContent = t; }
+
+  /* ---------- termometro principale ---------- */
+  function drawMainThermometer(m) {
+    const avail = $('mainCard').clientWidth || 1080;
+    const cardW = Math.max(760, Math.min(avail, 1080));
+    const core = T.hasCoreValues(m);
+    const cardH = core ? 560 : 220;
+    const cx = Math.floor(cardW / 2);
+    const key = registerMetric(m);
+    let s = text(34, 32, m.label, { size: 18, bold: true }) + text(34, 58, 'Minimo · SMA200 · Prezzo attuale · Massimo  (200 sedute)', { size: 10, fill: C.MUTED })
+      + neonStrip(34, 72, 34 + Math.min(cardW - 68, 260), 74) + helpButton(cardW - 32, 32, key, C.CARD_BG_2) + ratingDot(cardW - 58, 32, m);
+    if (!core) {
+      s += text(cx, cardH / 2 + 20, 'Dati non disponibili', { size: 15, bold: true, fill: C.MUTED, anchor: 'center' });
+    } else {
+      const { price, sma200: sma, low200: low, high200: high } = m;
+      const [scaleLow, scaleHigh] = scaleFor(m);
+      const top = 96, bottom = 372, tubeW = 34, tubeLeft = cx - Math.floor(tubeW / 2), tubeRight = cx + Math.floor(tubeW / 2);
+      const Y = (v) => yForValue(v, top, bottom, scaleLow, scaleHigh);
+      s += tube(tubeLeft, tubeRight, top, bottom, scaleLow, sma, scaleHigh, price, C.CARD_BG, 6, 3, 0.6);
+      s += drawMarker('Massima 200', high, Y(high), tubeLeft - 128, tubeLeft, C.MARK_HIGH, 'right');
+      s += drawMarker('SMA200', sma, Y(sma), tubeRight, tubeRight + 120, C.MARK_SMA, 'left');
+      s += drawMarker('Prezzo attuale', price, Y(price), tubeRight, tubeRight + 160, C.PRICE, 'left');
+      s += drawMarker('Minima 200', low, Y(low), tubeLeft - 128, tubeLeft, C.MARK_LOW, 'right');
+      if (m.poc200 !== null) {
+        const py = Y(m.poc200);
+        s += `<line x1="${tubeLeft - 4}" y1="${py}" x2="${tubeRight + 4}" y2="${py}" stroke="${C.PURPLE}" stroke-width="2" stroke-dasharray="4 3"/>`;
+        s += drawMarker('POC Volume Profile 200p', m.poc200, py, tubeLeft - 200, tubeLeft - 32, C.PURPLE, 'right');
+      }
+      s += priceLine(tubeLeft - 10, tubeRight + 10, Y(price));
+      const distance = T.distanceFromSma(m), hd = T.distanceFromHigh200(m);
+      const dc = (distance || 0) >= 0 ? C.GOOD : C.BAD, hc = (hd || 0) >= 0 ? C.GOOD : C.BAD;
+      const y1 = bottom + 34, y2 = y1 + 84, gap = 22, w = (cardW - 68 - gap) / 2;
+      const a1 = 34, a2 = 34 + w, b1 = a2 + gap, b2 = b1 + w;
+      s += statPanel(a1, y1, a2, y2, dc, C.CARD_BG) + statPanel(b1, y1, b2, y2, hc, C.CARD_BG);
+      s += text(a1 + 20, y1 + 22, 'DISTANZA vs SMA200', { size: 8, bold: true, fill: C.MUTED }) + text(a1 + 20, y1 + 54, T.fmtPct(distance), { size: 21, bold: true, fill: dc });
+      s += text(b1 + 20, y1 + 22, 'DISTANZA vs MASSIMA 200', { size: 8, bold: true, fill: C.MUTED }) + text(b1 + 20, y1 + 54, T.fmtPct(hd), { size: 21, bold: true, fill: hc });
+      s += `<line x1="34" y1="${y2 + 26}" x2="${cardW - 34}" y2="${y2 + 26}" stroke="${C.CARD_BORDER}"/>`;
+      s += text(cx, y2 + 48, m.source_note, { size: 9, fill: C.MUTED, anchor: 'center' });
+    }
+    $('mainCard').innerHTML = `<svg viewBox="0 0 ${cardW} ${cardH}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+  }
+
+  /* ---------- mini termometro (tessera) ---------- */
+  function tileHtml(m, w = 196, h = 214, badge = null, note = '', showError = false, reg = helpTargets) {
+    const key = registerMetric(m, reg);
+    let glow;
+    if (T.hasCoreValues(m)) glow = (T.distanceFromSma(m) || 0) >= 0 ? C.GOOD : C.BAD; else glow = C.VIOLET;
+    const label = m.label.length <= 26 ? m.label : m.label.slice(0, 25) + '…';
+    let s = text(16, 15, m.symbol, { size: 12, bold: true, anchor: 'nw' }) + text(16, 37, label, { size: 9, fill: C.MUTED, anchor: 'nw' })
+      + helpButton(w - 20, 20, key, C.CARD_BG_2) + ratingDot(w - 42, 20, m, 8);
+    if (badge) {
+      const [bt, bc] = badge;
+      const bx1 = 14, by1 = h - 26, bx2 = bx1 + 12 + bt.length * 6.6;
+      s += `<rect x="${bx1}" y="${by1}" width="${bx2 - bx1}" height="16" rx="8" fill="${blend(C.CARD_BG, bc, 0.2)}" stroke="${bc}" stroke-width="1"/>`
+        + text((bx1 + bx2) / 2, by1 + 8, bt, { size: 7, bold: true, fill: bc, anchor: 'center' });
+      const maxChars = Math.trunc((w - 10 - (bx2 + 6)) / 5.2);
+      if (note && maxChars >= 4) s += text(bx2 + 6, by1 + 8, note.length <= maxChars ? note : note.slice(0, maxChars - 1) + '…', { size: 7, fill: C.MUTED });
+    }
+    if (!T.hasCoreValues(m)) {
+      const reason = showError && !!m.error;
+      s += text(w / 2, h / 2 + (reason ? -18 : 10), 'N/D', { size: 14, bold: true, fill: C.BAD, anchor: 'center' });
+      if (reason) s += multiline(w / 2, h / 2 + 22, wrapText(T.friendlyError(m.error), 30), { size: 8, fill: C.MUTED, anchor: 'center' }, 14);
+    } else {
+      const [scaleLow, scaleHigh] = scaleFor(m);
+      const tl = 38, tr = 46, tt = 68, tbm = h - 40;
+      const Y = (v) => yForValue(v, tt, tbm, scaleLow, scaleHigh);
+      s += tube(tl, tr, tt, tbm, scaleLow, m.sma200, scaleHigh, m.price, C.CARD_BG, 3, 2, 0.5);
+      if (m.poc200 !== null) s += `<line x1="${tl - 6}" y1="${Y(m.poc200)}" x2="${tr + 6}" y2="${Y(m.poc200)}" stroke="${C.PURPLE}" stroke-width="2" stroke-dasharray="3 2"/>`;
+      const py = Y(m.price);
+      s += `<line x1="${tl - 6}" y1="${py}" x2="${tr + 6}" y2="${py}" stroke="${C.SHADOW}" stroke-width="4"/><line x1="${tl - 6}" y1="${py}" x2="${tr + 6}" y2="${py}" stroke="${C.PRICE}" stroke-width="1.6"/>`;
+      const distance = T.distanceFromSma(m) || 0.0, color = distance >= 0 ? C.GOOD : C.BAD;
+      const hd = T.distanceFromHigh200(m), hc = (hd || 0) >= 0 ? C.GOOD : C.BAD;
+      s += text(74, 72, 'PREZZO', { size: 7, bold: true, fill: C.MUTED, anchor: 'nw' }) + text(74, 88, T.fmtNumber(m.price), { size: 11, bold: true, anchor: 'nw' })
+        + text(74, 118, 'VS SMA200', { size: 7, bold: true, fill: C.MUTED, anchor: 'nw' }) + text(74, 134, T.fmtPct(distance), { size: 16, bold: true, fill: color, anchor: 'nw' })
+        + text(74, 164, `max200  ${T.fmtPct(hd)}`, { size: 9, bold: true, fill: hc, anchor: 'nw' });
+      if (m.poc200 !== null) s += text(74, 182, `POC200  ${T.fmtNumber(m.poc200)}`, { size: 8, bold: true, fill: C.PURPLE, anchor: 'nw' });
+    }
+    const gl = `--gl-border:${blend(C.CARD_BG, glow, 0.75)};--gl-1:${rgba(glow, 0.28)};--gl-2:${rgba(glow, 0.35)};--gl-3:${rgba(glow, 0.14)}`;
+    return `<div class="tile" data-tile="${key}" style="${gl};contain-intrinsic-size:196px ${h}px"><svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${s}</svg></div>`;
+  }
+  function wrapText(t, maxLen) {
+    return t.split('\n').map((line) => {
+      const out = []; let cur = '';
+      for (const word of line.split(' ')) {
+        if (cur && (cur + ' ' + word).length > maxLen) { out.push(cur); cur = word; } else cur = cur ? cur + ' ' + word : word;
+      }
+      if (cur) out.push(cur);
+      return out.join('\n');
+    }).join('\n');
+  }
+
+  /* ---------- filtri ---------- */
+  function passesFilters(m) {
+    if (S.filterActive && !T.isBelowSmaAndPoc(m, S.threshold)) return false;
+    if (S.priceMin !== null && (m.price === null || m.price < S.priceMin)) return false;
+    if (S.priceMax !== null && (m.price === null || m.price > S.priceMax)) return false;
+    if (S.voteFilter !== null && m.rating !== S.voteFilter) return false;
+    return true;
+  }
+  function activeFiltersDescription() {
+    const bits = [];
+    if (S.filterActive) bits.push(`almeno il ${Math.round(S.threshold * 100)}% sotto la media (SMA200) e sotto il POC`);
+    if (S.priceMin !== null && S.priceMax !== null) bits.push(`prezzo tra ${T.fmtNumber(S.priceMin)}€ e ${T.fmtNumber(S.priceMax)}€`);
+    else if (S.priceMin !== null) bits.push(`prezzo da ${T.fmtNumber(S.priceMin)}€ in su`);
+    else if (S.priceMax !== null) bits.push(`prezzo fino a ${T.fmtNumber(S.priceMax)}€`);
+    if (S.voteFilter !== null) bits.push(`voto fondamentale = ${S.voteFilter}`);
+    return bits.join(' e ');
+  }
+  function updateFilterButton() {
+    $('filterBtn').textContent = S.filterActive ? '👁  Mostra tutte' : `🔎  Solo -${Math.round(S.threshold * 100)}% da media e sotto POC`;
+  }
+  function updateThresholdButtons() {
+    for (const b of $('thresholds').children) {
+      const active = S.filterActive && Math.abs(S.threshold - Number(b.dataset.v)) < 1e-9;
+      b.className = 'btn small' + (active ? ' accent' : '');
+    }
+  }
+  function updateVoteButtons() {
+    for (const b of $('votes').children) b.className = 'btn small' + (S.voteFilter === Number(b.dataset.v) ? ' accent' : '');
+  }
+  function parsePriceField(t) {
+    t = t.trim();
+    if (!t || t === D.PRICE_FILTER_NO_BOUND) return null;
+    const v = Number(t.replace(',', '.'));
+    if (!Number.isFinite(v)) return null;
+    return v >= 0 ? v : null;
+  }
+  function applyPriceFilter() {
+    S.priceMin = parsePriceField($('priceMin').value);
+    S.priceMax = parsePriceField($('priceMax').value);
+    if (S.priceMin !== null && S.priceMax !== null && S.priceMin > S.priceMax) {
+      [S.priceMin, S.priceMax] = [S.priceMax, S.priceMin];
+      $('priceMin').value = String(Math.trunc(S.priceMin));
+      $('priceMax').value = String(Math.trunc(S.priceMax));
+    }
+    draw();
+  }
+
+  /* ---------- disegno della pagina ---------- */
+  let drawPending = false;
+  function scheduleDraw() { if (!drawPending) { drawPending = true; requestAnimationFrame(() => { drawPending = false; draw(); }); } }
+  function draw() {
+    helpTargets.clear();
+    drawMainThermometer(S.main);
+    const anyFilter = S.filterActive || S.priceMin !== null || S.priceMax !== null || S.voteFilter !== null;
+    const metricFor = (sp) => S.assetMetrics.get(sp.symbol) || T.newMetrics({ symbol: sp.symbol, label: sp.label, error: 'Non caricato' });
+    let html = '';
+    if (anyFilter) {
+      let nMatch = 0; for (const m of S.assetMetrics.values()) if (passesFilters(m)) nMatch++;
+      $('sectionTitle').textContent = 'Mini termometri';
+      $('sectionSub').textContent = `Filtro attivo: ${nMatch} su ${S.assets.length} con ${activeFiltersDescription()} · rimuovi i filtri per vederle divise per settore`;
+      const matching = S.sectors.flatMap(([, specs]) => specs).map(metricFor).filter(passesFilters);
+      if (matching.length) html = `<div class="grid">${matching.map((m) => tileHtml(m)).join('')}</div>`;
+      else if (S.assetMetrics.size) html = `<div class="empty">Nessuna azienda corrisponde ai filtri attivi.\nRimuovi o allarga i filtri per vederne altre, o riprova piu' tardi.</div>`;
+    } else {
+      $('sectionTitle').textContent = 'Mini termometri per settore';
+      $('sectionSub').textContent = `${S.assets.length} aziende/asset su ${S.sectors.length} settori · clicca una tessera per il dettaglio`;
+      for (const [name, specs] of S.sectors) {
+        html += `<div class="sector"><h3>${esc(name)}  (${specs.length})</h3><div class="line"></div></div><div class="grid">${specs.map((sp) => tileHtml(metricFor(sp))).join('')}</div>`;
+      }
+    }
+    $('grids').innerHTML = html;
+  }
+  function onGridClick(ev) {
+    const help = ev.target.closest('[data-help]');
+    if (help) { const m = helpTargets.get(help.dataset.help); if (m) openExplanation(m); return; }
+    const tile = ev.target.closest('[data-tile]');
+    if (tile) { const m = helpTargets.get(tile.dataset.tile); if (m) openDetail(m); }
+  }
+
+  /* ---------- aggiornamento dati ---------- */
+  async function refresh() {
+    $('refreshBtn').disabled = true;
+    setStatus("Scarico l'elenco aggiornato dei componenti S&P 500 (Wikipedia)...");
+    try {
+      const sectors = await T.loadSp500Sectors();
+      S.sectors = sectors; S.assets = T.flattenSectors(sectors);
+      S.sectorBySymbol = new Map(sectors.flatMap(([n, specs]) => specs.map((s) => [s.symbol, n])));
+      const nSectors = sectors.filter(([n]) => n !== D.COMMODITY_SECTOR[0]).length;
+      setStatus(`Trovati ${S.assets.length} aziende/asset su ${nSectors} settori. Scarico prezzi e fondamentali...`);
+      draw();
+      const [main, bySymbol] = await T.loadDashboard(S.assets, (done, total) => {
+        setStatus(`Trovati ${S.assets.length} aziende/asset su ${nSectors} settori. Scarico prezzi e fondamentali... ${done}/${total}`);
+      });
+      S.main = main; S.assetMetrics = bySymbol;
+      $('refreshBtn').disabled = false;
+      const ok = [...bySymbol.values()].filter(T.hasCoreValues).length;
+      setStatus(`Aggiornato: ${main.updated_at} | Mini termometri caricati: ${ok}/${bySymbol.size}`);
+      draw();
+    } catch (exc) {
+      $('refreshBtn').disabled = false;
+      setStatus(`Errore: ${exc.message}`);
+      messageBox(D.APP_TITLE, exc.message, 'error');
+    }
+  }
+
+  /* ---------- finestre (Toplevel del desktop) ---------- */
+  function openWindow(cls, html) {
+    const ov = document.createElement('div');
+    ov.className = 'overlay';
+    ov.innerHTML = `<div class="win ${cls}" role="dialog" aria-modal="true"><button class="close" type="button" aria-label="Chiudi">✕</button>${html}</div>`;
+    document.body.appendChild(ov);
+    const win = ov.firstElementChild;
+    win.closeWin = () => { ov.remove(); win.closed = true; };
+    win.querySelector('.close').onclick = win.closeWin;
+    ov.addEventListener('mousedown', (e) => { if (e.target === ov) win.closeWin(); });
+    return win;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const wins = document.querySelectorAll('.overlay');
+    if (wins.length) wins[wins.length - 1].firstElementChild.closeWin();
+  });
+  function messageBox(title, message, kind = 'info', onOk = null) {
+    const win = openWindow('card-win', `<h3>${esc(title)}</h3><div class="txt ${kind === 'error' ? 'bad' : ''}">${esc(message)}</div><div class="btns"><button class="btn accent" type="button">OK</button></div>`);
+    const ok = win.querySelector('.btns .btn');
+    ok.onclick = () => { win.closeWin(); if (onOk) onOk(); };
+    ok.focus();
+  }
+
+  // Chiave Gemini: resta nel browser del visitatore (come in Sintesi Mercati AI, di cui
+  // riusa la chiave se il visitatore l'ha gia' inserita li').
+  const KEY_STORE = 'termometri_gemini_key';
+  function getGeminiApiKey() {
+    try {
+      const own = (localStorage.getItem(KEY_STORE) || '').trim();
+      if (own) return own;
+      const smai = JSON.parse(localStorage.getItem('smai_keys') || '{}');
+      if (smai.GEMINI_API_KEY && smai.GEMINI_API_KEY.trim()) return smai.GEMINI_API_KEY.trim();
+    } catch (_) { }
+    return null;
+  }
+  function saveGeminiApiKey(key) { try { localStorage.setItem(KEY_STORE, key.trim()); } catch (_) { } }
+  function promptForApiKey(onSaved) {
+    const win = openWindow('card-win', `<h3>Configura Gemini</h3>
+      <div class="txt">Per generare le spiegazioni serve una API key gratuita di Google Gemini.</div>
+      <div class="foot" style="margin-top:4px">Ottienila su: <a href="${esc(D.GEMINI_API_KEY_INFO_URL)}" target="_blank" rel="noopener">${esc(D.GEMINI_API_KEY_INFO_URL)}</a></div>
+      <input type="password" autocomplete="off" spellcheck="false" placeholder="Incolla qui la chiave">
+      <div class="foot">La chiave resta solo in questo browser, su questo dispositivo: non viene inviata al sito.</div>
+      <div class="btns"><button class="btn accent" type="button">Salva e continua</button></div>`);
+    const input = win.querySelector('input');
+    const existing = getGeminiApiKey();
+    if (existing) input.value = existing;
+    input.focus();
+    const save = () => {
+      const key = input.value.trim();
+      if (!key) return;
+      saveGeminiApiKey(key);
+      win.closeWin();
+      if (onSaved) onSaved(key);
+    };
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') save(); });
+    win.querySelector('.btns .btn').onclick = save;
+  }
+
+  function openExplanation(m, onRated = null) {
+    if (!T.hasCoreValues(m)) { messageBox(D.APP_TITLE, 'Dati non disponibili per generare una spiegazione.'); return; }
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) { promptForApiKey((key) => showExplanationWindow(m, key, onRated)); return; }
+    showExplanationWindow(m, apiKey, onRated);
+  }
+  function showExplanationWindow(m, apiKey, onRated) {
+    const win = openWindow('card-win', `<h3>${esc(m.label)} (${esc(m.symbol)})</h3><div class="sub">Spiegazione fondamentale generata da Gemini...</div>
+      <div class="txt muted">Recupero fondamentali da SEC EDGAR e generazione della spiegazione...</div>`);
+    const sub = win.querySelector('.sub'), label = win.querySelector('.txt');
+    (async () => {
+      try {
+        const summary = m.cik ? await T.fetchEdgarFundamentalsSummary(m.cik) : null;
+        const raw = await T.askGemini(m, apiKey, summary);
+        if (win.closed) return;
+        sub.textContent = 'Spiegazione fondamentale generata da Gemini';
+        label.textContent = raw.trim(); label.className = 'txt';
+        if (onRated) onRated();
+      } catch (exc) {
+        if (win.closed) return;
+        if (exc instanceof T.GeminiAuthError) {
+          win.closeWin();
+          messageBox(D.APP_TITLE, "La API key di Gemini non e' valida. Inseriscine una nuova.", 'warning',
+            () => promptForApiKey((key) => showExplanationWindow(m, key, onRated)));
+          return;
+        }
+        label.textContent = `Errore nel contattare l'IA: ${exc.message}`; label.className = 'txt bad';
+      }
+    })();
+  }
+
+  /* ---------- dettaglio (open_detail) ---------- */
+  function openDetail(m) {
+    const win = openWindow('detail', '<div class="win-body"></div>');
+    const body = win.querySelector('.win-body');
+    const draw = () => {
+      if (win.closed) return;
+      const W = 780, H = T.hasCoreValues(m) ? 690 : 720;
+      const key = 'detail';
+      let s = `<rect x="0" y="0" width="${W}" height="64" fill="${C.HEADER_BG}"/>` + neonStrip(0, 64, W, 67)
+        + text(28, 32, `${m.label}  (${m.symbol})`, { size: 16, bold: true, fill: C.HEADER_FG });
+      const hx = W - 70, hy = 32;  // spostato a sinistra per lasciare spazio alla ✕ di chiusura
+      s += ratingDot(hx - 30, hy, m, 11);
+      s += `<g class="help" data-help="${key}">${glowCircle(hx, hy, 13, C.ACCENT, C.HEADER_BG, 3, 2, 0.6)}<circle cx="${hx}" cy="${hy}" r="13" fill="${blend(C.HEADER_BG, C.ACCENT, 0.2)}" stroke="${C.ACCENT}" stroke-width="1.5"/>${text(hx, hy, '?', { size: 12, bold: true, fill: C.ACCENT, anchor: 'center' })}</g>`;
+      if (!T.hasCoreValues(m)) {
+        s += text(W / 2, H / 2, m.error || 'Dati non disponibili', { size: 14, bold: true, fill: C.BAD, anchor: 'center' });
+      } else {
+        const [scaleLow, scaleHigh] = scaleFor(m);
+        const top = 118, bottom = 442, cx = Math.floor(W / 2), tw = 30, tl = cx - Math.floor(tw / 2), tr = cx + Math.floor(tw / 2);
+        const Y = (v) => yForValue(v, top, bottom, scaleLow, scaleHigh);
+        s += tube(tl, tr, top, bottom, scaleLow, m.sma200, scaleHigh, m.price, C.APP_BG, 6, 3, 0.6);
+        const markers = [['Massima 200', m.high200, C.MARK_HIGH, 'left'], ['Prezzo attuale', m.price, C.PRICE, 'right'],
+          ['SMA200', m.sma200, C.MARK_SMA, 'right'], ['Minima 200', m.low200, C.MARK_LOW, 'left']];
+        if (m.poc200 !== null) {
+          const py = Y(m.poc200);
+          s += `<line x1="${tl - 4}" y1="${py}" x2="${tr + 4}" y2="${py}" stroke="${C.PURPLE}" stroke-width="2" stroke-dasharray="4 3"/>`;
+          markers.push(['POC Volume Profile 200p', m.poc200, C.PURPLE, 'left']);
+        }
+        for (const [lbl, value, color, side] of markers) {
+          const my = Y(value);
+          if (side === 'left') {
+            s += arrowLine(tl - 120, my, tl, color, 'last') + text(tl - 138, my - 9, lbl, { size: 10, bold: true, anchor: 'e' })
+              + text(tl - 138, my + 13, T.fmtNumber(value), { size: 12, bold: true, fill: color, anchor: 'e' });
+          } else {
+            s += arrowLine(tr, my, tr + 140, color, 'first') + text(tr + 158, my - 9, lbl, { size: 10, bold: true, anchor: 'w' })
+              + text(tr + 158, my + 13, T.fmtNumber(value), { size: 12, bold: true, fill: color, anchor: 'w' });
+          }
+        }
+        s += priceLine(tl - 10, tr + 10, Y(m.price));
+        const distance = T.distanceFromSma(m), hd = T.distanceFromHigh200(m);
+        const dc = (distance || 0) >= 0 ? C.GOOD : C.BAD, hc = (hd || 0) >= 0 ? C.GOOD : C.BAD;
+        const y1 = bottom + 46, y2 = bottom + 130, gap = 20, w = (W - 56 - gap) / 2, a1 = 28, a2 = 28 + w, b1 = a2 + gap, b2 = b1 + w;
+        s += statPanel(a1, y1, a2, y2, dc, C.APP_BG) + statPanel(b1, y1, b2, y2, hc, C.APP_BG);
+        s += text(a1 + 18, y1 + 20, 'DISTANZA vs SMA200', { size: 8, bold: true, fill: C.MUTED }) + text(a1 + 18, y1 + 52, T.fmtPct(distance), { size: 22, bold: true, fill: dc });
+        s += text(b1 + 18, y1 + 20, 'DISTANZA vs MASSIMA 200', { size: 8, bold: true, fill: C.MUTED }) + text(b1 + 18, y1 + 52, T.fmtPct(hd), { size: 22, bold: true, fill: hc });
+        s += `<line x1="28" y1="${y2 + 30}" x2="${W - 28}" y2="${y2 + 30}" stroke="${C.CARD_BORDER}"/>`;
+        s += text(W / 2, y2 + 52, m.source_note, { size: 9, fill: C.MUTED, anchor: 'center' });
+        s += text(W / 2, y2 + 74, `200 chiusure usate  ·  aggiornato ${m.updated_at}`, { size: 9, fill: C.MUTED, anchor: 'center' });
+      }
+      body.innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+    };
+    body.addEventListener('click', (ev) => { if (ev.target.closest('[data-help]')) openExplanation(m, draw); });
+    draw();
+  }
+
+  /* ---------- Voto fondamentali (activate_local_semaphore) ---------- */
+  function activateLocalSemaphore() {
+    const btn = $('semaphoreBtn');
+    if (S.semRunning) {
+      S.semCancel = true;
+      btn.disabled = true; btn.textContent = '⏳ Annullamento...';
+      return;
+    }
+    const candidates = [S.main, ...S.assetMetrics.values()];
+    const targets = candidates.filter((m) => passesFilters(m) && m.rating === null && m.cik);
+    if (!targets.length) {
+      const desc = activeFiltersDescription();
+      const reason = desc ? `con ${desc}` : 'attualmente visibili';
+      messageBox(D.APP_TITLE, `Nessun termometro ${reason} con dati SEC EDGAR associati, oppure sono gia' tutti stati valutati.`);
+      return;
+    }
+    S.semRunning = true; S.semCancel = false;
+    btn.disabled = false; btn.textContent = '⏹  Annulla voto fondamentali';
+    const total = targets.length;
+    let done = 0, cancelled = false;
+    T.poolMap(targets, 16, async (m) => T.computeLocalRating(await T.fetchEdgarFundamentalsData(m.cik), S.sectorBySymbol.get(m.symbol) || ''),
+      (res, m) => {
+        if (cancelled) return;
+        done += 1;
+        const rating = res ? res[0] : null;
+        if (rating !== null) { m.rating = rating; m.rating_source = 'locale'; }
+        setStatus(`Voto fondamentali: ${done}/${total} analizzati...`);
+        scheduleDraw();
+        if (S.semCancel) cancelled = true;
+      }, () => cancelled).then(() => {
+      S.semRunning = false; S.semCancel = false;
+      btn.disabled = false; btn.textContent = '📊 Voto fondamentali';
+      if (cancelled) {
+        setStatus(`Voto fondamentali annullato: ${done}/${total} analizzati prima dell'interruzione.`);
+      } else {
+        S.voteFilter = 10; updateVoteButtons();
+        setStatus(`Voto fondamentali completato su ${total} termometri (nessuna IA usata).`);
+        draw();
+      }
+    });
+  }
+
+  /* ---------- motore di ricerca ---------- */
+  function onSearch() {
+    const q = $('searchInput').value.trim();
+    if (!q) { $('searchInput').focus(); return; }
+    openSearchWindow(q);
+  }
+  function openSearchWindow(query) {
+    const win = openWindow('search-win', `<div class="shead"><h3></h3>
+        <form class="search"><input type="search" enterkeyhint="search" autocomplete="off"><button class="btn search-btn" type="submit">Cerca</button></form></div>
+      <div class="strip"></div>
+      <div class="srow"><div class="st"></div><button class="btn" type="button" hidden>🔑 Configura Gemini</button></div>
+      <div class="win-body"></div>`);
+    const title = win.querySelector('h3'), form = win.querySelector('form'), input = form.querySelector('input'), sbtn = form.querySelector('button');
+    const status = win.querySelector('.st'), keyBtn = win.querySelector('.srow .btn'), body = win.querySelector('.win-body');
+    const state = { query, results: null, loading: true, run: 0 };
+    const reg = new Map();
+    const badgeColors = { 'S&P 500': C.ACCENT, 'Dashboard': C.MARK_SMA, 'SEC EDGAR': C.GOOD, 'Yahoo Finance': C.PURPLE, 'Gemini': C.MAGENTA };
+    input.value = query;
+    function redraw() {
+      if (win.closed) return;
+      if (state.loading) { body.innerHTML = '<div class="loading"><b>Cerco su SEC EDGAR, Yahoo Finance e Gemini…</b><span>poi scarico prezzi, SMA200 e POC di ogni risultato</span></div>'; return; }
+      if (!state.results.length) {
+        body.innerHTML = `<div class="loading none"><b>Nessun termometro trovato.</b><span>Prova con il ticker, il nome dell'azienda o una parola diversa (es. "oro", "Ferrari", "Nasdaq").</span></div>`;
+        return;
+      }
+      reg.clear();
+      body.innerHTML = `<div class="grid">${state.results.map(([h, m]) => {
+        let bt = h.source === 'Yahoo Finance' ? 'YAHOO' : h.source.toUpperCase();
+        if ((h.source === 'Gemini' || h.source === 'Yahoo Finance') && m.cik) bt += ' + SEC';
+        return tileHtml(m, 196, 240, [bt, badgeColors[h.source] || C.VIOLET], h.note, true, reg);
+      }).join('')}</div>`;
+    }
+    body.addEventListener('click', (ev) => {
+      const help = ev.target.closest('[data-help]');
+      if (help) { const m = reg.get(help.dataset.help); if (m) openExplanation(m, redraw); return; }
+      const tile = ev.target.closest('[data-tile]');
+      if (tile) { const m = reg.get(tile.dataset.tile); if (m) openDetail(m); }
+    });
+    async function runSearch(newQuery) {
+      newQuery = newQuery.trim();
+      if (!newQuery) return;
+      Object.assign(state, { query: newQuery, results: null, loading: true });
+      const runId = ++state.run;
+      title.textContent = `Risultati per «${newQuery}»`;
+      status.textContent = 'Ricerca in corso…'; status.className = 'st';
+      keyBtn.hidden = true; sbtn.disabled = true;
+      redraw();
+      const apiKey = getGeminiApiKey();
+      const known = new Map(S.sectors.flatMap(([name, specs]) => specs.map((sp) => [sp.symbol, [sp, name]])));
+      const existing = new Map(S.assetMetrics);
+      let results = [], notes = [], errorText = null;
+      try {
+        const [hits, n] = await T.searchThermometers(newQuery, apiKey, known);
+        notes = n;
+        let edgarMap;
+        try { edgarMap = new Map((await T.loadEdgarCompanyIndex()).map((c) => [c.ticker, [c.name, c.cik]])); } catch (_) { edgarMap = new Map(); }
+        const metrics = new Array(hits.length);
+        await T.poolMap(hits.map((h, i) => [h, i]), 8, async ([h, i]) => { metrics[i] = await T.resolveSearchHit(h, existing, edgarMap); });
+        const seen = new Set();
+        hits.forEach((h, i) => {
+          const m = metrics[i];
+          if (!m || seen.has(h.spec.symbol)) return;
+          seen.add(h.spec.symbol);
+          results.push([h, m]);
+        });
+      } catch (exc) {
+        results = []; notes = []; errorText = `Errore nella ricerca: ${exc.message}`;
+      }
+      if (win.closed || runId !== state.run) return;
+      Object.assign(state, { results, loading: false });
+      sbtn.disabled = false;
+      if (errorText) { status.textContent = errorText; status.className = 'st bad'; } else {
+        const ok = results.filter(([, m]) => T.hasCoreValues(m)).length;
+        const sources = [...new Set(results.map(([h]) => h.source))].sort();
+        let t = `${results.length} risultati (${ok} con dati completi)` + (sources.length ? ` · fonti: ${sources.join(', ')}` : '')
+          + ' · clic sulla tessera = dettaglio, «?» = spiegazione Gemini';
+        if (notes.length) t += '\n' + notes.join(' ');
+        status.textContent = t; status.className = 'st';
+        if (notes.some((n) => n.includes('non configurato') || n.includes('non valida'))) keyBtn.hidden = false;
+      }
+      redraw();
+    }
+    keyBtn.onclick = () => promptForApiKey(() => runSearch(state.query));
+    form.addEventListener('submit', (e) => { e.preventDefault(); runSearch(input.value); });
+    runSearch(query);
+  }
+
+  /* ---------- avvio ---------- */
+  (function setup() {
+    for (const pct of D.SMA_THRESHOLD_OPTIONS) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = `${Math.round(pct * 100)}%`; b.dataset.v = pct;
+      b.onclick = () => { S.threshold = pct; S.filterActive = true; updateFilterButton(); updateThresholdButtons(); draw(); };
+      $('thresholds').appendChild(b);
+    }
+    for (const v of D.VOTE_FILTER_CHOICES) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = String(v); b.dataset.v = v;
+      b.onclick = () => { S.voteFilter = S.voteFilter === v ? null : v; updateVoteButtons(); draw(); };
+      $('votes').appendChild(b);
+    }
+    for (const sel of [$('priceMin'), $('priceMax')]) {
+      sel.innerHTML = D.PRICE_FILTER_OPTIONS.map((o) => `<option>${esc(o)}</option>`).join('');
+      sel.value = D.PRICE_FILTER_OPTIONS[0];
+      sel.onchange = applyPriceFilter;
+    }
+    $('priceReset').onclick = () => {
+      S.priceMin = null; S.priceMax = null;
+      $('priceMin').value = D.PRICE_FILTER_NO_BOUND; $('priceMax').value = D.PRICE_FILTER_NO_BOUND;
+      draw();
+    };
+    $('filterBtn').onclick = () => { S.filterActive = !S.filterActive; updateFilterButton(); updateThresholdButtons(); draw(); };
+    updateFilterButton(); updateThresholdButtons(); updateVoteButtons();
+    $('refreshBtn').onclick = refresh;
+    $('semaphoreBtn').onclick = activateLocalSemaphore;
+    $('keyBtn').onclick = () => promptForApiKey(null);
+    $('searchForm').addEventListener('submit', (e) => { e.preventDefault(); onSearch(); });
+    $('grids').addEventListener('click', onGridClick);
+    $('mainCard').addEventListener('click', onGridClick);
+    let lastW = 0;
+    window.addEventListener('resize', () => { const w = $('mainCard').clientWidth; if (w !== lastW) { lastW = w; drawMainThermometer(S.main); } });
+    draw();
+    refresh();
+  })();
+})();
+</script>
+</body>
+</html>
