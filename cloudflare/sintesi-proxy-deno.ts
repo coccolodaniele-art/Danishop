@@ -39,15 +39,10 @@ const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) SintesiFontiAI/1.0
 // I bilanci SEC (company facts) delle societa' piu' grandi superano i 5 MB.
 const MAX_BYTES = 25 * 1024 * 1024;
 
-// Dati JSON della SEC usati da SP500 Vertical Thermometers (data.sec.gov e i file
-// www.sec.gov/files/...): la SEC li serve solo a richieste identificate e in questa
-// forma, altrimenti risponde 403. Le altre pagine sec.gov (usate da Sintesi Mercati AI)
-// restano con le intestazioni di sempre. Nasdaq.com risponde solo a richieste JSON.
+// Nasdaq.com (SP500 Vertical Thermometers) risponde solo a richieste di dati JSON;
+// tutte le altre fonti restano con le intestazioni di sempre.
 function upstreamHeaders(target: URL): Record<string, string> {
   const host = target.hostname.toLowerCase();
-  if (host === "data.sec.gov" || (host === "www.sec.gov" && target.pathname.startsWith("/files/"))) {
-    return { "User-Agent": "SP500VerticalThermometer/1.1 web-contact coccolodaniele-art.github.io", "Accept": "application/json", "Accept-Encoding": "identity" };
-  }
   if (host === "nasdaq.com" || host.endsWith(".nasdaq.com")) {
     return { "User-Agent": USER_AGENT, "Accept": "application/json, text/plain, */*" };
   }
