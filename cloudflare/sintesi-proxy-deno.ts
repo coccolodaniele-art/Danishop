@@ -1,4 +1,4 @@
-// Intermediario per la versione web di Sintesi Mercati AI (Deno Deploy).
+// Intermediario per le versioni web di Sintesi Mercati AI e SP500 Vertical Thermometers (Deno Deploy).
 // Stesse regole della versione Cloudflare (sintesi-proxy.js).
 //
 // I browser non permettono a una pagina web di scaricare direttamente feed e articoli
@@ -24,6 +24,8 @@ const ALLOWED_HOSTS = [
   "federalreserve.gov",
   "sec.gov",
   "news.google.com",
+  // SP500 Vertical Thermometers: fonte di riserva dei prezzi del motore di ricerca
+  "nasdaq.com",
 ];
 
 const ALLOWED_ORIGINS = [
@@ -34,7 +36,23 @@ const ALLOWED_ORIGINS = [
 ];
 
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) SintesiFontiAI/1.0 contact: local-user";
-const MAX_BYTES = 5 * 1024 * 1024;
+// I bilanci SEC (company facts) delle societa' piu' grandi superano i 5 MB.
+const MAX_BYTES = 25 * 1024 * 1024;
+
+// Dati JSON della SEC usati da SP500 Vertical Thermometers (data.sec.gov e i file
+// www.sec.gov/files/...): la SEC li serve solo a richieste identificate e in questa
+// forma, altrimenti risponde 403. Le altre pagine sec.gov (usate da Sintesi Mercati AI)
+// restano con le intestazioni di sempre. Nasdaq.com risponde solo a richieste JSON.
+function upstreamHeaders(target: URL): Record<string, string> {
+  const host = target.hostname.toLowerCase();
+  if (host === "data.sec.gov" || (host === "www.sec.gov" && target.pathname.startsWith("/files/"))) {
+    return { "User-Agent": "SP500VerticalThermometer/1.1 web-contact coccolodaniele-art.github.io", "Accept": "application/json", "Accept-Encoding": "identity" };
+  }
+  if (host === "nasdaq.com" || host.endsWith(".nasdaq.com")) {
+    return { "User-Agent": USER_AGENT, "Accept": "application/json, text/plain, */*" };
+  }
+  return { "User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" };
+}
 
 function hostAllowed(hostname: string): boolean {
   const host = hostname.toLowerCase();
@@ -74,10 +92,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
   let upstream: Response;
   try {
     upstream = await fetch(target.toString(), {
-      headers: {
-        "User-Agent": USER_AGENT,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      },
+      headers: upstreamHeaders(target),
       redirect: "follow",
     });
   } catch (_) {

@@ -63,8 +63,8 @@
    "features": "",
    "trialLabel": "PROVALO GRATIS!",
    "trialInfo": "Non dimenticare di ottenere prima gratuitamente la preziosa chiave api per poter utilizzare il programma con tutte le sue funzionalità! Questo è il  link:    https://aistudio.google.com/apikey",
-   "trialUrl": "",
-   "requirements": ""
+   "trialUrl": "https://coccolodaniele-art.github.io/Danishop/sp500-thermometers/",
+   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet. Per le spiegazioni scritte dall'intelligenza artificiale (il punto di domanda su ogni termometro) e per migliorare le ricerche serve una chiave API di Gemini, gratuita: https://aistudio.google.com/apikey"
   }
  ]
 }
