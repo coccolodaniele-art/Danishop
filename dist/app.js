@@ -12,6 +12,7 @@
       tagline: 'Oggetti usati, programmi e contatti',
       shopIntro: 'Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.',
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
+      tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
       ownerName: '',
       email: '',
       phone: '',
@@ -40,6 +41,12 @@
     { value: 'venduto', label: 'Venduto' }
   ];
   const MAX_PHOTOS = 6;
+  // Sezioni della pagina Programmi: ogni programma appartiene a una delle due schede.
+  const PROGRAM_SECTIONS = [
+    { value: 'apprendimento', route: 'programmi', nav: 'Apprendimento', title: "Programmi per l'apprendimento", introKey: 'programsIntro' },
+    { value: 'finanza', route: 'trading', nav: 'Trading e finanza', title: 'Programmi per trading e finanza', introKey: 'tradingIntro' }
+  ];
+  const sectionByValue = (v) => PROGRAM_SECTIONS.find((s) => s.value === v) || PROGRAM_SECTIONS[0];
   // L'area admin esiste solo sulla copia del sito in questo PC, mai su quella online.
   const IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
@@ -120,8 +127,8 @@
     }, it)) : [];
     d.programs = Array.isArray(raw.programs) ? raw.programs.map((p) => Object.assign({
       id: uid(), name: '', tagline: '', image: '', platform: '', version: '', description: '',
-      features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: ''
-    }, p)) : [];
+      features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: '', category: PROGRAM_SECTIONS[0].value
+    }, p)).map((p) => Object.assign(p, { category: sectionByValue(p.category).value })) : [];
     return d;
   }
 
@@ -333,13 +340,16 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    return ['shop', 'programmi', 'info', 'admin'].includes(r) ? r : 'programmi';
+    return ['shop', 'programmi', 'trading', 'info', 'admin'].includes(r) ? r : 'programmi';
   }
 
   function render() {
     state.route = currentRoute();
     updateChrome();
-    const views = { shop: renderShop, programmi: renderPrograms, info: renderInfo, admin: renderAdmin };
+    const views = {
+      shop: renderShop, info: renderInfo, admin: renderAdmin,
+      programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1])
+    };
     app.innerHTML = views[state.route]();
     afterRender();
   }
@@ -348,7 +358,7 @@
     const s = state.data.settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { shop: 'Shop usato', programmi: 'Programmi', info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { shop: 'Shop usato', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, info: 'Info e contatti', admin: 'Area admin' };
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -629,13 +639,13 @@
      Programmi (pubblico)
      ========================================================= */
 
-  function renderPrograms() {
+  function renderPrograms(section) {
     const s = state.data.settings;
-    const list = state.data.programs;
+    const list = state.data.programs.filter((p) => p.category === section.value);
     return `
       <section class="page-head">
-        <h1>Programmi</h1>
-        <p>${esc(s.programsIntro)}</p>
+        <h1>${esc(section.title)}</h1>
+        <p>${esc(s[section.introKey])}</p>
       </section>
       ${list.length ? `<div class="programs">${list.map(renderProgram).join('')}</div>`
         : '<div class="empty"><strong>Nessun programma pubblicato</strong>A breve troverai qui i miei programmi.</div>'}`;
@@ -806,13 +816,13 @@
     const list = state.data.programs;
     return `
       <div class="row between" style="margin-bottom:14px">
-        <p class="item-meta" style="margin:0">Presenta i tuoi programmi con spiegazioni e modalità di prova. L'ordine qui è quello mostrato sul sito.</p>
+        <p class="item-meta" style="margin:0">Presenta i tuoi programmi con spiegazioni e modalità di prova. Ognuno compare nella sua scheda (Apprendimento o Trading e finanza), nell'ordine di questa lista.</p>
         <button class="btn" data-action="new-program">+ Nuovo programma</button>
       </div>
       ${list.length ? `<div class="admin-list">${list.map((p, i) => `
         <div class="admin-row">
           <div class="thumb">${safeImg(p.image) ? `<img src="${safeImg(p.image)}" alt="">` : noPhoto()}</div>
-          <div class="info"><strong>${esc(p.name) || '(senza nome)'}</strong><span>${esc(p.tagline || p.platform || '')}</span></div>
+          <div class="info"><strong>${esc(p.name) || '(senza nome)'}</strong><span>${esc(sectionByValue(p.category).nav)} · ${esc(p.tagline || p.platform || '')}</span></div>
           <button class="btn ghost small" data-action="move-program" data-id="${esc(p.id)}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Sposta su">↑</button>
           <button class="btn ghost small" data-action="move-program" data-id="${esc(p.id)}" data-dir="1" ${i === list.length - 1 ? 'disabled' : ''} aria-label="Sposta giù">↓</button>
           <button class="btn secondary small" data-action="edit-program" data-id="${esc(p.id)}">Modifica</button>
@@ -905,6 +915,7 @@
       <form id="programForm" class="form-card stack" novalidate>
         <div class="form-section" style="margin-top:0">Presentazione</div>
         ${field('name', 'Nome del programma', p.name, { req: true })}
+        ${field('category', 'Scheda del sito', p.category, { options: PROGRAM_SECTIONS.map((s) => ({ value: s.value, label: s.nav })), hint: 'In quale scheda compare il programma.' })}
         ${field('tagline', 'Frase breve', p.tagline, { placeholder: 'Es. Gestisci il magazzino in pochi clic' })}
         <div class="grid-2">
           ${field('platform', 'Piattaforma', p.platform, { placeholder: 'Es. Windows 10/11' })}
@@ -1023,7 +1034,8 @@
           ${field('tagline', 'Sottotitolo', s.tagline)}
         </div>
         ${field('shopIntro', 'Testo introduttivo dello Shop usato', s.shopIntro, { textarea: true, rows: 2 })}
-        ${field('programsIntro', 'Testo introduttivo dei Programmi', s.programsIntro, { textarea: true, rows: 2 })}
+        ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
+        ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
 
         <div class="form-section">Pagamento con bonifico</div>
         <div class="notice ok">Questi dati compaiono nella finestra di acquisto, con i pulsanti per copiarli.</div>
@@ -1294,7 +1306,7 @@
     'new-program': () => {
       state.editing = { type: 'program', isNew: true, draft: {
         id: uid(), name: '', tagline: '', image: '', platform: '', version: '', description: '',
-        features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: ''
+        features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: '', category: PROGRAM_SECTIONS[0].value
       } };
       render();
       window.scrollTo(0, 0);

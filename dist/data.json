@@ -4,7 +4,7 @@
   "siteName": "Laboratorio del Dany",
   "tagline": "Oggetti usati, programmi e contatti",
   "shopIntro": "Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.",
-  "programsIntro": "I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.",
+  "programsIntro": "Programmi per imparare divertendosi: programmazione, inglese e altro ancora. Si usano direttamente dal browser, anche da telefono.",
   "ownerName": "Daniele Coccolo",
   "email": "coccolo.daniele@yahoo.it",
   "phone": "3497698210",
@@ -20,7 +20,8 @@
   "bank": "Poste Italiane",
   "bic": "",
   "paymentNote": "Dopo aver ricevuto il bonifico spedisco l'oggetto entro 2 giorni lavorativi e ti invio il codice di tracciamento.",
-  "defaultShipping": 6
+  "defaultShipping": 6,
+  "tradingIntro": "Programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale. Si usano direttamente dal browser, anche da telefono."
  },
  "items": [],
  "programs": [
@@ -36,7 +37,8 @@
    "trialLabel": "PROVALO GRATIS!",
    "trialInfo": "",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/codequest/",
-   "requirements": ""
+   "requirements": "",
+   "category": "apprendimento"
   },
   {
    "id": "mun8vbdr71vb7",
@@ -50,7 +52,8 @@
    "trialLabel": "PROVALO GRATIS!",
    "trialInfo": "ALT! Per poterlo utilizzare scaricati prima la chiave API di Gemini! vai a questo link, registrati e creati la tua chiave api così potrai attivare il motore ai del programma, si tratta solo di pochi semplici passi:   https://aistudio.google.com/app/apikey\nUna volta che hai ottenuto la tua chiave api salvala da qualche parte sul tuo computer! Poi apri il programma e nella sezione API inserisci la tua api key e salva!",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/sintesi-mercati-ai/",
-   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet. Per la sintesi scritta dall'intelligenza artificiale serve una chiave API (Gemini è gratuita: https://aistudio.google.com/app/apikey); senza chiave il programma usa la sintesi locale."
+   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet. Per la sintesi scritta dall'intelligenza artificiale serve una chiave API (Gemini è gratuita: https://aistudio.google.com/app/apikey); senza chiave il programma usa la sintesi locale.",
+   "category": "finanza"
   },
   {
    "id": "muokmzza3pjsy",
@@ -64,7 +67,8 @@
    "trialLabel": "PROVALO GRATIS!",
    "trialInfo": "Non dimenticare di ottenere prima gratuitamente la preziosa chiave api per poter utilizzare il programma con tutte le sue funzionalità! Questo è il  link:    https://aistudio.google.com/apikey",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/sp500-thermometers/",
-   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet. Per le spiegazioni scritte dall'intelligenza artificiale (il punto di domanda su ogni termometro) e per migliorare le ricerche serve una chiave API di Gemini, gratuita: https://aistudio.google.com/apikey"
+   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet. Per le spiegazioni scritte dall'intelligenza artificiale (il punto di domanda su ogni termometro) e per migliorare le ricerche serve una chiave API di Gemini, gratuita: https://aistudio.google.com/apikey",
+   "category": "finanza"
   },
   {
    "id": "muontpfbbtfq3",
@@ -78,7 +82,8 @@
    "trialLabel": "PROVALO GRATIS!",
    "trialInfo": "",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/wordquest/",
-   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Non serve nessuna chiave API. I progressi restano salvati nel browser del dispositivo che usi."
+   "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Non serve nessuna chiave API. I progressi restano salvati nel browser del dispositivo che usi.",
+   "category": "apprendimento"
   }
  ]
 }
