@@ -51,6 +51,20 @@
    "trialInfo": "ALT! Per poterlo utilizzare scaricati prima la chiave API di Gemini! vai a questo link, registrati e creati la tua chiave api così potrai attivare il motore ai del programma, si tratta solo di pochi semplici passi:   https://aistudio.google.com/app/apikey\nUna volta che hai ottenuto la tua chiave api salvala da qualche parte sul tuo computer! Poi apri il programma e nella sezione API inserisci la tua api key e salva!",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/sintesi-mercati-ai/",
    "requirements": "Funziona direttamente dal sito, nel browser: nessun download né installazione, anche da telefono. Serve una connessione a internet. Per la sintesi scritta dall'intelligenza artificiale serve una chiave API (Gemini è gratuita: https://aistudio.google.com/app/apikey); senza chiave il programma usa la sintesi locale."
+  },
+  {
+   "id": "muokmzza3pjsy",
+   "name": "SP500 VERTICAL THERMOMETERS",
+   "tagline": "Riconosci a colpo d'occhio tutte le azioni selezionate dell'sp500 che vale la pena comprare!",
+   "image": "",
+   "platform": "Windows 10/11",
+   "version": "1.0",
+   "description": "Questo programma è dedicato a chi cerca occasioni di entrata nei mercati finanziari senza perdere tanto tempo in ricerche ed analisi. La visualizzazione dello stato del prezzo su un asse che ricorda un termometro permette di riconoscere occasioni favorevoli a colpo d'occhio! Unendo la semplicità con l'efficacia, sono visibili alcuni tra i più importanti parametri dell'analisi: Media mobile e POC (Point of Control: prezzo tipico) entrambi stabiliti a 200 periodi (calcolati su gli ultimi 200 giorni), minima e massima e posizione del prezzo rispetto ad essi ed infine un numero in alto a destra per ogni scheda che, una volta attivato, indica il voto da 1 a 10 che misura la qualità dei dati di analisi fondamentale (bilancio, utili, p/e, debiti ecc...). Un filtro impostato di default inquadra inizialmente soltanto le aziende che possiedono un prezzo al di sotto del POC e della Sma di almeno 10% ma poi si possono anche filtrare i termometri  in molti altri modi: range di prezzo, voti fondamentali e percentuali di distanza. In fine nell'angolo in alto a destra di ogni termometro troverete un piccolo punto di domanda, se lo cliccate Gemini vi darà una panoramica semplice e chiara della situazione attuale di quella specifica azienda basando la propria sintesi esclusivamente sui dati ottenuti da SEC EDGGAR (uno dei siti più autorevoli in materia di dati finanziari). Anche qui è necessaria una chiave API di Gemini che puoi creare e ottenere gratuitamente al link:    https://aistudio.google.com/apikey",
+   "features": "",
+   "trialLabel": "PROVALO GRATIS!",
+   "trialInfo": "Non dimenticare di ottenere prima gratuitamente la preziosa chiave api per poter utilizzare il programma con tutte le sue funzionalità! Questo è il  link:    https://aistudio.google.com/apikey",
+   "trialUrl": "",
+   "requirements": ""
   }
  ]
 }
