@@ -172,9 +172,25 @@
 
   function vinta(s) { return s.found.every((f) => f.length === 13); }
 
-  // Si può finire da soli: mazzo e scarti vuoti e tutte le carte scoperte.
+  // Si può finire da soli: tutte le carte delle colonne sono scoperte e, mandando sulle basi
+  // tutto quello che si può e pescando dal mazzo quando serve, si arriva alla vittoria.
   function finibile(s) {
-    return !vinta(s) && !s.stock.length && !s.waste.length && s.tab.every((col) => col.every((c) => c.up));
+    if (vinta(s) || !s.tab.every((col) => col.every((c) => c.up))) return false;
+    const t = clona(s);
+    let pescateAVuoto = 0;
+    for (let k = 0; k < 3000; k++) {
+      if (vinta(t)) return true;
+      const m = passoAutomatico(t);
+      if (!m) return false;
+      if (m.pesca) {
+        if (++pescateAVuoto > 2 * (t.stock.length + t.waste.length) + 6) return false;
+        pesca(t);
+      } else {
+        muovi(t, m.src, m.dst);
+        pescateAVuoto = 0;
+      }
+    }
+    return false;
   }
 
   function baseLibera(s, id) {
@@ -182,7 +198,30 @@
     return -1;
   }
 
-  // Prossima mossa del completamento automatico: la carta più bassa che può salire sulle basi.
+  // Una carta può salire da sola sulle basi senza danni quando le carte del colore opposto
+  // di un valore più basso sono già tutte sulle basi (nessuna avrà più bisogno di appoggiarsi lì).
+  function sicuraPerBase(s, id) {
+    const v = valore(id);
+    if (v <= 2) return true;
+    const livello = [0, 0, 0, 0];
+    s.found.forEach((f) => { if (f.length) livello[seme(f[0].id)] = f.length; });
+    return (rossa(id) ? [0, 3] : [1, 2]).every((x) => livello[x] >= v - 1);
+  }
+
+  // Carta da mandare in automatico sulle basi (scarti o cima di una colonna), se c'è.
+  function mossaSicura(s) {
+    const cand = [];
+    if (s.waste.length) cand.push({ src: { pila: 'waste' }, c: cima(s.waste) });
+    s.tab.forEach((col, i) => { if (col.length && cima(col).up) cand.push({ src: { pila: 'tab', i, n: col.length - 1 }, c: cima(col) }); });
+    for (const k of cand) {
+      const i = baseLibera(s, k.c.id);
+      if (i >= 0 && sicuraPerBase(s, k.c.id)) return { src: k.src, dst: { pila: 'found', i } };
+    }
+    return null;
+  }
+
+  // Prossima mossa del completamento automatico: la carta più bassa che può salire sulle basi,
+  // altrimenti pescare dal mazzo ({ pesca: true }).
   function passoAutomatico(s) {
     let best = null;
     const prova = (src, c) => {
@@ -191,7 +230,8 @@
     };
     if (s.waste.length) prova({ pila: 'waste' }, cima(s.waste));
     s.tab.forEach((col, i) => { if (col.length) prova({ pila: 'tab', i, n: col.length - 1 }, cima(col)); });
-    return best && { src: best.src, dst: best.dst };
+    if (best) return { src: best.src, dst: best.dst };
+    return s.stock.length || s.waste.length ? { pesca: true } : null;
   }
 
   // Destinazione migliore per un tocco su una carta: prima le basi, poi le colonne.
@@ -318,7 +358,7 @@
     SEMI, SIMBOLI, VALORI, NOMI, PUNTI,
     seme, valore, rossa, nome, rng,
     nuovaPartita, clona, pesca, carteDa, sequenzaValida, accetta, legale, muovi,
-    vinta, finibile, passoAutomatico, destinazioneMigliore, baseLibera,
+    vinta, finibile, passoAutomatico, destinazioneMigliore, baseLibera, sicuraPerBase, mossaSicura,
     raggiungibiliDalMazzo, suggerimenti, bloccata, punteggio
   };
 });

@@ -99,32 +99,34 @@ main { max-width: 1060px; margin: 0 auto; padding: 12px 16px 20px; }
 .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .28s ease; }
 .card:not(.up) .inner { transform: rotateY(180deg); }
 .face, .back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: calc(var(--cw) * .09); }
+/* Faccia della carta: disegno SVG al centro, valore e seme negli angoli */
 .face {
-  background: linear-gradient(180deg, #fff 0%, #f6f4ee 100%); color: #1b1f2a;
-  border: 1px solid rgba(0, 0, 0, .28); box-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+  background: #fff; color: #161a24;
+  border: 1px solid rgba(0, 0, 0, .35); box-shadow: 0 1px 2px rgba(0, 0, 0, .35);
   overflow: hidden;
 }
-.face.rossa { color: #cf2235; }
-.face .v { position: absolute; left: 7%; top: 3%; font-weight: 800; font-size: var(--f); line-height: 1; letter-spacing: -.06em; }
-.face .s { position: absolute; right: 7%; top: 4%; font-size: var(--f); line-height: 1; }
-.face .m { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-size: calc(var(--cw) * .56); line-height: 1; }
-.face .fig {
-  position: absolute; left: 14%; right: 14%; top: calc(var(--f) + 12%); bottom: 7%;
-  border: 1.5px solid currentColor; border-radius: calc(var(--cw) * .06);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2%;
-  background: linear-gradient(160deg, rgba(224, 166, 75, .22), rgba(224, 166, 75, .05));
-  font-family: Georgia, "Times New Roman", serif; font-weight: 700; line-height: 1;
+.face.rossa { color: #d0182c; }
+.face .arte { position: absolute; inset: 0; width: 100%; height: 100%; }
+.table.compatte .face .pieno, .table:not(.compatte) .face .compatto { display: none; }
+.face .idx {
+  position: absolute; left: 3%; top: 2.5%; min-width: calc(var(--f) * .95);
+  display: flex; flex-direction: column; align-items: center; line-height: 1;
 }
-.face .fig b { font-size: calc(var(--cw) * .42); }
-.face .fig i { font-style: normal; font-size: calc(var(--cw) * .22); }
+.face .idx b { font: 700 var(--f)/1 Arial, "Helvetica Neue", Helvetica, sans-serif; letter-spacing: -.02em; }
+.face .idx b.dieci { letter-spacing: -.1em; margin-left: -.1em; }
+.face .idx svg { width: calc(var(--f) * .78); height: calc(var(--f) * .78); margin-top: calc(var(--f) * .1); }
+.face .idx.basso { left: auto; top: auto; right: 3%; bottom: 2.5%; transform: rotate(180deg); }
+.table.compatte .face .idx.basso { display: none; }
+
+/* Dorso classico a rombi con cornice bianca */
 .back {
   transform: rotateY(180deg);
-  border: calc(var(--cw) * .05) solid #f7f7f2;
+  border: calc(var(--cw) * .05) solid #fff;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .18) 0 12%, transparent 13%),
-    repeating-linear-gradient(45deg, var(--back-1) 0 4px, var(--back-2) 4px 8px),
-    var(--back-2);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .4), inset 0 0 0 1px rgba(0, 0, 0, .15);
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .2) 0 1.2px, transparent 1.2px calc(var(--cw) * .085)),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, .2) 0 1.2px, transparent 1.2px calc(var(--cw) * .085)),
+    radial-gradient(circle at 50% 50%, var(--back-1), var(--back-2));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .45), inset 0 0 0 1.5px var(--back-2), inset 0 0 0 3px rgba(255, 255, 255, .55), 0 0 0 1px rgba(0, 0, 0, .3);
 }
 
 /* Evidenziazioni */

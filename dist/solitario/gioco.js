@@ -16,7 +16,7 @@
 
   const DORSI = { blu: ['#2c64c9', '#1f4fa8'], rosso: ['#c43442', '#a5222f'], verde: ['#25875a', '#1d6b45'], viola: ['#7a4fc9', '#5f3aa6'] };
   const TAVOLI = { verde: ['#2a8a57', '#17583a'], blu: ['#2f6fa8', '#183e66'], bordeaux: ['#8a2f45', '#4f1624'], grafite: ['#4a5468', '#262c38'] };
-  const impostazioni = Object.assign({ pesca: 1, suoni: true, auto: true, dorso: 'blu', tavolo: 'verde' }, store.get('impostazioni', {}));
+  const impostazioni = Object.assign({ pesca: 1, suoni: true, auto: true, basi: true, dorso: 'blu', tavolo: 'verde' }, store.get('impostazioni', {}));
   const salvaImpostazioni = () => store.set('impostazioni', impostazioni);
 
   const STAT_VUOTE = { giocate: 0, vinte: 0, serie: 0, serieMax: 0, tempo: null, punti: null, mosse: null };
@@ -34,6 +34,7 @@
   let generazione = 0;      // cambia a ogni nuova partita: ferma le animazioni rimaste in sospeso
   let timerDistribuzione = null;
   let G = null;             // geometria del tavolo
+  let puoFinire = false;    // la partita si può completare da sola
   const ultimaPos = new Map();
   const elevaTimer = new Map();
 
@@ -53,14 +54,13 @@
     slot.stock = mk('stock', '↻');
     for (let i = 0; i < 4; i++) slot.found.push(mk('found', 'A'));
     for (let i = 0; i < 7; i++) slot.tab.push(mk('tab', 'K'));
+    document.body.insertAdjacentHTML('afterbegin', window.Carte.definizioni());
     for (let id = 0; id < 52; id++) {
       const el = document.createElement('div');
       el.className = 'card';
       el.dataset.id = id;
-      const sym = R.SIMBOLI[R.seme(id)] + '︎';
-      const lab = R.VALORI[R.valore(id) - 1];
-      const mid = R.valore(id) > 10 ? `<div class="fig"><b>${lab}</b><i>${sym}</i></div>` : `<div class="m">${sym}</div>`;
-      el.innerHTML = `<div class="inner"><div class="face${R.rossa(id) ? ' rossa' : ''}"><span class="v">${lab}</span><span class="s">${sym}</span>${mid}</div><div class="back"></div></div>`;
+      el.setAttribute('role', 'img');
+      el.innerHTML = `<div class="inner">${window.Carte.faccia(id)}<div class="back"></div></div>`;
       table.appendChild(el);
       carte[id] = el;
     }
@@ -84,13 +84,13 @@
     const cw = Math.floor(Math.min((W - g * 8) / 7, 108, Math.max(56, (altezza - 40) / 5.5)));
     const ch = Math.round(cw * 1.42);
     const left = Math.round((W - (7 * cw + 6 * g)) / 2);
-    const f = Math.min(cw * 0.3, 24);
+    const f = Math.round((cw * 0.12 + 6.5) * 10) / 10;   // grandezza del valore negli angoli
     const topY = g;
     const tabY = topY + ch + Math.round(g * 1.8);
     const avail = Math.max(altezza, tabY + ch * 3);
     const offDown = Math.max(4, Math.round(ch * 0.09));
-    const upStd = Math.max(f * 1.25 + 6, ch * 0.2);
-    const upMin = f * 1.05 + 3;
+    const upStd = Math.max(f * 1.95 + 7, ch * 0.2);   // si vedono valore e seme
+    const upMin = f * 1.1 + 5;                          // si vede almeno il valore
     const offUp = game.tab.map((col) => {
       const giu = col.filter((c) => !c.up).length;
       const su = col.length - giu;
@@ -129,10 +129,12 @@
   /* ---------------- Disegno ---------------- */
   function render(opz = {}) {
     G = geometria();
+    puoFinire = R.finibile(game);
     const P = posizioni();
     table.style.setProperty('--cw', G.cw + 'px');
     table.style.setProperty('--ch', G.ch + 'px');
     table.style.setProperty('--f', G.f + 'px');
+    table.classList.toggle('compatte', G.cw < 66);
     table.style.height = G.H + 'px';
 
     const place = (el, x, y) => { el.style.transform = `translate(${x}px, ${y}px)`; };
@@ -194,7 +196,7 @@
     $('#infoDeal').textContent = (meta.giornaliera ? 'Partita del giorno' : 'Partita n. ' + game.seed) + ' · Pesca ' + game.pesca;
     $('#btnUndo').disabled = !storia.length || occupato || meta.finita;
     $('#btnHint').disabled = occupato || meta.finita;
-    $('#btnFinish').hidden = occupato || meta.finita || !R.finibile(game);
+    $('#btnFinish').hidden = occupato || meta.finita || !puoFinire;
   }
 
   /* ---------------- Tempo ---------------- */
@@ -237,8 +239,10 @@
     const prima = R.clona(game);
     const esito = R.muovi(game, src, dst);
     if (!esito) return false;
-    storia.push(prima);
-    if (storia.length > 300) storia.shift();
+    if (!opz.senzaStoria) {
+      storia.push(prima);
+      if (storia.length > 300) storia.shift();
+    }
     avviaTempo();
     suono(dst.pila === 'found' ? 'base' : 'posa');
     if (esito.scoperta != null) setTimeout(() => suono('gira'), 140);
@@ -263,11 +267,26 @@
     render({ eleva });
     salva();
     if (R.vinta(game)) { vittoria(); return; }
-    if (R.finibile(game)) {
-      if (impostazioni.auto && !occupato) completaAutomaticamente();
+    if (occupato) return;
+    if (puoFinire) {
+      if (impostazioni.auto) completaAutomaticamente();
       return;
     }
-    if (!occupato && R.bloccata(game) && meta.avvisoBlocco !== game.mosse) {
+    // Le carte che non servono più salgono da sole sulle basi, una alla volta.
+    // Non entrano nella cronologia: "Annulla" torna a prima della mossa del giocatore.
+    const sicura = impostazioni.basi && R.mossaSicura(game);
+    if (sicura) {
+      occupato = true;
+      aggiornaInfo();
+      const gen = generazione;
+      setTimeout(() => {
+        if (gen !== generazione) return;
+        occupato = false;
+        esegui(sicura.src, sicura.dst, { senzaStoria: true });
+      }, ridotto ? 60 : 170);
+      return;
+    }
+    if (R.bloccata(game) && meta.avvisoBlocco !== game.mosse) {
       meta.avvisoBlocco = game.mosse;
       toast('Non ci sono più mosse utili: annulla qualche mossa o inizia una nuova partita.', 5000);
     }
@@ -291,10 +310,16 @@
       const m = R.passoAutomatico(game);
       if (!m) { occupato = false; dopoMossa(new Set()); return; }
       const prima = R.clona(game);
-      R.muovi(game, m.src, m.dst);
       storia.push(prima);
-      suono('base');
-      render({ eleva: new Set([game.found[m.dst.i][game.found[m.dst.i].length - 1].id]) });
+      if (m.pesca) {
+        R.pesca(game);
+        suono('pesca');
+        render({ eleva: new Set(game.waste.slice(-3).map((c) => c.id)) });
+      } else {
+        R.muovi(game, m.src, m.dst);
+        suono('base');
+        render({ eleva: new Set([game.found[m.dst.i][game.found[m.dst.i].length - 1].id]) });
+      }
       if (R.vinta(game)) { occupato = false; salva(); vittoria(); return; }
       setTimeout(passo, ridotto ? 30 : 95);
     };
@@ -640,7 +665,8 @@
       <div class="label">Colore del tavolo</div>
       <div class="swatches">${Object.entries(TAVOLI).map(([n, c]) => sw('tavolo', n, c)).join('')}</div>
       <label class="check"><input type="checkbox" data-opt="suoni" ${impostazioni.suoni ? 'checked' : ''}> Suoni</label>
-      <label class="check"><input type="checkbox" data-opt="auto" ${impostazioni.auto ? 'checked' : ''}> Completa da solo quando tutte le carte sono scoperte</label>
+      <label class="check"><input type="checkbox" data-opt="basi" ${impostazioni.basi ? 'checked' : ''}> Manda da sole sulle basi le carte che non servono più</label>
+      <label class="check"><input type="checkbox" data-opt="auto" ${impostazioni.auto ? 'checked' : ''}> Finisci la partita da solo quando tutte le carte sono scoperte</label>
       <p class="muted small">Il numero di carte da pescare (1 o 3) si sceglie quando inizi una nuova partita.</p>
       <div class="modal-actions"><button class="btn primary" type="button" data-act="chiudi">Fatto</button></div>`;
     openModal(html(), {
@@ -721,6 +747,7 @@
         <li>Nelle <b>colonne</b> le carte si mettono in ordine decrescente alternando rosso e nero (es. un 6 nero sopra un 7 rosso). Puoi spostare anche gruppi di carte già in ordine.</li>
         <li>In una colonna vuota può andare solo un <b>Re</b> (con le carte che ha sopra).</li>
         <li>Quando una carta coperta resta in cima a una colonna si gira da sola.</li>
+        <li>Le carte che non servono più salgono da sole sulle basi, e quando tutte le carte delle colonne sono scoperte la partita si conclude da sola (si può disattivare nelle impostazioni).</li>
         <li>Tocca il <b>mazzo</b> in alto a sinistra per pescare 1 o 3 carte; quando finisce, toccalo di nuovo per rigirare gli scarti.</li>
       </ul>
       <h3>Comandi</h3>
