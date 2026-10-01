@@ -83,9 +83,11 @@
   svg .help { cursor: pointer; }
 
   /* ---------- finestre ---------- */
-  .overlay { position: fixed; inset: 0; background: rgba(3, 2, 16, .72); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .overlay { position: fixed; inset: 0; background: rgba(3, 2, 16, .72); display: flex; align-items: center; justify-content: center; padding: 16px;
+    overscroll-behavior: contain; }
+  body:has(.overlay) { overflow: hidden; }
   .win { position: relative; background: var(--app-bg); border: 1.2px solid #4a3b99; box-shadow: 0 0 30px rgba(138, 92, 255, .35);
-    max-width: 100%; max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+    max-width: 100%; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; }
   .win .close { position: absolute; top: 8px; right: 10px; z-index: 2; background: transparent; border: 0; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 6px; }
   .win .close:hover { color: var(--text); }
   .win-body { overflow: auto; }
@@ -94,7 +96,14 @@
   .card-win { width: 500px; background: var(--card-bg); padding: 18px 20px 20px; }
   .card-win h3 { margin: 0 30px 6px 0; font-size: 18px; }
   .card-win .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 12px; }
-  .card-win .txt { font-size: 15px; white-space: pre-wrap; line-height: 1.45; overflow-wrap: anywhere; }
+  .card-win .txt { font-size: 15px; white-space: pre-wrap; line-height: 1.45; overflow-wrap: anywhere;
+    /* testi lunghi (spiegazioni Gemini): scorrono dentro la finestra, titolo e ✕ restano fermi */
+    flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 8px; margin-right: -8px;
+    scrollbar-width: thin; scrollbar-color: #4a3b99 transparent; }
+  .card-win .txt::-webkit-scrollbar { width: 6px; }
+  .card-win .txt::-webkit-scrollbar-thumb { background: #4a3b99; border-radius: 3px; }
+  .card-win .txt.more { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 40px), transparent);
+    mask-image: linear-gradient(180deg, #000 calc(100% - 40px), transparent); }
   .card-win .txt.muted { color: var(--muted); } .card-win .txt.bad { color: var(--bad); }
   .card-win input { width: 100%; background: var(--field-bg); color: var(--text); border: 2px solid var(--violet); outline: 0; padding: 9px 10px; margin: 10px 0 4px; }
   .card-win input:focus { border-color: var(--accent); }
@@ -119,7 +128,10 @@
     main { padding: 8px 10px 30px; }
     .title { font-size: 22px; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-    .search-win { height: calc(100vh - 16px); } .overlay { padding: 8px; }
+    .search-win { height: calc(100vh - 16px); height: calc(100dvh - 16px); } .overlay { padding: 8px; }
+    .win { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); }
+    .card-win { padding: 16px 14px 16px 16px; }
+    .card-win .txt { font-size: 14.5px; }
   }
 </style>
 </head>
@@ -1510,6 +1522,13 @@ if (typeof module !== 'undefined') module.exports = T;
     const win = openWindow('card-win', `<h3>${esc(m.label)} (${esc(m.symbol)})</h3><div class="sub">Spiegazione fondamentale generata da Gemini...</div>
       <div class="txt muted">Recupero fondamentali da SEC EDGAR e generazione della spiegazione...</div>`);
     const sub = win.querySelector('.sub'), label = win.querySelector('.txt');
+    // sfumatura in basso finche' c'e' altro testo da leggere scorrendo
+    const fade = () => {
+      if (win.closed) { window.removeEventListener('resize', fade); return; }
+      label.classList.toggle('more', label.scrollHeight - label.scrollTop - label.clientHeight > 4);
+    };
+    label.addEventListener('scroll', fade, { passive: true });
+    window.addEventListener('resize', fade);
     (async () => {
       try {
         const summary = m.cik ? await T.fetchEdgarFundamentalsSummary(m.cik) : null;
@@ -1517,6 +1536,7 @@ if (typeof module !== 'undefined') module.exports = T;
         if (win.closed) return;
         sub.textContent = 'Spiegazione fondamentale generata da Gemini';
         label.textContent = raw.trim(); label.className = 'txt';
+        label.scrollTop = 0; fade();
         if (onRated) onRated();
       } catch (exc) {
         if (win.closed) return;
