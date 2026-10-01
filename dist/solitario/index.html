@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Solitario</title>
+<meta name="description" content="Il classico Solitario (Klondike) da giocare nel browser, anche da telefono: pesca 1 o 3 carte, suggerimenti, mosse annullabili e statistiche.">
+<meta name="theme-color" content="#11151f">
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%231d6b45"/><rect x="22" y="14" width="56" height="74" rx="8" fill="%23fff"/><text x="50" y="68" font-size="46" text-anchor="middle" fill="%23d0283a" font-family="Segoe UI Symbol,DejaVu Sans,sans-serif">&#9829;&#xFE0E;</text></svg>'>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="top">
+  <h1 class="brand"><span class="brand-icon" aria-hidden="true">&#9824;&#xFE0E;</span>Solitario</h1>
+  <button id="btnRules" class="top-btn icon" type="button" aria-label="Come si gioca" title="Come si gioca">?</button>
+  <button id="btnStats" class="top-btn icon" type="button" aria-label="Statistiche" title="Statistiche">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M4 20V10h3v10H4Zm6.5 0V4h3v16h-3ZM17 20v-7h3v7h-3Z"/></svg>
+  </button>
+  <button id="btnSettings" class="top-btn icon" type="button" aria-label="Impostazioni" title="Impostazioni">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2.1-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+  </button>
+</header>
+
+<main>
+  <div class="bar">
+    <div class="info">
+      <div class="chip"><span class="k">Tempo</span><b id="infoTime">0:00</b></div>
+      <div class="chip"><span class="k">Mosse</span><b id="infoMoves">0</b></div>
+      <div class="chip"><span class="k">Punti</span><b id="infoScore">0</b></div>
+      <div id="infoDeal" class="deal muted small"></div>
+    </div>
+    <div class="tools">
+      <button id="btnNew" class="btn primary" type="button"><span aria-hidden="true">&#10022;</span><span class="lbl">Nuova partita</span></button>
+      <button id="btnUndo" class="btn" type="button" title="Annulla l'ultima mossa (Ctrl+Z)"><span aria-hidden="true">&#8630;</span><span class="lbl">Annulla</span></button>
+      <button id="btnHint" class="btn" type="button" title="Suggerimento (H)"><span aria-hidden="true">&#128161;</span><span class="lbl">Suggerimento</span></button>
+    </div>
+  </div>
+
+  <div id="table" class="table" aria-label="Tavolo da gioco"></div>
+  <button id="btnFinish" class="btn primary finish" type="button" hidden>Completa automaticamente</button>
+</main>
+
+<div id="modal" class="modal" hidden><div id="modalBox" class="modal-box" role="dialog" aria-modal="true"></div></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="regole.js"></script>
+<script src="gioco.js"></script>
+</body>
+</html>
