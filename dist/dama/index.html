@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dama</title>
+<meta name="description" content="Gioca a dama italiana contro il computer (5 livelli) o con un amico sullo stesso dispositivo.">
+<meta name="theme-color" content="#11151f">
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23b58863"/><rect width="50" height="50" fill="%23f0d9b5"/><rect x="50" y="50" width="50" height="50" fill="%23f0d9b5"/><circle cx="50" cy="56" r="30" fill="%23222"/><circle cx="50" cy="46" r="30" fill="%23f4efe3" stroke="%23222" stroke-width="3"/><circle cx="50" cy="46" r="18" fill="none" stroke="%23c9bfa8" stroke-width="3"/></svg>'>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="top">
+  <button id="btnHome" class="top-btn" type="button" hidden>&larr; Menu</button>
+  <h1 class="brand"><span class="brand-icon" aria-hidden="true"><i></i></span>Dama</h1>
+  <button id="btnRules" class="top-btn icon" type="button" aria-label="Regole" title="Regole">?</button>
+  <button id="btnSettings" class="top-btn icon" type="button" aria-label="Impostazioni" title="Impostazioni">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2.1-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+  </button>
+</header>
+
+<main>
+  <!-- MENU -->
+  <section id="scrMenu" class="screen">
+    <div class="hero">
+      <div id="heroBoard" class="hero-board" aria-hidden="true"></div>
+      <div>
+        <h2>Una partita a dama?</h2>
+        <p>La dama italiana con tutte le sue regole: sfida il computer scegliendo la difficoltà, oppure gioca con un amico sullo stesso dispositivo.</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <article class="card">
+        <h3><span class="card-ico">🤖</span> Contro il computer</h3>
+        <div class="label">Difficoltà</div>
+        <div id="levels" class="levels"></div>
+        <p id="levelDesc" class="muted small"></p>
+        <div class="label">Giochi con</div>
+        <div id="colorPick" class="seg">
+          <button type="button" data-color="1" class="on">Bianco</button>
+          <button type="button" data-color="0">Casuale</button>
+          <button type="button" data-color="-1">Nero</button>
+        </div>
+        <div class="card-actions">
+          <button id="btnPlayAI" class="btn primary" type="button">Gioca</button>
+          <button id="btnResume" class="btn" type="button" hidden>Riprendi la partita</button>
+        </div>
+        <p id="aiStats" class="muted small"></p>
+      </article>
+
+      <article class="card">
+        <h3><span class="card-ico">👥</span> Due giocatori</h3>
+        <p>Sulla stessa damiera, a turno: perfetto per giocare con un amico seduto accanto a te.</p>
+        <label class="check"><input type="checkbox" id="flipLocal"> Gira la damiera a ogni mossa</label>
+        <div class="card-actions">
+          <button id="btnPlayLocal" class="btn primary" type="button">Gioca</button>
+          <button id="btnResumeLocal" class="btn" type="button" hidden>Riprendi la partita</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PARTITA -->
+  <section id="scrGame" class="screen" hidden>
+    <div class="game">
+      <div class="board-col">
+        <div id="barTop" class="pbar"></div>
+        <div class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="Damiera"></div>
+          <div id="pieces" class="pieces"></div>
+        </div>
+        <div id="barBottom" class="pbar"></div>
+      </div>
+      <aside class="side">
+        <div id="gameStatus" class="game-status"></div>
+        <div class="moves-box">
+          <div id="moves" class="moves"></div>
+        </div>
+        <div id="actions" class="actions"></div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal" hidden><div id="modalBox" class="modal-box" role="dialog" aria-modal="true"></div></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="regole.js"></script>
+<script src="gioco.js"></script>
+</body>
+</html>
