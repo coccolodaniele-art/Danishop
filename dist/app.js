@@ -14,6 +14,7 @@
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
       tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
       gamesIntro: 'Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.',
+      booksIntro: 'Libri che vendo: per ognuno trovi la copertina, di cosa parla e il prezzo. Clicca su Acquista per riceverlo a casa.',
       ownerName: '',
       email: '',
       phone: '',
@@ -32,7 +33,8 @@
       defaultShipping: 8
     },
     items: [],
-    programs: []
+    programs: [],
+    books: []
   };
 
   const CONDITIONS = ['Nuovo', 'Come nuovo', 'Ottime condizioni', 'Buone condizioni', 'Usato con segni', 'Da riparare / per ricambi'];
@@ -131,7 +133,15 @@
       id: uid(), name: '', tagline: '', image: '', platform: '', version: '', description: '',
       features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: '', category: PROGRAM_SECTIONS[0].value
     }, p)).map((p) => Object.assign(p, { category: sectionByValue(p.category).value })) : [];
+    d.books = Array.isArray(raw.books) ? raw.books.map((b) => Object.assign(newBook(), b)) : [];
     return d;
+  }
+
+  function newBook() {
+    return {
+      id: uid(), title: '', author: '', publisher: '', genre: '', cover: '', description: '',
+      price: 0, shipping: 0, condition: '', status: 'disponibile'
+    };
   }
 
   function isLocalHost() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
@@ -342,14 +352,14 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    return ['shop', 'programmi', 'trading', 'giochi', 'info', 'admin'].includes(r) ? r : 'programmi';
+    return ['shop', 'libri', 'programmi', 'trading', 'giochi', 'info', 'admin'].includes(r) ? r : 'programmi';
   }
 
   function render() {
     state.route = currentRoute();
     updateChrome();
     const views = {
-      shop: renderShop, info: renderInfo, admin: renderAdmin,
+      shop: renderShop, libri: renderBooks, info: renderInfo, admin: renderAdmin,
       programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1]),
       giochi: () => renderPrograms(PROGRAM_SECTIONS[2])
     };
@@ -361,7 +371,7 @@
     const s = state.data.settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { shop: 'Shop usato', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { shop: 'Shop usato', libri: 'Libri', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -437,7 +447,17 @@
     }).join('')}</div>`;
   }
 
-  function findItem(id) { return state.data.items.find((i) => i.id === id); }
+  // Articolo acquistabile: un oggetto dello Shop usato oppure un libro (presentato con la stessa forma).
+  function findItem(id) {
+    const it = state.data.items.find((i) => i.id === id);
+    if (it) return it;
+    const b = findBook(id);
+    return b && {
+      id: b.id, kind: 'libro', title: b.title,
+      price: b.price, shipping: b.shipping, photos: b.cover ? [b.cover] : [], status: b.status
+    };
+  }
+  function findBook(id) { return state.data.books.find((b) => b.id === id); }
 
   function openItem(id) {
     const it = findItem(id);
@@ -586,9 +606,9 @@
     const s = state.data.settings;
     const total = Number(form.dataset.total);
     const lines = [
-      `Ciao${s.ownerName ? ' ' + s.ownerName.split(' ')[0] : ''}, vorrei acquistare questo articolo dal tuo Shop usato:`,
+      `Ciao${s.ownerName ? ' ' + s.ownerName.split(' ')[0] : ''}, vorrei acquistare ${it.kind === 'libro' ? 'questo libro dal tuo sito' : 'questo articolo dal tuo Shop usato'}:`,
       '',
-      `ARTICOLO: ${it.title}`,
+      `${it.kind === 'libro' ? 'LIBRO' : 'ARTICOLO'}: ${it.title}`,
       `Prezzo: ${money(it.price)} · Spedizione: ${Number(it.shipping) > 0 ? money(it.shipping) : 'inclusa'}`,
       `TOTALE: ${money(total)}`,
       `Codice ordine: ${form.dataset.code}`,
@@ -725,6 +745,60 @@
   }
 
   /* =========================================================
+     Libri (pubblico)
+     ========================================================= */
+
+  function renderBooks() {
+    const s = state.data.settings;
+    const order = { disponibile: 0, riservato: 1, venduto: 2 };
+    const list = state.data.books.map((b, i) => [b, i])
+      .sort(([a, i], [b, j]) => (order[a.status] - order[b.status]) || (i - j)).map(([b]) => b);
+    return `
+      <section class="page-head">
+        <h1>Libri</h1>
+        <p>${esc(s.booksIntro)}</p>
+      </section>
+      ${list.length ? `<div class="programs">${list.map(renderBook).join('')}</div>`
+        : '<div class="empty"><strong>Nessun libro in vendita al momento</strong>Torna a trovarci presto!</div>'}`;
+  }
+
+  // Scheda di un libro: copertina a sinistra, descrizione, prezzo e acquisto a lato.
+  function renderBook(b) {
+    const cover = safeImg(b.cover);
+    const shipping = Number(b.shipping) || 0;
+    return `
+      <article class="program book${b.status === 'venduto' ? ' sold' : ''}" id="libro-${esc(b.id)}">
+        <div class="program-media book-media">${cover ? `
+          <button type="button" class="book-cover" data-action="zoom-cover" data-id="${esc(b.id)}" aria-label="Ingrandisci la copertina di ${esc(b.title)}">
+            <img src="${cover}" alt="Copertina di ${esc(b.title)}" loading="lazy">
+          </button>` : `<span class="initial">${esc((b.title || '?').trim().charAt(0).toUpperCase())}</span>`}
+          ${b.status !== 'disponibile' ? `<span class="badge status-${esc(b.status)}">${statusLabel(b.status)}</span>` : ''}
+        </div>
+        <div class="program-body">
+          <div>
+            <h2>${esc(b.title)}</h2>
+            ${b.author ? `<p class="tagline">${esc(b.author)}</p>` : ''}
+          </div>
+          ${b.genre || b.publisher || b.condition ? `<div class="spec">
+            ${b.genre ? `<span class="badge">${esc(b.genre)}</span>` : ''}
+            ${b.publisher ? `<span class="badge">${esc(b.publisher)}</span>` : ''}
+            ${b.condition ? `<span class="badge">${esc(b.condition)}</span>` : ''}
+          </div>` : ''}
+          ${b.description ? `<div class="text">${linkify(b.description)}</div>` : ''}
+          <div class="book-buy">
+            <div>
+              <div class="price-big">${money(b.price)}</div>
+              <div class="item-meta">${shipping > 0 ? `+ ${money(shipping)} di spedizione` : 'Spedizione inclusa'}</div>
+            </div>
+            ${b.status === 'disponibile'
+              ? `<button class="btn" data-action="buy" data-id="${esc(b.id)}">Acquista</button>`
+              : `<div class="notice">${b.status === 'venduto' ? 'Questo libro è già stato venduto.' : 'Questo libro è riservato: un altro acquirente sta completando l\'acquisto.'}</div>`}
+          </div>
+        </div>
+      </article>`;
+  }
+
+  /* =========================================================
      Info e contatti (pubblico)
      ========================================================= */
 
@@ -786,10 +860,11 @@
     const tabs = [
       ['articoli', 'Articoli', d.items.length],
       ['programmi', 'Programmi', d.programs.length],
+      ['libri', 'Libri', d.books.length],
       ['dati', 'I miei dati'],
       ['pubblica', state.localServer ? 'Online' : (state.hasDraft ? 'Pubblica ●' : 'Pubblica')]
     ];
-    const bodies = { articoli: adminItems, programmi: adminPrograms, dati: adminSettings, pubblica: adminPublish };
+    const bodies = { articoli: adminItems, programmi: adminPrograms, libri: adminBooks, dati: adminSettings, pubblica: adminPublish };
     return `
       <div class="admin-head">
         <h1>Area admin</h1>
@@ -864,7 +939,29 @@
         : '<div class="empty"><strong>Nessun programma</strong>Clicca su "Nuovo programma" per aggiungerne uno.</div>'}`;
   }
 
-  /* ---------- Editor (articolo / programma) ---------- */
+  function adminBooks() {
+    const list = state.data.books;
+    return `
+      <div class="row between" style="margin-bottom:14px">
+        <p class="item-meta" style="margin:0">I libri della scheda Libri, nell'ordine di questa lista. Quando qualcuno paga, cambia lo stato in <strong>Venduto</strong>.</p>
+        <button class="btn" data-action="new-book">+ Nuovo libro</button>
+      </div>
+      ${list.length ? `<div class="admin-list">${list.map((b, i) => `
+        <div class="admin-row">
+          <div class="thumb">${safeImg(b.cover) ? `<img src="${safeImg(b.cover)}" alt="">` : noPhoto()}</div>
+          <div class="info"><strong>${esc(b.title) || '(senza titolo)'}</strong><span>${money(b.price)}${b.author ? ' · ' + esc(b.author) : ''}</span></div>
+          <select data-action="book-status" data-id="${esc(b.id)}" aria-label="Stato">
+            ${STATUSES.map((st) => `<option value="${st.value}" ${b.status === st.value ? 'selected' : ''}>${st.label}</option>`).join('')}
+          </select>
+          <button class="btn ghost small" data-action="move-book" data-id="${esc(b.id)}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Sposta su">↑</button>
+          <button class="btn ghost small" data-action="move-book" data-id="${esc(b.id)}" data-dir="1" ${i === list.length - 1 ? 'disabled' : ''} aria-label="Sposta giù">↓</button>
+          <button class="btn secondary small" data-action="edit-book" data-id="${esc(b.id)}">Modifica</button>
+          <button class="btn danger small" data-action="delete-book" data-id="${esc(b.id)}">Elimina</button>
+        </div>`).join('')}</div>`
+        : '<div class="empty"><strong>Nessun libro</strong>Clicca su "Nuovo libro" e carica la copertina.</div>'}`;
+  }
+
+  /* ---------- Editor (articolo / programma / libro) ---------- */
 
   function field(name, label, value, opts = {}) {
     const attrs = `name="${name}" ${opts.req ? 'required' : ''} ${opts.placeholder ? `placeholder="${esc(opts.placeholder)}"` : ''} ${opts.extra || ''}`;
@@ -881,6 +978,7 @@
 
   function renderEditor() {
     const ed = state.editing;
+    if (ed.type === 'book') return renderBookEditor(ed);
     return ed.type === 'item' ? renderItemEditor(ed) : renderProgramEditor(ed);
   }
 
@@ -983,6 +1081,51 @@
       </form>`;
   }
 
+  function renderBookEditor(ed) {
+    const b = ed.draft;
+    const cover = safeImg(b.cover);
+    return `
+      <div class="admin-head">
+        <h1>${ed.isNew ? 'Nuovo libro' : 'Modifica libro'}</h1>
+        <button class="btn ghost small" data-action="cancel-edit">← Torna alla lista</button>
+      </div>
+      <form id="bookForm" class="form-card stack" novalidate>
+        <div class="form-section" style="margin-top:0">Copertina</div>
+        <div class="field">
+          <div class="row">
+            ${cover ? `<div class="photo-tile cover" style="width:120px"><img src="${cover}" alt=""></div>` : ''}
+            <button type="button" class="btn secondary small" data-action="pick-book-cover">${cover ? 'Cambia copertina' : 'Carica copertina'}</button>
+            ${cover ? '<button type="button" class="btn ghost small" data-action="remove-book-cover">Rimuovi</button>' : ''}
+          </div>
+          <input type="file" id="bookCoverInput" accept="image/*" hidden>
+        </div>
+
+        <div class="form-section">Il libro</div>
+        ${field('title', 'Titolo', b.title, { req: true })}
+        <div class="grid-2">
+          ${field('author', 'Autore', b.author)}
+          ${field('publisher', 'Editore', b.publisher)}
+        </div>
+        <div class="grid-2">
+          ${field('genre', 'Genere', b.genre, { placeholder: 'Es. Psicologia, Spiritualità…' })}
+          ${field('condition', 'Condizioni', b.condition, { options: [{ value: '', label: 'Non indicate' }, ...CONDITIONS] })}
+        </div>
+        ${field('description', 'Descrizione', b.description, { textarea: true, rows: 6, placeholder: 'Di cosa parla, a chi è rivolto…' })}
+
+        <div class="form-section">Prezzo e vendita</div>
+        <div class="grid-2">
+          ${field('price', 'Prezzo (€)', b.price || '', { req: true, extra: 'inputmode="decimal"', placeholder: '0,00' })}
+          ${field('shipping', 'Spese di spedizione (€)', b.shipping, { extra: 'inputmode="decimal"', hint: '0 = spedizione inclusa' })}
+        </div>
+        ${field('status', 'Stato', b.status, { options: STATUSES })}
+
+        <div class="sticky-actions row end">
+          <button type="button" class="btn secondary" data-action="cancel-edit">Annulla</button>
+          <button type="submit" class="btn">Salva libro</button>
+        </div>
+      </form>`;
+  }
+
   function readForm(form) {
     const o = {};
     new FormData(form).forEach((v, k) => { o[k] = String(v).trim(); });
@@ -990,7 +1133,7 @@
   }
 
   function syncEditorFromForm() {
-    const form = document.getElementById('itemForm') || document.getElementById('programForm');
+    const form = document.getElementById('itemForm') || document.getElementById('programForm') || document.getElementById('bookForm');
     if (form && state.editing) Object.assign(state.editing.draft, readForm(form));
   }
 
@@ -1054,6 +1197,21 @@
     }
   }
 
+  async function saveBookForm(form) {
+    const v = readForm(form);
+    const ed = state.editing;
+    if (!v.title) { toast('Inserisci il titolo', true); form.elements['title'].focus(); return; }
+    if (!num(v.price)) { toast('Inserisci un prezzo valido', true); form.elements['price'].focus(); return; }
+    const book = Object.assign(ed.draft, v, { price: num(v.price), shipping: num(v.shipping) });
+    if (ed.isNew) state.data.books.push(book);
+    else state.data.books = state.data.books.map((b) => (b.id === book.id ? book : b));
+    if (await saveDraft()) {
+      state.editing = null;
+      toast('Libro salvato');
+      render();
+    }
+  }
+
   /* ---------- I miei dati ---------- */
 
   function adminSettings() {
@@ -1070,6 +1228,7 @@
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
         ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
         ${field('gamesIntro', 'Testo introduttivo della scheda Giochi', s.gamesIntro, { textarea: true, rows: 2 })}
+        ${field('booksIntro', 'Testo introduttivo della scheda Libri', s.booksIntro, { textarea: true, rows: 2 })}
 
         <div class="form-section">Pagamento con bonifico</div>
         <div class="notice ok">Questi dati compaiono nella finestra di acquisto, con i pulsanti per copiarli.</div>
@@ -1293,6 +1452,14 @@
         <h2 id="modalTitle" class="shot-title">${esc(p.name)}</h2>
         <img class="shot-full" src="${src}" alt="${esc(p.name)}">`, { wide: true });
     },
+    'zoom-cover': (el) => {
+      const b = findBook(el.dataset.id);
+      const src = b && safeImg(b.cover);
+      if (!src) return;
+      openModal(`
+        <h2 id="modalTitle" class="shot-title">${esc(b.title)}</h2>
+        <img class="shot-full" src="${src}" alt="Copertina di ${esc(b.title)}">`, { wide: true });
+    },
     'buy': (el) => openCheckout(el.dataset.id),
     'copy': (el) => copy(el.dataset.value),
 
@@ -1371,6 +1538,37 @@
     'pick-program-image': () => document.getElementById('programImageInput').click(),
     'remove-program-image': () => { syncEditorFromForm(); state.editing.draft.image = ''; render(); },
 
+    'new-book': () => {
+      state.editing = { type: 'book', isNew: true, draft: Object.assign(newBook(), { shipping: state.data.settings.defaultShipping || 0 }) };
+      render();
+      window.scrollTo(0, 0);
+    },
+    'edit-book': (el) => {
+      const b = findBook(el.dataset.id);
+      if (!b) return;
+      state.editing = { type: 'book', isNew: false, draft: clone(b) };
+      render();
+      window.scrollTo(0, 0);
+    },
+    'delete-book': async (el) => {
+      const b = findBook(el.dataset.id);
+      if (!b || !confirm(`Eliminare "${b.title}"?`)) return;
+      state.data.books = state.data.books.filter((x) => x.id !== b.id);
+      await saveDraft();
+      render();
+    },
+    'move-book': async (el) => {
+      const list = state.data.books;
+      const i = list.findIndex((x) => x.id === el.dataset.id);
+      const j = i + Number(el.dataset.dir);
+      if (i < 0 || j < 0 || j >= list.length) return;
+      [list[i], list[j]] = [list[j], list[i]];
+      await saveDraft();
+      render();
+    },
+    'pick-book-cover': () => document.getElementById('bookCoverInput').click(),
+    'remove-book-cover': () => { syncEditorFromForm(); state.editing.draft.cover = ''; render(); },
+
     'export': exportData,
     'publish-local': publishLocal,
     'sync-now': (el) => syncNow(el),
@@ -1417,6 +1615,19 @@
       await saveDraft();
       toast(`Stato: ${statusLabel(t.value)}`);
       render();
+    } else if (t.dataset.action === 'book-status') {
+      const b = findBook(t.dataset.id);
+      if (!b) return;
+      b.status = t.value;
+      await saveDraft();
+      toast(`Stato: ${statusLabel(t.value)}`);
+      render();
+    } else if (t.id === 'bookCoverInput' && t.files[0]) {
+      syncEditorFromForm();
+      try {
+        state.editing.draft.cover = await compressImage(t.files[0], 1000, 0.82);
+        render();
+      } catch (err) { toast(err.message, true); }
     } else if (t.id === 'photoInput') {
       await addPhotos(t.files);
       t.value = '';
@@ -1485,6 +1696,7 @@
       }
       case 'itemForm': await saveItemForm(form); break;
       case 'programForm': await saveProgramForm(form); break;
+      case 'bookForm': await saveBookForm(form); break;
       case 'settingsForm': await saveSettingsForm(form); break;
     }
   });
