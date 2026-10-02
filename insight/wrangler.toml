@@ -1,0 +1,11 @@
+# Configurazione del servizio statistiche (Cloudflare Worker).
+# Pubblicazione: vedi LEGGIMI.md
+name = "danishop-insight"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "danishop-insight"
+database_id = "c9fd96e6-d075-4895-bba2-92f1785c72d6"

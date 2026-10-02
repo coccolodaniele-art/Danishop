@@ -15,6 +15,8 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
+import urllib.parse
 import urllib.request
 import webbrowser
 from datetime import datetime
@@ -32,6 +34,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
 DATA_FILE = os.path.join(DIST, "data.json")
 BACKUP_DIR = os.path.join(ROOT, "backup")
+INSIGHT_CONFIG = os.path.join(ROOT, "admin", ".insight.json")
 ADMIN_URL = f"http://localhost:{PORT}/#admin"
 ALLOWED_ORIGINS = {f"http://localhost:{PORT}", f"http://{HOST}:{PORT}"}
 
@@ -95,6 +98,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(200, {"ok": True, "app": "gestione-sito"})
         if self.path == "/api/sync-status":
             return self._json(200, sincronizza.read_status())
+        if self.path.startswith(("/api/insight?", "/api/insight-export?")):
+            return self._insight()
         return super().do_GET()
 
     def do_POST(self):
@@ -120,6 +125,34 @@ class Handler(SimpleHTTPRequestHandler):
         schedule_sync("Aggiornamento contenuti dal Gestore")
         return self._json(200, {"ok": True})
 
+    def _insight(self):
+        """Legge le statistiche del sito dal servizio online e le passa all'area admin."""
+        url = urllib.parse.urlsplit(self.path)
+        try:
+            days = min(max(int(urllib.parse.parse_qs(url.query).get("days", ["30"])[0]), 1), 366)
+        except ValueError:
+            days = 30
+        export = url.path == "/api/insight-export"
+        try:
+            status, body, ctype = insight_request("export" if export else "stats", days)
+        except InsightError as exc:
+            return self._json(503, {"ok": False, "error": str(exc)})
+        if status != 200 or not export:
+            if not ctype.startswith("application/json"):
+                body = json.dumps({"ok": False, "error": f"Il servizio statistiche ha risposto con errore {status}"}).encode()
+            return self._raw(status, body, "application/json; charset=utf-8")
+        name = f"statistiche_sito_{datetime.now():%Y-%m-%d}_{days}giorni.csv"
+        return self._raw(200, body, "text/csv; charset=utf-8", {"Content-Disposition": f'attachment; filename="{name}"'})
+
+    def _raw(self, status, body, ctype, headers=None):
+        self.send_response(status)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        for k, v in (headers or {}).items():
+            self.send_header(k, v)
+        self.end_headers()
+        self.wfile.write(body)
+
     def _json(self, status, payload):
         body = json.dumps(payload).encode("utf-8")
         self.send_response(status)
@@ -127,6 +160,40 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+
+class InsightError(Exception):
+    pass
+
+
+def insight_config():
+    """Indirizzo e chiave del servizio statistiche, salvati solo su questo PC (admin/.insight.json)."""
+    try:
+        with open(INSIGHT_CONFIG, encoding="utf-8") as fh:
+            cfg = json.load(fh)
+    except FileNotFoundError:
+        raise InsightError("Le statistiche non sono ancora collegate: manca il file admin/.insight.json") from None
+    except (OSError, ValueError):
+        raise InsightError("Il file admin/.insight.json non è leggibile") from None
+    if not cfg.get("url") or not cfg.get("key"):
+        raise InsightError("Nel file admin/.insight.json mancano l'indirizzo o la chiave")
+    return cfg["url"].rstrip("/"), cfg["key"]
+
+
+def insight_request(kind, days):
+    """Chiede al servizio online il riepilogo (stats) o tutti gli eventi in CSV (export)."""
+    base, key = insight_config()
+    req = urllib.request.Request(
+        f"{base}/{kind}?days={days}",
+        headers={"Authorization": f"Bearer {key}", "User-Agent": "GestioneSito/1.0"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=25) as res:
+            return res.status, res.read(), res.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as exc:
+        return exc.code, exc.read(), exc.headers.get("Content-Type", "")
+    except (urllib.error.URLError, TimeoutError, OSError):
+        raise InsightError("Impossibile raggiungere il servizio statistiche: controlla la connessione a internet") from None
 
 
 def save_data(data):

@@ -54,6 +54,10 @@
   // L'area admin esiste solo sulla copia del sito in questo PC, mai su quella online.
   const IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
+  // Servizio che raccoglie le statistiche del sito (cartella insight/). Online è sempre attivo;
+  // sul PC solo per prova, aprendo il sito con ?insight=http://127.0.0.1:8788
+  const INSIGHT_URL = 'https://danishop-insight.coccolo-daniele.workers.dev';
+
   const state = {
     data: clone(DEFAULT_DATA),
     published: clone(DEFAULT_DATA),
@@ -62,6 +66,7 @@
     route: 'programmi',
     shop: { q: '', cat: 'Tutte', showSold: false },
     adminTab: 'articoli',
+    insight: { days: 30, data: null, loading: false, error: '' },
     editing: null,
     localServer: false
   };
@@ -357,6 +362,7 @@
 
   function render() {
     state.route = currentRoute();
+    insight.section(state.route);
     updateChrome();
     const views = {
       shop: renderShop, libri: renderBooks, info: renderInfo, admin: renderAdmin,
@@ -385,6 +391,120 @@
     render();
     if (prev !== state.route) window.scrollTo(0, 0);
   });
+
+  /* =========================================================
+     Statistiche: raccolta anonima di visite e click
+     =========================================================
+     Niente cookie e niente dati personali: per ogni apertura del sito un codice casuale
+     tenuto solo in memoria, la scheda visitata, il tempo passato e i click importanti.
+     Chi visita può escludersi aprendo il sito con ?noinsight (e riattivare con ?insight=on). */
+
+  const insight = (() => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('noinsight')) localSet('insight_off', '1');
+    if (params.get('insight') === 'on') localSet('insight_off', null);
+    const testUrl = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(params.get('insight') || '') ? params.get('insight') : '';
+    const endpoint = IS_LOCAL ? testUrl : INSIGHT_URL;
+    const enabled = !!endpoint && localGet('insight_off') !== '1' && !navigator.webdriver;
+    const sid = uid() + Math.random().toString(36).slice(2, 6);
+    const queue = [];
+    let timer = null;
+    let first = true;
+    let cur = null; // { s: sezione, acc: ms già contati, since: inizio del conteggio visibile, scroll }
+
+    function flush() {
+      clearTimeout(timer);
+      timer = null;
+      if (!queue.length) return;
+      const body = JSON.stringify({
+        sid, lang: navigator.language || '', screen: window.screen ? screen.width : 0,
+        ref: document.referrer, utm: params.get('utm_source') || params.get('ref') || '',
+        events: queue.splice(0, 25)
+      });
+      let sent = false;
+      try { sent = navigator.sendBeacon && navigator.sendBeacon(endpoint + '/e', new Blob([body], { type: 'text/plain' })); } catch (_) {}
+      if (!sent) fetch(endpoint + '/e', { method: 'POST', body, keepalive: true, headers: { 'Content-Type': 'text/plain' } }).catch(() => {});
+      if (queue.length) flush();
+    }
+    function push(ev, now) {
+      if (!enabled) return;
+      queue.push(ev);
+      if (now) flush();
+      else if (!timer) timer = setTimeout(flush, 1500);
+    }
+    function stopClock() {
+      if (!cur) return;
+      if (cur.since) cur.acc += Date.now() - cur.since;
+      cur.since = 0;
+      const secs = Math.round(cur.acc / 1000);
+      if (secs >= 1) push({ t: 'time', s: cur.s, v: Math.min(secs, 1800), sc: cur.scroll });
+      cur.acc = 0;
+    }
+    function measureScroll() {
+      if (!cur) return;
+      const doc = document.documentElement;
+      const pct = Math.round(Math.min(1, (window.scrollY + window.innerHeight) / Math.max(doc.scrollHeight, 1)) * 100);
+      if (pct > cur.scroll) cur.scroll = pct;
+    }
+
+    if (enabled) {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') { stopClock(); flush(); }
+        else if (cur && !cur.since) cur.since = Date.now();
+      });
+      window.addEventListener('pagehide', () => { stopClock(); flush(); });
+      window.addEventListener('scroll', measureScroll, { passive: true });
+    }
+
+    return {
+      // Nuova scheda aperta: chiude il tempo della precedente e registra la visualizzazione.
+      section(route) {
+        if (!enabled || (cur && cur.s === route)) return;
+        stopClock();
+        cur = null;
+        if (route === 'admin') return;
+        cur = { s: route, acc: 0, since: document.visibilityState === 'hidden' ? 0 : Date.now(), scroll: 0 };
+        push({ t: 'view', s: route, e: first ? 1 : 0 }, first);
+        first = false;
+        setTimeout(measureScroll, 300);
+      },
+      click(name, label, value) {
+        if (!cur) return;
+        push({ t: 'click', s: cur.s, n: name, l: String(label || '').slice(0, 120), v: value });
+      }
+    };
+  })();
+
+  // Quali click contano per le statistiche: articoli, programmi, giochi, acquisti e contatti.
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action], a[href]');
+    if (!el) return;
+    const card = el.closest('article');
+    const cardName = card && card.querySelector('h2') ? card.querySelector('h2').textContent.trim() : '';
+    const act = el.dataset.action;
+    if (act) {
+      const id = el.dataset.id;
+      if (act === 'open-item') insight.click('open-item', (findItem(id) || {}).title);
+      else if (act === 'buy') insight.click('buy', (findItem(id) || {}).title);
+      else if (act === 'zoom-shot') insight.click('zoom-image', cardName);
+      else if (act === 'zoom-cover') insight.click('zoom-cover', cardName);
+      else if (act === 'shop-cat') insight.click('category', el.dataset.cat);
+      else if (act === 'toggle-sold') insight.click('show-sold');
+      else if (act === 'copy') insight.click('copy', (el.getAttribute('aria-label') || '').replace(/^Copia\s*/, '') || 'email');
+      return;
+    }
+    const href = el.getAttribute('href') || '';
+    if (el.classList.contains('play-now')) insight.click('play-game', cardName);
+    else if (card && el.closest('.trial') && /^https?:|^[\w-]+\//.test(href)) {
+      insight.click(/\.(exe|msi|zip|rar|7z|dmg|apk)([?#]|$)/i.test(href) ? 'download' : 'open-program', cardName);
+    } else if (href === '#info' && card) insight.click('ask-info', cardName);
+    else if (href.startsWith('mailto:')) insight.click('contact', 'Email');
+    else if (href.startsWith('tel:')) insight.click('contact', 'Telefono');
+    else if (/^https:\/\/wa\.me\//.test(href)) insight.click('contact', 'WhatsApp');
+    else if (/^https?:\/\//.test(href) && !href.startsWith(location.origin)) {
+      try { insight.click('external-link', new URL(href).hostname.replace(/^www\./, '')); } catch (_) {}
+    }
+  }, true);
 
   /* =========================================================
      Shop usato (pubblico)
@@ -630,6 +750,8 @@
     } else {
       location.href = `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent('Ordine ' + form.dataset.code + ' - ' + it.title)}&body=${encodeURIComponent(body)}`;
     }
+    insight.click('order', it.title, total);
+    insight.click('order-via', via === 'whatsapp' ? 'WhatsApp' : 'Email');
     showOrderSent(it, form.dataset, via);
   }
 
@@ -861,10 +983,11 @@
       ['articoli', 'Articoli', d.items.length],
       ['programmi', 'Programmi', d.programs.length],
       ['libri', 'Libri', d.books.length],
+      ['insight', 'Insight'],
       ['dati', 'I miei dati'],
       ['pubblica', state.localServer ? 'Online' : (state.hasDraft ? 'Pubblica ●' : 'Pubblica')]
     ];
-    const bodies = { articoli: adminItems, programmi: adminPrograms, libri: adminBooks, dati: adminSettings, pubblica: adminPublish };
+    const bodies = { articoli: adminItems, programmi: adminPrograms, libri: adminBooks, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
     return `
       <div class="admin-head">
         <h1>Area admin</h1>
@@ -1295,6 +1418,348 @@
     }
   }
 
+  /* ---------- Insight (statistiche del sito) ---------- */
+
+  const INSIGHT_PERIODS = [[1, 'Oggi'], [7, '7 giorni'], [30, '30 giorni'], [90, '3 mesi'], [365, '12 mesi']];
+  const SECTION_NAMES = { shop: 'Shop usato', libri: 'Libri', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
+  const CLICK_NAMES = {
+    'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
+    'open-item': 'Articoli aperti', 'zoom-cover': 'Copertine di libri ingrandite', 'buy': 'Clic su Acquista',
+    'order': 'Ordini inviati', 'order-via': 'Ordini: canale usato', 'search': 'Ricerche nello shop',
+    'category': 'Filtri per categoria', 'show-sold': 'Mostra venduti', 'zoom-image': 'Immagini dei programmi ingrandite',
+    'ask-info': 'Richieste di informazioni', 'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo',
+    'external-link': 'Link esterni aperti', 'copy': 'Dati del bonifico copiati'
+  };
+  const LABEL_GROUPS = ['open-program', 'play-game', 'open-item', 'zoom-cover', 'buy', 'order', 'search', 'contact',
+    'download', 'ask-info', 'external-link', 'order-via', 'category', 'copy', 'zoom-image'];
+  const WEEKDAYS = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+  const nf = new Intl.NumberFormat('it-IT');
+  const fmt = (n) => nf.format(Math.round(Number(n) || 0));
+  let insightTimer = null;
+
+  function fmtDur(sec) {
+    sec = Math.round(Number(sec) || 0);
+    if (sec < 60) return `${sec} s`;
+    if (sec < 3600) return `${Math.floor(sec / 60)} min ${String(sec % 60).padStart(2, '0')} s`;
+    return `${Math.floor(sec / 3600)} h ${String(Math.floor(sec % 3600 / 60)).padStart(2, '0')} min`;
+  }
+  function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+  function regionName(code) {
+    if (!code || code === '?' || code === 'XX' || code === 'T1') return 'Sconosciuto';
+    try { return new Intl.DisplayNames(['it'], { type: 'region' }).of(code); } catch (_) { return code; }
+  }
+  function langName(code) {
+    if (!code || code === '?') return 'Sconosciuta';
+    try {
+      const n = new Intl.DisplayNames(['it'], { type: 'language' }).of(code.split('-')[0]);
+      return n.charAt(0).toUpperCase() + n.slice(1);
+    } catch (_) { return code; }
+  }
+  function dayLabel(day, withWeekday) {
+    const d = new Date(day + 'T12:00:00');
+    return d.toLocaleDateString('it-IT', withWeekday ? { weekday: 'short', day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short' });
+  }
+
+  function adminInsight() {
+    if (!state.localServer) {
+      return `<div class="form-card stack"><h2 style="margin:0">Insight</h2>
+        <div class="notice">Le statistiche si leggono tramite il Gestore: apri l'area admin dall'icona <strong>Gestione sito</strong> sul desktop.</div></div>`;
+    }
+    const ins = state.insight;
+    return `
+      <div class="ins-bar">
+        <div class="chips" role="group" aria-label="Periodo">
+          ${INSIGHT_PERIODS.map(([d, l]) => `<button class="chip ${ins.days === d ? 'active' : ''}" data-action="insight-days" data-days="${d}">${l}</button>`).join('')}
+        </div>
+        <div class="row">
+          <button class="btn secondary small" data-action="insight-reload">Aggiorna</button>
+          <a class="btn secondary small" href="/api/insight-export?days=${ins.days}" download>${ICONS.download} Scarica i dati (CSV)</a>
+        </div>
+      </div>
+      <div id="insightBody">${insightBody()}</div>`;
+  }
+
+  function insightBody() {
+    const ins = state.insight;
+    const d = ins.data;
+    if (ins.error && !d) return `<div class="notice">⚠ ${esc(ins.error)}</div>`;
+    if (!d) return '<div class="empty">Carico le statistiche…</div>';
+    const t = d.totals;
+    const p = d.previous;
+    const periodName = d.range.days === 1 ? 'oggi' : `ultimi ${d.range.days} giorni`;
+    const avgDur = t.sessions ? t.seconds / t.sessions : 0;
+    const kpis = [
+      ['Visualizzazioni', fmt(t.views), t.views, p.views, false, 'Schede del sito aperte in totale'],
+      ['Visitatori', fmt(t.visitors), t.visitors, p.visitors, false, 'Persone diverse ogni giorno, sommate sul periodo'],
+      ['Visite', fmt(t.sessions), t.sessions, p.sessions, false, 'Ogni volta che qualcuno apre il sito'],
+      ['Durata media visita', fmtDur(avgDur), avgDur, p.sessions ? p.seconds / p.sessions : 0, false, 'Tempo passato sul sito con la pagina in primo piano'],
+      ['Pagine per visita', (t.sessions ? t.views / t.sessions : 0).toLocaleString('it-IT', { maximumFractionDigits: 1 }), t.sessions ? t.views / t.sessions : 0, p.sessions ? p.views / p.sessions : 0, false, 'Quante schede guarda in media chi entra'],
+      ['Frequenza di rimbalzo', pct(t.bounces, t.sessions) + '%', pct(t.bounces, t.sessions), pct(p.bounces, p.sessions), true, 'Visite con una sola scheda vista e nessun click: più è bassa, meglio è'],
+      ['Click importanti', fmt(t.clicks), t.clicks, p.clicks, false, 'Articoli, programmi, giochi, acquisti, contatti…'],
+      ['Ordini inviati', fmt(t.orders), t.orders, p.orders, false, 'Ordini mandati via email o WhatsApp dal modulo di acquisto']
+    ];
+    const liveSections = Object.entries(d.live.sections).map(([s, n]) => `${esc(SECTION_NAMES[s] || s)} ${n}`).join(' · ');
+    const noData = !d.database.events;
+
+    return `
+      <div class="ins-live"><span class="ins-dot${d.live.visitors ? ' on' : ''}" aria-hidden="true"></span>
+        <strong>${d.live.visitors === 1 ? '1 persona' : fmt(d.live.visitors) + ' persone'} sul sito adesso</strong>
+        <span class="item-meta">${liveSections ? liveSections + ' · ' : ''}ultimi 5 minuti · aggiornato alle ${new Date(d.generated).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</span>
+      </div>
+      ${noData ? `<div class="notice" style="margin-bottom:16px">Non ci sono ancora dati: le statistiche si riempiono man mano che le persone visitano il sito online.</div>` : ''}
+      <div class="ins-kpis">${kpis.map(([label, val, cur, prev, inverse, help]) => {
+        let delta = '<span class="ins-delta">—</span>';
+        if (prev > 0) {
+          const ch = Math.round((cur - prev) / prev * 100);
+          const good = inverse ? ch < 0 : ch > 0;
+          delta = ch === 0 ? '<span class="ins-delta">= invariato</span>'
+            : `<span class="ins-delta ${good ? 'up' : 'down'}">${ch > 0 ? '▲' : '▼'} ${Math.abs(ch)}%</span>`;
+        } else if (cur > 0) delta = '<span class="ins-delta up">▲ nuovo</span>';
+        return `<div class="ins-kpi" title="${esc(help)}"><small>${esc(label)}</small><strong>${val}</strong>${delta}</div>`;
+      }).join('')}</div>
+      <p class="item-meta ins-note">Periodo: ${esc(periodName)} (${esc(dayLabel(d.range.from))} – ${esc(dayLabel(d.range.to))}). Le variazioni lo confrontano con il periodo precedente della stessa durata (${esc(dayLabel(d.range.prevFrom))} – ${esc(dayLabel(d.range.prevTo))}). Passa il mouse su un riquadro per la spiegazione.</p>
+
+      <div class="form-card">
+        <div class="ins-head"><h2>Andamento ${d.range.days === 1 ? 'di oggi, ora per ora' : 'giorno per giorno'}</h2>
+          <div class="ins-legend"><span><i style="background:var(--viz-1)"></i>Visualizzazioni</span><span><i style="background:var(--viz-2)"></i>Visitatori</span></div>
+        </div>
+        <div id="insightTrend" class="ins-trend"></div>
+      </div>
+
+      <div class="ins-grid">
+        <div class="form-card ins-wide">
+          <div class="ins-head"><h2>Sezioni più visitate</h2></div>
+          ${insightSections(d)}
+        </div>
+        <div class="form-card ins-wide">
+          <div class="ins-head"><h2>Click e azioni</h2><span class="item-meta">quante volte · in quante visite</span></div>
+          ${d.clicks.length ? barList(d.clicks.map((c) => ({ k: CLICK_NAMES[c.k] || c.k, n: c.n, extra: c.sessions === 1 ? '1 visita' : `${fmt(c.sessions)} visite` }))) : '<p class="item-meta">Nessun click registrato nel periodo.</p>'}
+        </div>
+        ${insightLabelCards(d)}
+        <div class="form-card">
+          <div class="ins-head"><h2>Percorso di acquisto</h2><span class="item-meta">visite</span></div>
+          ${insightFunnel(d.funnel)}
+        </div>
+        <div class="form-card">
+          <div class="ins-head"><h2>Da dove arrivano</h2><span class="item-meta">visite</span></div>
+          ${barList(d.sources.referrers.map((r) => ({ k: r.k === '?' ? 'Accesso diretto o app' : r.k, n: r.n })))}
+          ${d.sources.campaigns.some((r) => r.k !== '?') ? `<h3 class="ins-sub">Campagne (utm_source)</h3>${barList(d.sources.campaigns.filter((r) => r.k !== '?'))}` : ''}
+        </div>
+        <div class="form-card">
+          <div class="ins-head"><h2>Dispositivi</h2><span class="item-meta">visite</span></div>
+          ${barList(d.audience.devices)}
+          <h3 class="ins-sub">Sistema operativo</h3>${barList(d.audience.os)}
+          <h3 class="ins-sub">Browser</h3>${barList(d.audience.browsers)}
+          <h3 class="ins-sub">Larghezza schermo</h3>${barList(d.audience.screens)}
+        </div>
+        <div class="form-card">
+          <div class="ins-head"><h2>Paesi e lingue</h2><span class="item-meta">visite</span></div>
+          ${barList(merge(d.audience.countries.map((r) => ({ k: regionName(r.k), n: r.n }))))}
+          <h3 class="ins-sub">Lingua del browser</h3>${barList(merge(d.audience.languages.map((r) => ({ k: langName(r.k), n: r.n }))))}
+        </div>
+        <div class="form-card">
+          <div class="ins-head"><h2>Orari di visita</h2><span class="item-meta">visualizzazioni</span></div>
+          ${hourChart(d.hours)}
+          <h3 class="ins-sub">Giorni della settimana</h3>
+          ${barList([1, 2, 3, 4, 5, 6, 0].map((i) => ({ k: WEEKDAYS[i], n: d.weekdays[i] })), { keepZero: d.weekdays.some(Boolean) })}
+        </div>
+        <div class="form-card ins-wide">
+          <div class="ins-head"><h2>Ultime attività</h2><span class="item-meta">le 40 più recenti</span></div>
+          ${insightRecent(d.recent)}
+        </div>
+      </div>
+      <p class="item-meta ins-note">
+        Dati anonimi, senza cookie né indirizzi IP. Nel database: ${fmt(d.database.events)} eventi${d.database.since ? ` dal ${esc(dayLabel(d.database.since))}` : ''} (si conservano circa 13 mesi).
+        Per non contare le tue visite, apri una volta il sito online da ogni tuo dispositivo con
+        <a href="https://coccolodaniele-art.github.io/Danishop/?noinsight" target="_blank" rel="noopener">questo indirizzo</a>.
+      </p>`;
+  }
+
+  // Unisce le righe che hanno lo stesso nome (es. lingue "it" e "it-it").
+  function merge(rows) {
+    const out = new Map();
+    rows.forEach((r) => out.set(r.k, (out.get(r.k) || 0) + (Number(r.n) || 0)));
+    return [...out].map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
+  }
+
+  function barList(rows, opts = {}) {
+    const list = rows.filter((r) => opts.keepZero || Number(r.n) > 0);
+    if (!list.length) return '<p class="item-meta">Ancora nessun dato.</p>';
+    const max = Math.max(...list.map((r) => Number(r.n) || 0), 1);
+    const total = list.reduce((a, r) => a + (Number(r.n) || 0), 0);
+    return `<div class="ins-bars">${list.map((r) => `
+      <div class="ins-bar-row" title="${esc(r.k)}: ${fmt(r.n)}${total ? ` (${pct(r.n, total)}% del totale)` : ''}">
+        <span class="ins-bar-label">${esc(r.k)}</span>
+        <span class="ins-bar-track"><span style="width:${r.n ? Math.max(1.5, r.n / max * 100) : 0}%"></span></span>
+        <span class="ins-bar-val">${fmt(r.n)}${r.extra ? `<small>${esc(r.extra)}</small>` : ''}</span>
+      </div>`).join('')}</div>`;
+  }
+
+  function insightSections(d) {
+    if (!d.sections.length) return '<p class="item-meta">Ancora nessun dato.</p>';
+    const max = Math.max(...d.sections.map((s) => s.views), 1);
+    return `<div class="ins-table-wrap"><table class="ins-table">
+      <thead><tr><th>Sezione</th><th class="ins-col-bar">Visualizzazioni</th><th>Visite</th><th>Tempo medio</th><th>Scorrimento</th><th>Ingressi</th></tr></thead>
+      <tbody>${d.sections.map((s) => `
+        <tr>
+          <td>${esc(SECTION_NAMES[s.k] || s.k)}</td>
+          <td class="ins-col-bar"><span class="ins-cell-bar"><span class="ins-bar-track"><span style="width:${s.views ? Math.max(1.5, s.views / max * 100) : 0}%"></span></span><b>${fmt(s.views)}</b></span></td>
+          <td>${fmt(s.sessions)}</td>
+          <td>${fmtDur(s.views ? s.seconds / s.views : 0)}</td>
+          <td>${s.scroll == null ? '—' : s.scroll + '%'}</td>
+          <td>${fmt(s.entries)}</td>
+        </tr>`).join('')}</tbody></table></div>
+      <p class="item-meta ins-note" style="margin:10px 0 0">Tempo medio = tempo passato nella sezione per ogni visualizzazione. Scorrimento = fin dove si scende in media nella pagina. Ingressi = visite iniziate da quella sezione.</p>`;
+  }
+
+  function insightLabelCards(d) {
+    const by = {};
+    d.labels.forEach((r) => { (by[r.name] = by[r.name] || []).push(r); });
+    return LABEL_GROUPS.filter((n) => by[n]).map((n) => `
+      <div class="form-card">
+        <div class="ins-head"><h2>${esc(CLICK_NAMES[n] || n)}</h2><span class="item-meta">i più frequenti</span></div>
+        ${barList(by[n].slice(0, 10).map((r) => ({ k: r.k, n: r.n })))}
+      </div>`).join('');
+  }
+
+  function insightFunnel(f) {
+    const steps = [
+      ['Hanno visto Shop o Libri', f.visited],
+      ['Hanno aperto un articolo o una copertina', f.opened],
+      ['Hanno cliccato Acquista', f.checkout],
+      ['Hanno inviato l\'ordine', f.ordered]
+    ];
+    if (!f.visited) return '<p class="item-meta">Ancora nessuna visita allo Shop o ai Libri nel periodo.</p>';
+    return `<div class="ins-funnel">${steps.map(([label, n], i) => `
+      <div class="ins-step">
+        <div class="ins-step-top"><span>${esc(label)}</span><strong>${fmt(n)}${i ? ` <small>${pct(n, f.visited)}%</small>` : ''}</strong></div>
+        <span class="ins-bar-track"><span style="width:${n ? Math.max(1.5, pct(n, f.visited)) : 0}%"></span></span>
+      </div>`).join('')}</div>`;
+  }
+
+  function hourChart(hours) {
+    const max = Math.max(...hours, 1);
+    return `<div class="ins-hours" role="img" aria-label="Visualizzazioni per ora del giorno">
+      ${hours.map((n, h) => `<span class="ins-hour" title="Dalle ${h}:00 alle ${h}:59 · ${fmt(n)} visualizzazioni"><i style="height:${n ? Math.max(3, n / max * 100) : 0}%"></i></span>`).join('')}
+    </div><div class="ins-hours-axis"><span>0</span><span>6</span><span>12</span><span>18</span><span>23</span></div>`;
+  }
+
+  function insightRecent(rows) {
+    if (!rows.length) return '<p class="item-meta">Ancora nessuna attività.</p>';
+    return `<div class="ins-table-wrap"><table class="ins-table ins-recent">
+      <thead><tr><th>Quando</th><th>Cosa</th><th>Sezione</th><th>Dettaglio</th><th>Dispositivo</th><th>Paese</th></tr></thead>
+      <tbody>${rows.map((r) => `
+        <tr>
+          <td>${esc(new Date(r.ts).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))}</td>
+          <td>${r.type === 'view' ? 'Visualizzazione' : esc(CLICK_NAMES[r.name] || r.name)}</td>
+          <td>${esc(SECTION_NAMES[r.section] || r.section || '—')}</td>
+          <td>${esc(r.label || '')}${r.name === 'order' && r.value ? ` · ${money(r.value)}` : ''}</td>
+          <td>${esc([r.device, r.browser].filter(Boolean).join(' · '))}</td>
+          <td>${esc(regionName(r.country))}</td>
+        </tr>`).join('')}</tbody></table></div>`;
+  }
+
+  // Grafico a linee dell'andamento, disegnato sulla larghezza reale del riquadro.
+  function drawTrend() {
+    const box = document.getElementById('insightTrend');
+    const d = state.insight.data;
+    if (!box || !d) return;
+    const pts = d.series;
+    const hourly = d.range.days === 1;
+    const W = Math.max(box.clientWidth, 280);
+    const H = 240;
+    const L = 40, R = 14, T = 12, B = 28;
+    const maxRaw = Math.max(...pts.map((p) => p.views), 1);
+    const unit = Math.pow(10, Math.floor(Math.log10(maxRaw)));
+    const tick = [0.25, 0.5, 1, 2, 2.5, 5, 10].map((m) => Math.max(1, m * unit)).find((v) => v * 4 >= maxRaw);
+    const top = tick * 4;
+    const x = (i) => pts.length === 1 ? L + (W - L - R) / 2 : L + i * (W - L - R) / (pts.length - 1);
+    const y = (v) => T + (H - T - B) * (1 - v / top);
+    const line = (key) => pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[key]).toFixed(1)}`).join('');
+    const every = Math.max(1, Math.ceil(pts.length / Math.max(2, Math.floor((W - L) / 70))));
+    const xLabel = (p) => hourly ? `${p.k}:00` : dayLabel(p.k);
+    box.innerHTML = `
+      <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Visualizzazioni e visitatori nel periodo">
+        ${[0, 1, 2, 3, 4].map((i) => `<line x1="${L}" x2="${W - R}" y1="${y(tick * i)}" y2="${y(tick * i)}" class="ins-grid-line"/>
+          <text x="${L - 8}" y="${y(tick * i) + 4}" text-anchor="end" class="ins-axis">${fmt(tick * i)}</text>`).join('')}
+        ${pts.map((p, i) => i % every === 0
+          ? `<text x="${x(i)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : 'middle'}" class="ins-axis">${esc(xLabel(p))}</text>` : '').join('')}
+        <path d="${line('views')}L${x(pts.length - 1)},${y(0)}L${x(0)},${y(0)}Z" fill="var(--viz-1)" opacity=".12"/>
+        <path d="${line('views')}" fill="none" stroke="var(--viz-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="${line('visitors')}" fill="none" stroke="var(--viz-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <g class="ins-hover" visibility="hidden">
+          <line class="ins-cross" y1="${T}" y2="${H - B}"/>
+          <circle r="4.5" class="ins-pt" fill="var(--viz-1)"/>
+          <circle r="4.5" class="ins-pt" fill="var(--viz-2)"/>
+        </g>
+        <rect x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent" class="ins-hit"/>
+      </svg>
+      <div class="ins-tip" hidden></div>`;
+    const svg = box.querySelector('svg');
+    const g = svg.querySelector('.ins-hover');
+    const tip = box.querySelector('.ins-tip');
+    const [c1, c2] = g.querySelectorAll('circle');
+    const cross = g.querySelector('line');
+    const show = (clientX) => {
+      const r = svg.getBoundingClientRect();
+      const rel = (clientX - r.left - L) / (W - L - R);
+      const i = Math.min(pts.length - 1, Math.max(0, Math.round(rel * (pts.length - 1))));
+      const p = pts[i];
+      g.setAttribute('visibility', 'visible');
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i));
+      c1.setAttribute('cx', x(i)); c1.setAttribute('cy', y(p.views));
+      c2.setAttribute('cx', x(i)); c2.setAttribute('cy', y(p.visitors));
+      tip.hidden = false;
+      tip.innerHTML = `<strong>${esc(hourly ? `Oggi, ${p.k}:00 – ${p.k}:59` : dayLabel(p.k, true))}</strong>
+        <span><i style="background:var(--viz-1)"></i>Visualizzazioni <b>${fmt(p.views)}</b></span>
+        <span><i style="background:var(--viz-2)"></i>Visitatori <b>${fmt(p.visitors)}</b></span>
+        <span><i></i>Visite <b>${fmt(p.sessions)}</b></span>`;
+      tip.style.left = (x(i) + 14 + tip.offsetWidth > W ? x(i) - 14 - tip.offsetWidth : x(i) + 14) + 'px';
+    };
+    const hide = () => { g.setAttribute('visibility', 'hidden'); tip.hidden = true; };
+    const hit = svg.querySelector('.ins-hit');
+    hit.addEventListener('pointermove', (e) => show(e.clientX));
+    hit.addEventListener('pointerdown', (e) => show(e.clientX));
+    hit.addEventListener('pointerleave', hide);
+  }
+
+  async function loadInsight(quiet) {
+    const ins = state.insight;
+    const days = ins.days;
+    ins.loading = true;
+    try {
+      const res = await fetch(`/api/insight?days=${days}`, { cache: 'no-store' });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) throw new Error(out.error || 'Errore ' + res.status);
+      if (days !== ins.days) return;
+      ins.data = out;
+      ins.error = '';
+    } catch (err) {
+      if (days !== ins.days) return;
+      ins.error = err.message === 'Failed to fetch' ? 'Il Gestore non risponde' : err.message;
+      if (quiet && ins.data) toast('Statistiche non aggiornate: ' + ins.error, true);
+      else ins.data = null;
+    } finally {
+      ins.loading = false;
+    }
+    const body = document.getElementById('insightBody');
+    if (body) { body.innerHTML = insightBody(); drawTrend(); }
+  }
+
+  // Mentre la scheda Insight è aperta, ricarica i numeri ogni minuto.
+  function watchInsight() {
+    const open = state.route === 'admin' && state.isAdmin && !state.editing && state.adminTab === 'insight' && state.localServer;
+    if (!open) { clearInterval(insightTimer); insightTimer = null; return; }
+    if (!state.insight.data && !state.insight.loading) loadInsight();
+    else drawTrend();
+    if (!insightTimer) {
+      insightTimer = setInterval(() => {
+        if (document.visibilityState === 'visible' && document.getElementById('insightBody')) loadInsight(true);
+      }, 60000);
+    }
+  }
+  window.addEventListener('resize', () => { clearTimeout(drawTrend.t); drawTrend.t = setTimeout(drawTrend, 150); });
+
   /* ---------- Pubblica ---------- */
 
   function adminPublish() {
@@ -1572,6 +2037,8 @@
     'export': exportData,
     'publish-local': publishLocal,
     'sync-now': (el) => syncNow(el),
+    'insight-days': (el) => { state.insight.days = Number(el.dataset.days); state.insight.data = null; state.insight.error = ''; render(); },
+    'insight-reload': () => loadInsight(true),
     'import': () => document.getElementById('importInput').click(),
     'discard': async () => {
       if (!confirm('Tornare alla versione pubblicata? Le modifiche non pubblicate andranno perse.')) return;
@@ -1592,10 +2059,13 @@
   app.addEventListener('click', handleClick);
   modalBody.addEventListener('click', handleClick);
 
+  let searchTimer = null;
   app.addEventListener('input', (e) => {
     if (e.target.id === 'shopSearch') {
       state.shop.q = e.target.value;
       document.getElementById('itemsGrid').innerHTML = renderItemsGrid();
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => { const q = state.shop.q.trim().toLowerCase(); if (q.length >= 2) insight.click('search', q); }, 1500);
     }
     if (e.target.name === 'iban' && e.target.form && e.target.form.id === 'settingsForm') {
       const val = e.target.value;
@@ -1655,6 +2125,7 @@
         if (!v.message) { toast('Scrivi un messaggio', true); return; }
         const s = state.data.settings;
         location.href = `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent('Messaggio dal sito' + (v.name ? ' - ' + v.name : ''))}&body=${encodeURIComponent(v.message + (v.name ? '\n\n' + v.name : ''))}`;
+        insight.click('contact-form', 'Modulo messaggi');
         toast('Si sta aprendo il tuo programma di posta');
         break;
       }
@@ -1704,6 +2175,7 @@
   function afterRender() {
     bindDropzone();
     loadSyncStatus();
+    watchInsight();
   }
 
   /* =========================================================

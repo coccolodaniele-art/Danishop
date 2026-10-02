@@ -2,3 +2,7 @@ backup/
 __pycache__/
 admin/.stato_sincronizzazione.json
 *.tmp
+.wrangler/
+insight/.dev.vars
+admin/.insight.json
+node_modules/
