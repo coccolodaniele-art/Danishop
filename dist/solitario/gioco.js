@@ -16,7 +16,7 @@
 
   const DORSI = { blu: ['#2c64c9', '#1f4fa8'], rosso: ['#c43442', '#a5222f'], verde: ['#25875a', '#1d6b45'], viola: ['#7a4fc9', '#5f3aa6'] };
   const TAVOLI = { verde: ['#2a8a57', '#17583a'], blu: ['#2f6fa8', '#183e66'], bordeaux: ['#8a2f45', '#4f1624'], grafite: ['#4a5468', '#262c38'] };
-  const impostazioni = Object.assign({ pesca: 1, suoni: true, auto: true, basi: true, dorso: 'blu', tavolo: 'verde' }, store.get('impostazioni', {}));
+  const impostazioni = Object.assign({ pesca: 1, suoni: true, dorso: 'blu', tavolo: 'verde' }, store.get('impostazioni', {}));
   const salvaImpostazioni = () => store.set('impostazioni', impostazioni);
 
   const STAT_VUOTE = { giocate: 0, vinte: 0, serie: 0, serieMax: 0, tempo: null, punti: null, mosse: null };
@@ -239,10 +239,8 @@
     const prima = R.clona(game);
     const esito = R.muovi(game, src, dst);
     if (!esito) return false;
-    if (!opz.senzaStoria) {
-      storia.push(prima);
-      if (storia.length > 300) storia.shift();
-    }
+    storia.push(prima);
+    if (storia.length > 300) storia.shift();
     avviaTempo();
     suono(dst.pila === 'found' ? 'base' : 'posa');
     if (esito.scoperta != null) setTimeout(() => suono('gira'), 140);
@@ -267,25 +265,7 @@
     render({ eleva });
     salva();
     if (R.vinta(game)) { vittoria(); return; }
-    if (occupato) return;
-    if (puoFinire) {
-      if (impostazioni.auto) completaAutomaticamente();
-      return;
-    }
-    // Le carte che non servono più salgono da sole sulle basi, una alla volta.
-    // Non entrano nella cronologia: "Annulla" torna a prima della mossa del giocatore.
-    const sicura = impostazioni.basi && R.mossaSicura(game);
-    if (sicura) {
-      occupato = true;
-      aggiornaInfo();
-      const gen = generazione;
-      setTimeout(() => {
-        if (gen !== generazione) return;
-        occupato = false;
-        esegui(sicura.src, sicura.dst, { senzaStoria: true });
-      }, ridotto ? 60 : 170);
-      return;
-    }
+    if (occupato || puoFinire) return;
     if (R.bloccata(game) && meta.avvisoBlocco !== game.mosse) {
       meta.avvisoBlocco = game.mosse;
       toast('Non ci sono più mosse utili: annulla qualche mossa o inizia una nuova partita.', 5000);
@@ -311,15 +291,9 @@
       if (!m) { occupato = false; dopoMossa(new Set()); return; }
       const prima = R.clona(game);
       storia.push(prima);
-      if (m.pesca) {
-        R.pesca(game);
-        suono('pesca');
-        render({ eleva: new Set(game.waste.slice(-3).map((c) => c.id)) });
-      } else {
-        R.muovi(game, m.src, m.dst);
-        suono('base');
-        render({ eleva: new Set([game.found[m.dst.i][game.found[m.dst.i].length - 1].id]) });
-      }
+      R.muovi(game, m.src, m.dst);
+      suono('base');
+      render({ eleva: new Set([game.found[m.dst.i][game.found[m.dst.i].length - 1].id]) });
       if (R.vinta(game)) { occupato = false; salva(); vittoria(); return; }
       setTimeout(passo, ridotto ? 30 : 95);
     };
@@ -665,8 +639,6 @@
       <div class="label">Colore del tavolo</div>
       <div class="swatches">${Object.entries(TAVOLI).map(([n, c]) => sw('tavolo', n, c)).join('')}</div>
       <label class="check"><input type="checkbox" data-opt="suoni" ${impostazioni.suoni ? 'checked' : ''}> Suoni</label>
-      <label class="check"><input type="checkbox" data-opt="basi" ${impostazioni.basi ? 'checked' : ''}> Manda da sole sulle basi le carte che non servono più</label>
-      <label class="check"><input type="checkbox" data-opt="auto" ${impostazioni.auto ? 'checked' : ''}> Finisci la partita da solo quando tutte le carte sono scoperte</label>
       <p class="muted small">Il numero di carte da pescare (1 o 3) si sceglie quando inizi una nuova partita.</p>
       <div class="modal-actions"><button class="btn primary" type="button" data-act="chiudi">Fatto</button></div>`;
     openModal(html(), {
@@ -691,7 +663,6 @@
     impostazioni[o] = e.target.checked;
     salvaImpostazioni();
     if (o === 'suoni' && impostazioni.suoni) suono('base');
-    if (o === 'auto') aggiornaInfo();
   });
 
   function finestraStatistiche() {
@@ -747,7 +718,7 @@
         <li>Nelle <b>colonne</b> le carte si mettono in ordine decrescente alternando rosso e nero (es. un 6 nero sopra un 7 rosso). Puoi spostare anche gruppi di carte già in ordine.</li>
         <li>In una colonna vuota può andare solo un <b>Re</b> (con le carte che ha sopra).</li>
         <li>Quando una carta coperta resta in cima a una colonna si gira da sola.</li>
-        <li>Le carte che non servono più salgono da sole sulle basi, e quando tutte le carte delle colonne sono scoperte la partita si conclude da sola (si può disattivare nelle impostazioni).</li>
+        <li>Quando tutte le carte sono scoperte e il mazzo è finito compare il pulsante <b>Completa automaticamente</b>, se vuoi mandare tutto sulle basi in un colpo.</li>
         <li>Tocca il <b>mazzo</b> in alto a sinistra per pescare 1 o 3 carte; quando finisce, toccalo di nuovo per rigirare gli scarti.</li>
       </ul>
       <h3>Comandi</h3>

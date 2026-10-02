@@ -108,7 +108,7 @@
    "platform": "Browser, PC e telefono",
    "version": "1.0",
    "description": "Il Solitario di sempre (Klondike), quello con le sette colonne e le quattro basi da riempire dall'Asso al Re. Trascina le carte oppure toccale e andranno da sole al posto giusto. Scegli se pescare una carta alla volta (più facile) o tre (la versione classica), chiedi un suggerimento quando sei bloccato e annulla le mosse quante volte vuoi.",
-   "features": "Pesca 1 carta o 3 carte\nSuggerimenti e mosse annullabili senza limiti\nCarte classiche ben disegnate, con le figure tradizionali\nLe carte salgono da sole sulle basi e la partita si conclude da sola\nPunteggio, tempo e statistiche con le serie di vittorie\nPartita del giorno: la stessa distribuzione per tutti\nLa partita resta salvata: puoi chiudere e riprendere più tardi",
+   "features": "Pesca 1 carta o 3 carte\nSuggerimenti e mosse annullabili senza limiti\nCarte classiche ben disegnate, con le figure tradizionali\nPulsante per completare la partita quando tutte le carte sono scoperte\nPunteggio, tempo e statistiche con le serie di vittorie\nPartita del giorno: la stessa distribuzione per tutti\nLa partita resta salvata: puoi chiudere e riprendere più tardi",
    "trialLabel": "Gioca ora",
    "trialInfo": "",
    "trialUrl": "https://coccolodaniele-art.github.io/Danishop/solitario/",
