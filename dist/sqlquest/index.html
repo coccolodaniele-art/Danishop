@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQLQuest — Impara SQL</title>
+<meta name="description" content="Simulatore SQL nel browser: 55 esercizi con soluzioni, dalle basi di SELECT fino a JOIN, subquery, funzioni finestra e modifica dei dati.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230b2530'/%3E%3Cstop offset='1' stop-color='%2312384a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cellipse cx='32' cy='19' rx='15' ry='6' fill='none' stroke='%235eead4' stroke-width='4'/%3E%3Cpath d='M17 19v26c0 3.3 6.7 6 15 6s15-2.7 15-6V19' fill='none' stroke='%235eead4' stroke-width='4'/%3E%3Cpath d='M17 32c0 3.3 6.7 6 15 6s15-2.7 15-6' fill='none' stroke='%2338bdf8' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<style>
+  /* Tema del sito (Coccolo Digital): fondo acqua, un accento verde petrolio, codice su fondo blu-petrolio scuro. */
+  :root {
+    --bg: #eaf4f3;
+    --panel: #ffffff;
+    --sunken: #f1f8f7;
+    --line: rgba(13, 79, 87, .12);
+    --line-strong: rgba(13, 79, 87, .22);
+    --ink: #0b2530;
+    --text-2: #2b4752;
+    --muted: #5a7480;
+    --accent: #0f766e;
+    --accent-hover: #115e59;
+    --accent-soft: rgba(15, 118, 110, .08);
+    --accent-line: rgba(15, 118, 110, .32);
+    --sky: #0284c7;
+    --ok: #059669;
+    --bad: #dc2626;
+    --gold: #d97706;
+    --deep: #0b2530;
+    --deep-2: #12384a;
+    --code-text: #d5e6ea;
+    --shadow: 0 1px 2px rgba(11, 37, 48, .05), 0 10px 28px rgba(13, 79, 87, .08);
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse 60% 45% at 10% -5%, rgba(20, 184, 166, .2), transparent 70%),
+      radial-gradient(ellipse 55% 40% at 95% 0%, rgba(14, 165, 233, .16), transparent 70%),
+      radial-gradient(rgba(13, 79, 87, .13) 1px, transparent 1px) 0 0 / 26px 26px,
+      linear-gradient(180deg, #e3f3f0, #eef5f8);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  button { font: inherit; cursor: pointer; }
+  a { color: var(--accent); }
+  code { font-family: var(--mono); font-size: .86em; padding: 1px 5px; border-radius: 5px; background: var(--sunken); border: 1px solid var(--line); color: #9d174d; }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb { background: #bcd6d3; border-radius: 9px; }
+
+  /* ---------- barra in alto ---------- */
+  .topbar {
+    height: 60px; display: flex; align-items: center; gap: 16px; padding: 0 18px;
+    background: rgba(240, 249, 247, .85); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    position: relative; z-index: 5;
+  }
+  .topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, #14b8a6, #0ea5e9 60%, transparent); opacity: .5; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 18px; letter-spacing: -.02em; }
+  .logo svg { width: 34px; height: 34px; flex: none; }
+  .logo .badge { font-family: var(--mono); font-size: 10.5px; font-weight: 500; color: #5eead4; background: linear-gradient(135deg, var(--deep), var(--deep-2)); padding: 2px 7px; border-radius: 6px; }
+  .modes { display: flex; gap: 4px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  .modes button { border: 0; background: none; padding: 6px 12px; border-radius: 7px; color: var(--text-2); font-weight: 600; font-size: 13.5px; }
+  .modes button:hover { background: var(--accent-soft); color: var(--accent); }
+  .modes button.active { background: var(--accent); color: #fff; }
+  .progress { margin-left: auto; width: 260px; display: flex; flex-direction: column; gap: 5px; }
+  .progress .row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .progress .row b { color: var(--ink); }
+  .bar { height: 7px; border-radius: 9px; background: rgba(13, 79, 87, .12); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; border-radius: 9px; background: linear-gradient(90deg, #14b8a6, #0ea5e9); transition: width .5s; }
+  .back { font-size: 13px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+  .back:hover { color: var(--accent); }
+  .menu-btn { display: none; border: 1px solid var(--line-strong); background: var(--panel); border-radius: 8px; padding: 6px 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
+
+  /* ---------- disposizione ---------- */
+  .app { display: grid; grid-template-columns: 270px minmax(0, 1fr) minmax(0, 1.08fr); height: calc(100vh - 60px); }
+
+  /* elenco esercizi */
+  .sidebar { overflow-y: auto; padding: 14px 12px 24px; border-right: 1px solid var(--line); background: rgba(255, 255, 255, .55); }
+  .mod { margin-bottom: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; overflow: hidden; box-shadow: 0 1px 2px rgba(11, 37, 48, .04); }
+  .mod-head { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; padding: 10px 12px; text-align: left; color: var(--ink); }
+  .mod-head:hover { background: var(--sunken); }
+  .mod-ico { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 15px; background: linear-gradient(135deg, rgba(20, 184, 166, .15), rgba(14, 165, 233, .15)); flex: none; }
+  .mod-title { flex: 1; font-weight: 600; font-size: 13px; line-height: 1.25; }
+  .mod-title small { display: block; color: var(--muted); font-weight: 400; font-size: 11px; }
+  .mod-count { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .mod-count.full { color: var(--ok); }
+  .mod-list { display: none; padding: 2px 6px 8px; }
+  .mod.open .mod-list { display: block; }
+  .les { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; text-align: left; padding: 6px 8px; border-radius: 7px; font-size: 12.5px; color: var(--text-2); }
+  .les:hover { background: var(--sunken); color: var(--ink); }
+  .les.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: inset 3px 0 0 var(--accent); }
+  .les .dot { width: 18px; height: 18px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 10px; font-weight: 700; border: 1px solid #bcd6d3; background: #fff; color: var(--muted); }
+  .les.done .dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .les .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .les .stars { font-size: 10px; color: var(--gold); letter-spacing: -1px; }
+  .side-foot { margin-top: 14px; padding: 0 4px; font-size: 12px; color: var(--muted); }
+  .side-foot button { border: 0; background: none; color: var(--muted); padding: 0; font-size: 12px; text-decoration: underline; }
+  .side-foot button:hover { color: var(--bad); }
+
+  /* pannello lezione */
+  .lesson { overflow-y: auto; padding: 22px 26px 40px; background: rgba(255, 255, 255, .72); border-right: 1px solid var(--line); }
+  .crumb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-bottom: 8px; }
+  .crumb .lvl { color: var(--accent); letter-spacing: 1px; }
+  .crumb .xp { color: var(--gold); }
+  .lesson h1 { margin: 0 0 12px; font-size: 1.55rem; font-weight: 800; letter-spacing: -.03em; }
+  .theory { font-size: 14.5px; line-height: 1.7; color: var(--text-2); }
+  .theory p { margin: 0 0 12px; }
+  .theory pre, .code-show { margin: 10px 0 14px; padding: 12px 14px; border-radius: 9px; background: var(--deep); border: 1px solid var(--deep-2); color: var(--code-text); font-family: var(--mono); font-size: 12.8px; line-height: 1.6; overflow-x: auto; white-space: pre; }
+  .theory .tip { background: #ecfaf8; border: 1px solid #b8e5df; border-left: 3px solid var(--accent); border-radius: 8px; padding: 9px 12px; font-size: 13.5px; }
+  .theory table.mini { border-collapse: collapse; margin: 6px 0 14px; font-size: 13px; }
+  .theory table.mini td { padding: 5px 12px 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .example { margin: 4px 0 18px; }
+  .theory .row.inline { margin: -6px 0 16px; }
+  .example .lbl, .task h2 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); margin: 0 0 6px; font-weight: 500; }
+  .example .lbl::before, .task h2::before { content: "// "; color: var(--muted); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--ink); font-size: 13px; font-weight: 600; box-shadow: 0 1px 2px rgba(11, 37, 48, .05); transition: background .15s, border-color .15s, color .15s; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .btn.primary { background: var(--accent); border-color: transparent; color: #fff; box-shadow: 0 1px 2px rgba(11, 37, 48, .1), 0 4px 12px rgba(15, 118, 110, .22); }
+  .btn.primary:hover { background: var(--accent-hover); color: #fff; }
+  .btn.good { background: var(--ok); border-color: transparent; color: #fff; }
+  .btn.good:hover { background: #047857; color: #fff; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .task { margin-top: 6px; padding: 16px 18px; border-radius: 12px; background: var(--panel); border: 1px solid var(--accent-line); border-left: 4px solid var(--accent); box-shadow: var(--shadow); }
+  .task .text { font-size: 15px; line-height: 1.6; margin: 0 0 12px; }
+  .task .note { font-size: 12.5px; color: var(--muted); margin: -4px 0 12px; }
+  .help { margin-top: 12px; padding: 10px 13px; border-radius: 9px; font-size: 13.5px; line-height: 1.55; }
+  .help.hint { background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+  .help.sol { background: #f0fdfa; border: 1px solid #99f6e4; }
+  .help.sol pre { margin: 8px 0; }
+  .feedback { margin-top: 12px; padding: 11px 14px; border-radius: 9px; font-size: 14px; line-height: 1.5; }
+  .feedback.ko { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .feedback.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+  .feedback.ok b.stars { color: var(--gold); letter-spacing: 1px; }
+  .lesson-nav { display: flex; justify-content: space-between; margin-top: 22px; gap: 10px; }
+
+  /* area di lavoro: editor + risultati */
+  .work { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .editor-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255, 255, 255, .85); border-bottom: 1px solid var(--line); }
+  .editor-head .file { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-right: auto; }
+  .editor-head .file b { color: var(--ink); font-weight: 500; }
+  .kbd { font-family: var(--mono); font-size: 10.5px; opacity: .75; font-weight: 400; }
+  #editorWrap { height: 38%; min-height: 150px; background: var(--deep); position: relative; }
+  #editor { width: 100%; height: 100%; border: 0; resize: none; padding: 12px; background: var(--deep); color: var(--code-text); font-family: var(--mono); font-size: 14px; outline: none; }
+  .CodeMirror { height: 100%; font-family: var(--mono); font-size: 14px; line-height: 1.6; background: var(--deep); color: var(--code-text); }
+  .CodeMirror-gutters { background: #08202a; border-right: 1px solid var(--deep-2); }
+  .CodeMirror-linenumber { color: #4b6b75; }
+  .CodeMirror-cursor { border-left: 2px solid #5eead4; }
+  .CodeMirror-selected, .CodeMirror-focused .CodeMirror-selected { background: rgba(94, 234, 212, .18) !important; }
+  .CodeMirror-matchingbracket { color: #fff !important; outline: 1px solid #5eead4; }
+  .CodeMirror-placeholder { color: #5f828c !important; }
+  .CodeMirror span.cm-keyword { color: #5eead4; font-weight: 600; }
+  .CodeMirror span.cm-builtin, .CodeMirror span.cm-type { color: #7dd3fc; }
+  .CodeMirror span.cm-string, .CodeMirror span.cm-string-2 { color: #86efac; }
+  .CodeMirror span.cm-number { color: #fcd34d; }
+  .CodeMirror span.cm-comment { color: #6b8f99; font-style: italic; }
+  .CodeMirror span.cm-operator { color: #c4b5fd; }
+  .CodeMirror span.cm-variable-2, .CodeMirror span.cm-variable-3 { color: #f9a8d4; }
+  .CodeMirror span.cm-atom { color: #fda4af; }
+  .out-tabs { display: flex; align-items: center; gap: 4px; padding: 6px 10px 0; background: rgba(255, 255, 255, .85); border-bottom: 1px solid var(--line); }
+  .out-tabs button { border: 0; background: none; padding: 7px 12px; font-size: 13px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; }
+  .out-tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .out-tabs .info { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-bottom: 4px; }
+  .out { flex: 1; overflow: auto; padding: 14px; background: rgba(255, 255, 255, .6); min-height: 0; }
+  .out .label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 8px; }
+  .out .label.expected { color: var(--gold); }
+  .empty-out { color: var(--muted); font-size: 13.5px; line-height: 1.6; padding: 10px 2px; }
+  .msg { padding: 10px 13px; border-radius: 9px; font-size: 13.5px; margin-bottom: 10px; }
+  .msg.err { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .msg.info { background: #ecfaf8; border: 1px solid #b8e5df; color: #134e4a; }
+  table.res { border-collapse: separate; border-spacing: 0; font-size: 13px; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; box-shadow: 0 1px 2px rgba(11, 37, 48, .04); }
+  table.res th { position: sticky; top: 0; background: #e6f3f1; color: var(--ink); font-family: var(--mono); font-size: 11.5px; font-weight: 600; text-align: left; padding: 7px 12px; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+  table.res td { padding: 6px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+  table.res tr:last-child td { border-bottom: 0; }
+  table.res tr:nth-child(even) td { background: #f7fbfb; }
+  table.res td.num { text-align: right; font-family: var(--mono); font-size: 12.5px; }
+  table.res .null { color: #94a3b8; font-family: var(--mono); font-size: 11px; font-style: italic; }
+  .more { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .tcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(11, 37, 48, .04); }
+  .tcard h3 { margin: 0 0 6px; display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13.5px; }
+  .tcard h3 small { margin-left: auto; font-weight: 400; color: var(--muted); font-size: 11px; }
+  .tcard ul { list-style: none; margin: 0 0 8px; padding: 0; }
+  .tcard li { display: flex; gap: 8px; align-items: baseline; font-size: 12.5px; padding: 2px 0; }
+  .tcard li button { border: 0; background: none; padding: 0; font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .tcard li button:hover { color: var(--accent); text-decoration: underline; }
+  .tcard li .type { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+  .tcard li .key { font-size: 10px; font-weight: 700; padding: 0 5px; border-radius: 4px; background: #fef3c7; color: #92400e; }
+  .tcard li .key.fk { background: #e0f2fe; color: #075985; }
+  .lab-tips pre { cursor: pointer; }
+  .lab-tips pre:hover { outline: 2px solid var(--accent-line); }
+
+  .loading { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(234, 244, 243, .92); font-size: 15px; color: var(--text-2); }
+  .loading div { text-align: center; }
+  .loading .spin { width: 34px; height: 34px; margin: 0 auto 12px; border-radius: 50%; border: 3px solid rgba(15, 118, 110, .2); border-top-color: var(--accent); animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; right: 20px; bottom: 20px; z-index: 60; background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 12px 32px rgba(11, 37, 48, .3); opacity: 0; transform: translateY(10px); transition: .25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: none; }
+  .toast.good { background: var(--ok); }
+
+  @media (max-width: 1100px) { .app { grid-template-columns: 230px minmax(0, 1fr) minmax(0, 1fr); } .progress { width: 180px; } }
+  @media (max-width: 860px) {
+    body { overflow: auto; }
+    .topbar { height: auto; flex-wrap: wrap; padding: 10px 14px; gap: 10px; }
+    .progress { order: 5; width: 100%; margin: 0; }
+    .menu-btn { display: inline-block; }
+    .app { display: block; height: auto; }
+    .sidebar { display: none; border-right: 0; border-bottom: 1px solid var(--line); }
+    body.show-menu .sidebar { display: block; }
+    .lesson { border-right: 0; padding: 18px 16px 24px; }
+    #editorWrap { height: 230px; }
+    .out { min-height: 240px; max-height: 70vh; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="../#programmi" title="Torna al sito">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b2530"/><stop offset="1" stop-color="#12384a"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#lg)"/><ellipse cx="32" cy="19" rx="15" ry="6" fill="none" stroke="#5eead4" stroke-width="4"/><path d="M17 19v26c0 3.3 6.7 6 15 6s15-2.7 15-6V19" fill="none" stroke="#5eead4" stroke-width="4"/><path d="M17 32c0 3.3 6.7 6 15 6s15-2.7 15-6" fill="none" stroke="#38bdf8" stroke-width="4"/></svg>
+    SQLQuest <span class="badge">SQL</span>
+  </a>
+  <button class="menu-btn" id="menuBtn" type="button">☰ Esercizi</button>
+  <nav class="modes" aria-label="Modalità">
+    <button type="button" data-mode="corso" class="active">📚 Corso</button>
+    <button type="button" data-mode="lab">🧪 Laboratorio</button>
+  </nav>
+  <div class="progress" title="Esercizi completati e punti esperienza">
+    <div class="row"><span><b id="progTesto">0 / 0</b> esercizi</span><span id="xpTesto">0 XP</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+  <a class="back" href="../#programmi">← Torna al sito</a>
+</header>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Esercizi"></aside>
+  <main class="lesson" id="lesson"></main>
+  <section class="work" aria-label="Editor e risultati">
+    <div class="editor-head">
+      <span class="file" id="fileName"><b>query.sql</b></span>
+      <button class="btn" id="btnReset" type="button" title="Svuota l'editor">↺ Ripristina</button>
+      <button class="btn good" id="btnCheck" type="button">✓ Verifica</button>
+      <button class="btn primary" id="btnRun" type="button">▶ Esegui <span class="kbd">Ctrl+Invio</span></button>
+    </div>
+    <div id="editorWrap"><textarea id="editor" spellcheck="false" placeholder="-- Scrivi qui la tua query SQL e premi Esegui (Ctrl+Invio)"></textarea></div>
+    <div class="out-tabs" role="tablist">
+      <button type="button" data-tab="ris" class="active">Risultato</button>
+      <button type="button" data-tab="tab">Tabelle</button>
+      <span class="info" id="outInfo"></span>
+    </div>
+    <div class="out" id="out"></div>
+  </section>
+</div>
+
+<div class="loading" id="loading"><div><div class="spin"></div>Carico il motore SQL…</div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.14.2/sql-wasm.js"></script>
+<script src="database.js"></script>
+<script src="lezioni.js"></script>
+<script src="motore.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
