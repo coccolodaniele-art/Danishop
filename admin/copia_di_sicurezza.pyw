@@ -10,8 +10,10 @@ Contenuto:
 - i sorgenti di SP500 Vertical Thermometers (fondamentali specifici);
 - i sorgenti di Sintesi Mercati AI (programmi vari).
 
-Non vengono copiate le chiavi API (gemini_api_key.txt, groq_api_key.txt): sono
-personali e si rigenerano su https://aistudio.google.com/apikey.
+Non vengono copiate le chiavi API (gemini_api_key.txt, groq_api_key.txt) e la chiave delle
+statistiche (admin/.insight.json): sono personali e si rigenerano. Restano fuori anche gli
+strumenti scaricabili del servizio statistiche (insight/node_modules, si rimettono con
+"npm install") e i suoi dati di prova locali (insight/.wrangler).
 """
 import datetime as dt
 import os
@@ -33,8 +35,8 @@ SOURCES = [
 ]
 # Esclusi: chiavi personali, file temporanei e doppioni pesanti gia' presenti altrove
 # (gli .exe dei programmi sono comunque inclusi nella cartella SITO E-COMMERCE).
-SKIP_FILES = {"gemini_api_key.txt", "groq_api_key.txt"}
-SKIP_DIRS = {"__pycache__", "build", "dist"}
+SKIP_FILES = {"gemini_api_key.txt", "groq_api_key.txt", ".insight.json", ".dev.vars"}
+SKIP_DIRS = {"__pycache__", "build", "dist", "node_modules", ".wrangler"}
 KEEP_DIST_UNDER = "desktop-software-store"  # la cartella dist del sito va SEMPRE copiata
 
 LEGGIMI = """COPIA DI SICUREZZA DEL SITO - {data}
@@ -42,9 +44,11 @@ LEGGIMI = """COPIA DI SICUREZZA DEL SITO - {data}
 Contenuto
 - SITO E-COMMERCE\\desktop-software-store: il sito completo (e' anche su GitHub,
   repository coccolodaniele-art/Danishop). La cartella dist e' il sito pubblicato;
-  dist\\data.json contiene articoli, foto, programmi, dati personali e IBAN;
+  dist\\data.json contiene programmi, foto, attestati, libri, dati personali e IBAN;
   backup\\ contiene le copie automatiche di data.json; .git contiene tutta la
   cronologia delle modifiche.
+- SITO E-COMMERCE\\desktop-software-store\\insight: il servizio delle statistiche
+  (Cloudflare Worker "danishop-insight" + database D1), istruzioni in insight\\LEGGIMI.md.
 - SITO E-COMMERCE\\desktop-software-store\\cloudflare\\sintesi-proxy-deno.ts: il codice
   del proxy (Deno Deploy, progetto formal-goose-2584) usato da Sintesi Mercati AI e
   da SP500 Vertical Thermometers.
@@ -58,6 +62,8 @@ Per ripristinare
    desktop-software-store (vedi CLAUDE.md).
 
 Le chiavi API non sono incluse: si rigenerano su https://aistudio.google.com/apikey
+Neanche la chiave delle statistiche (admin\\.insight.json): per ricrearla vedi
+desktop-software-store\\insight\\LEGGIMI.md (npx wrangler secret put ADMIN_KEY).
 
 ATTENZIONE: questa copia contiene i tuoi dati personali e l'IBAN. Conservala in un
 posto privato (chiavetta tua, cloud personale), non condividerla.
