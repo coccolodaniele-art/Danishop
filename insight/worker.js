@@ -15,7 +15,7 @@
 
 const ALLOWED_ORIGINS = ["https://coccolodaniele-art.github.io"];
 const LOCAL_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-const SECTIONS = ["shop", "libri", "programmi", "trading", "giochi", "info"];
+const SECTIONS = ["programmi", "trading", "giochi", "info"];
 const BOTS = /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|preview|facebookexternalhit|embedly|curl|wget|python|java\/|monitor|uptime/i;
 const KEEP_DAYS = 400;
 const TZ = "Europe/Rome";
@@ -141,7 +141,7 @@ async function stats(env, days) {
      WHERE ${R} AND type = 'view' AND entry = 1 GROUP BY k ORDER BY n DESC LIMIT ${limit}`);
 
   const [cur, prev, series, sections, clicks, labels, refs, utm, countries, devices, browsers, oses, langs,
-    screens, hours, weekdays, funnel, live, recent, total] = await Promise.all([
+    screens, hours, weekdays, live, recent, total] = await Promise.all([
     totals(env, from, today),
     totals(env, prevFrom, prevTo),
     days === 1
@@ -164,11 +164,6 @@ async function stats(env, days) {
          FROM events WHERE ${R} AND type = 'view' AND entry = 1 GROUP BY k ORDER BY n DESC`),
     all(`SELECT hour AS k, SUM(type = 'view') AS n FROM events WHERE ${R} GROUP BY hour`),
     all(`SELECT CAST(strftime('%w', day) AS INTEGER) AS k, SUM(type = 'view') AS n FROM events WHERE ${R} GROUP BY k`),
-    all(`SELECT COUNT(DISTINCT CASE WHEN type = 'view' AND section IN ('shop', 'libri') THEN sid END) AS visited,
-           COUNT(DISTINCT CASE WHEN type = 'click' AND name IN ('open-item', 'zoom-cover') THEN sid END) AS opened,
-           COUNT(DISTINCT CASE WHEN type = 'click' AND name = 'buy' THEN sid END) AS checkout,
-           COUNT(DISTINCT CASE WHEN type = 'click' AND name = 'order' THEN sid END) AS ordered
-         FROM events WHERE ${R}`),
     env.DB.prepare(`SELECT section, MAX(ts) AS ts FROM events WHERE ts > ?1 AND type = 'view' GROUP BY sid`)
       .bind(now - 5 * 60000).all().then((r) => r.results),
     env.DB.prepare(`SELECT ts, type, section, name, label, value, country, device, browser FROM events
@@ -192,7 +187,6 @@ async function stats(env, days) {
     sources: { referrers: refs, campaigns: utm },
     audience: { countries, devices, browsers, os: oses, languages: langs, screens },
     hours: fill(hours, 24), weekdays: fill(weekdays, 7),
-    funnel: funnel[0],
     live: { visitors: live.length, sections: liveSections },
     recent,
     database: { events: total.n, since: total.first },
@@ -206,7 +200,7 @@ async function totals(env, from, to) {
             COUNT(DISTINCT CASE WHEN type = 'view' THEN sid END) AS sessions,
             COALESCE(SUM(CASE WHEN type = 'time' THEN value END), 0) AS seconds,
             SUM(type = 'click') AS clicks,
-            SUM(type = 'click' AND name = 'order') AS orders
+            SUM(type = 'click' AND name IN ('open-program', 'play-game', 'download')) AS launches
      FROM events WHERE day BETWEEN ?1 AND ?2`).bind(from, to).first();
   const b = await env.DB.prepare(
     `SELECT COUNT(*) AS n FROM (SELECT sid FROM events WHERE day BETWEEN ?1 AND ?2 GROUP BY sid

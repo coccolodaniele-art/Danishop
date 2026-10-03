@@ -10,11 +10,9 @@
     settings: {
       siteName: 'Il mio sito',
       tagline: 'Oggetti usati, programmi e contatti',
-      shopIntro: 'Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.',
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
       tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
       gamesIntro: 'Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.',
-      booksIntro: 'Libri che vendo: per ognuno trovi la copertina, di cosa parla e il prezzo. Clicca su Acquista per riceverlo a casa.',
       ownerName: '',
       email: '',
       phone: '',
@@ -24,26 +22,11 @@
       instagram: '',
       facebook: '',
       linkedin: '',
-      about: '',
-      ibanHolder: '',
-      iban: '',
-      bank: '',
-      bic: '',
-      paymentNote: 'Dopo aver ricevuto il bonifico spedisco l\'oggetto entro 2 giorni lavorativi e ti invio il codice di tracciamento.',
-      defaultShipping: 8
+      about: ''
     },
-    items: [],
-    programs: [],
-    books: []
+    programs: []
   };
 
-  const CONDITIONS = ['Nuovo', 'Come nuovo', 'Ottime condizioni', 'Buone condizioni', 'Usato con segni', 'Da riparare / per ricambi'];
-  const STATUSES = [
-    { value: 'disponibile', label: 'Disponibile' },
-    { value: 'riservato', label: 'Riservato' },
-    { value: 'venduto', label: 'Venduto' }
-  ];
-  const MAX_PHOTOS = 6;
   // Sezioni della pagina Programmi: ogni programma appartiene a una delle schede.
   const PROGRAM_SECTIONS = [
     { value: 'apprendimento', route: 'programmi', nav: 'Apprendimento', title: "Programmi per l'apprendimento", introKey: 'programsIntro' },
@@ -64,8 +47,7 @@
     hasDraft: false,
     isAdmin: sessionGet('admin_ok') === '1' || isRemembered(),
     route: 'programmi',
-    shop: { q: '', cat: 'Tutte', showSold: false },
-    adminTab: 'articoli',
+    adminTab: 'programmi',
     insight: { days: 30, data: null, loading: false, error: '' },
     editing: null,
     localServer: false
@@ -130,23 +112,15 @@
     const d = clone(DEFAULT_DATA);
     if (!raw || typeof raw !== 'object') return d;
     d.settings = Object.assign(d.settings, raw.settings || {});
-    d.items = Array.isArray(raw.items) ? raw.items.map((it) => Object.assign({
-      id: uid(), title: '', price: 0, shipping: 0, condition: CONDITIONS[2], category: '',
-      description: '', photos: [], status: 'disponibile', createdAt: Date.now()
-    }, it)) : [];
     d.programs = Array.isArray(raw.programs) ? raw.programs.map((p) => Object.assign({
       id: uid(), name: '', tagline: '', image: '', platform: '', version: '', description: '',
       features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: '', category: PROGRAM_SECTIONS[0].value
     }, p)).map((p) => Object.assign(p, { category: sectionByValue(p.category).value })) : [];
-    d.books = Array.isArray(raw.books) ? raw.books.map((b) => Object.assign(newBook(), b)) : [];
+    // Articoli e libri delle schede Shop usato e Libri (tolte dal sito): non si vedono più,
+    // ma restano nel file così come sono.
+    if (Array.isArray(raw.items)) d.items = raw.items;
+    if (Array.isArray(raw.books)) d.books = raw.books;
     return d;
-  }
-
-  function newBook() {
-    return {
-      id: uid(), title: '', author: '', publisher: '', genre: '', cover: '', description: '',
-      price: 0, shipping: 0, condition: '', status: 'disponibile'
-    };
   }
 
   function isLocalHost() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
@@ -217,28 +191,12 @@
   function money(n) { return eur.format(Number(n) || 0); }
   function num(v) { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : 0; }
 
-  function formatIban(iban) { return String(iban || '').replace(/\s+/g, '').toUpperCase().replace(/(.{4})/g, '$1 ').trim(); }
-  function ibanValid(iban) {
-    const s = String(iban || '').replace(/\s+/g, '').toUpperCase();
-    if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(s)) return false;
-    if (s.startsWith('IT') && s.length !== 27) return false;
-    const r = s.slice(4) + s.slice(0, 4);
-    let mod = 0;
-    for (const ch of r) {
-      const v = /\d/.test(ch) ? ch : String(ch.charCodeAt(0) - 55);
-      for (const d of v) mod = (mod * 10 + Number(d)) % 97;
-    }
-    return mod === 1;
-  }
   function waNumber(n) {
     let d = String(n || '').replace(/[^\d+]/g, '');
     if (d.startsWith('+')) d = d.slice(1);
     else if (d.startsWith('00')) d = d.slice(2);
     else if (/^3\d{8,9}$/.test(d)) d = '39' + d;
     return d;
-  }
-  function paragraphs(text) {
-    return esc(text).split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
   }
 
   let toastTimer = null;
@@ -249,22 +207,6 @@
     el.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-  }
-
-  async function copy(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch (_) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-    }
-    toast('Copiato negli appunti');
   }
 
   async function sha256(text) {
@@ -303,8 +245,6 @@
 
   const ICONS = {
     photo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>',
-    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
-    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
     mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
     phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
     chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>',
@@ -313,12 +253,10 @@
     link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
     upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>',
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
-    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-4-4m4 4 4-4"/><path d="M4 18v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5 9-10"/></svg>'
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-4-4m4 4 4-4"/><path d="M4 18v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></svg>'
   };
 
   function noPhoto() { return `<div class="no-photo">${ICONS.photo}</div>`; }
-  function statusLabel(s) { return (STATUSES.find((x) => x.value === s) || STATUSES[0]).label; }
 
   /* =========================================================
      Modale
@@ -357,7 +295,7 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    return ['shop', 'libri', 'programmi', 'trading', 'giochi', 'info', 'admin'].includes(r) ? r : 'programmi';
+    return ['programmi', 'trading', 'giochi', 'info', 'admin'].includes(r) ? r : 'programmi';
   }
 
   function render() {
@@ -365,7 +303,7 @@
     insight.section(state.route);
     updateChrome();
     const views = {
-      shop: renderShop, libri: renderBooks, info: renderInfo, admin: renderAdmin,
+      info: renderInfo, admin: renderAdmin,
       programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1]),
       giochi: () => renderPrograms(PROGRAM_SECTIONS[2])
     };
@@ -377,7 +315,7 @@
     const s = state.data.settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { shop: 'Shop usato', libri: 'Libri', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -475,22 +413,14 @@
     };
   })();
 
-  // Quali click contano per le statistiche: articoli, programmi, giochi, acquisti e contatti.
+  // Quali click contano per le statistiche: programmi, giochi e contatti.
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-action], a[href]');
     if (!el) return;
     const card = el.closest('article');
     const cardName = card && card.querySelector('h2') ? card.querySelector('h2').textContent.trim() : '';
-    const act = el.dataset.action;
-    if (act) {
-      const id = el.dataset.id;
-      if (act === 'open-item') insight.click('open-item', (findItem(id) || {}).title);
-      else if (act === 'buy') insight.click('buy', (findItem(id) || {}).title);
-      else if (act === 'zoom-shot') insight.click('zoom-image', cardName);
-      else if (act === 'zoom-cover') insight.click('zoom-cover', cardName);
-      else if (act === 'shop-cat') insight.click('category', el.dataset.cat);
-      else if (act === 'toggle-sold') insight.click('show-sold');
-      else if (act === 'copy') insight.click('copy', (el.getAttribute('aria-label') || '').replace(/^Copia\s*/, '') || 'email');
+    if (el.dataset.action) {
+      if (el.dataset.action === 'zoom-shot') insight.click('zoom-image', cardName);
       return;
     }
     const href = el.getAttribute('href') || '';
@@ -505,280 +435,6 @@
       try { insight.click('external-link', new URL(href).hostname.replace(/^www\./, '')); } catch (_) {}
     }
   }, true);
-
-  /* =========================================================
-     Shop usato (pubblico)
-     ========================================================= */
-
-  function visibleItems() {
-    const { q, cat, showSold } = state.shop;
-    const needle = q.trim().toLowerCase();
-    const order = { disponibile: 0, riservato: 1, venduto: 2 };
-    return state.data.items
-      .filter((it) => showSold || it.status !== 'venduto')
-      .filter((it) => cat === 'Tutte' || it.category === cat)
-      .filter((it) => !needle || [it.title, it.description, it.category].join(' ').toLowerCase().includes(needle))
-      .sort((a, b) => (order[a.status] - order[b.status]) || (b.createdAt - a.createdAt));
-  }
-
-  function renderShop() {
-    const s = state.data.settings;
-    const cats = [...new Set(state.data.items.filter((i) => i.category).map((i) => i.category))].sort();
-    const soldCount = state.data.items.filter((i) => i.status === 'venduto').length;
-    return `
-      <section class="page-head">
-        <h1>Shop usato</h1>
-        <p>${esc(s.shopIntro)}</p>
-      </section>
-      ${state.data.items.length ? `
-        <div class="toolbar">
-          <label class="search">
-            ${ICONS.search}
-            <input type="search" id="shopSearch" placeholder="Cerca un articolo…" value="${esc(state.shop.q)}" aria-label="Cerca">
-          </label>
-          ${cats.length ? `<div class="chips">
-            ${['Tutte', ...cats].map((c) => `<button class="chip ${state.shop.cat === c ? 'active' : ''}" data-action="shop-cat" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}
-          </div>` : ''}
-          ${soldCount ? `<button class="chip ${state.shop.showSold ? 'active' : ''}" data-action="toggle-sold">Mostra venduti (${soldCount})</button>` : ''}
-        </div>` : ''}
-      <div id="itemsGrid">${renderItemsGrid()}</div>`;
-  }
-
-  function renderItemsGrid() {
-    const list = visibleItems();
-    if (!state.data.items.length) {
-      return `<div class="empty"><strong>Nessun articolo in vendita al momento</strong>Torna a trovarci presto!</div>`;
-    }
-    if (!list.length) return `<div class="empty"><strong>Nessun risultato</strong>Prova a cambiare ricerca o categoria.</div>`;
-    return `<div class="items">${list.map((it) => {
-      const cover = safeImg(it.photos[0]);
-      return `
-        <button class="item-card ${it.status === 'venduto' ? 'sold' : ''}" data-action="open-item" data-id="${esc(it.id)}">
-          <div class="item-photo">
-            ${cover ? `<img src="${cover}" alt="${esc(it.title)}" loading="lazy">` : noPhoto()}
-            ${it.status !== 'disponibile' ? `<span class="badge status-${esc(it.status)}">${statusLabel(it.status)}</span>` : ''}
-          </div>
-          <div class="item-body">
-            <h3>${esc(it.title)}</h3>
-            <span class="item-meta">${esc(it.condition)}${it.category ? ' · ' + esc(it.category) : ''}</span>
-            <span class="item-price">${money(it.price)}</span>
-          </div>
-        </button>`;
-    }).join('')}</div>`;
-  }
-
-  // Articolo acquistabile: un oggetto dello Shop usato oppure un libro (presentato con la stessa forma).
-  function findItem(id) {
-    const it = state.data.items.find((i) => i.id === id);
-    if (it) return it;
-    const b = findBook(id);
-    return b && {
-      id: b.id, kind: 'libro', title: b.title,
-      price: b.price, shipping: b.shipping, photos: b.cover ? [b.cover] : [], status: b.status
-    };
-  }
-  function findBook(id) { return state.data.books.find((b) => b.id === id); }
-
-  function openItem(id) {
-    const it = findItem(id);
-    if (!it) return;
-    const photos = it.photos.map(safeImg).filter(Boolean);
-    const shipping = Number(it.shipping) || 0;
-    const canBuy = it.status === 'disponibile';
-    openModal(`
-      <div class="detail">
-        <div>
-          <div class="gallery-main" id="galleryMain">
-            ${photos[0] ? `<img src="${photos[0]}" alt="${esc(it.title)}">` : noPhoto()}
-          </div>
-          ${photos.length > 1 ? `<div class="thumbs">${photos.map((p, i) => `
-            <button class="${i === 0 ? 'active' : ''}" data-action="gallery" data-index="${i}" aria-label="Foto ${i + 1}"><img src="${p}" alt=""></button>`).join('')}</div>` : ''}
-        </div>
-        <div>
-          <span class="badge status-${esc(it.status)}">${statusLabel(it.status)}</span>
-          <h2 id="modalTitle">${esc(it.title)}</h2>
-          <div class="spec">
-            <span class="badge">${esc(it.condition)}</span>
-            ${it.category ? `<span class="badge">${esc(it.category)}</span>` : ''}
-          </div>
-          <div class="price-big">${money(it.price)}</div>
-          <div class="item-meta">${shipping > 0 ? `+ ${money(shipping)} di spedizione` : 'Spedizione inclusa'}</div>
-          ${it.description ? `<div class="desc">${esc(it.description)}</div>` : '<div style="height:18px"></div>'}
-          ${canBuy
-            ? `<button class="btn block" data-action="buy" data-id="${esc(it.id)}">Acquista</button>`
-            : `<div class="notice">${it.status === 'venduto' ? 'Questo articolo è già stato venduto.' : 'Questo articolo è riservato: un altro acquirente sta completando l\'acquisto.'}</div>`}
-        </div>
-      </div>`);
-    modalBody._photos = photos;
-    modalBody._title = it.title;
-  }
-
-  function orderCode() {
-    const d = new Date();
-    return `ORD-${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-  }
-
-  function openCheckout(id) {
-    const it = findItem(id);
-    if (!it) return;
-    const s = state.data.settings;
-    const shipping = Number(it.shipping) || 0;
-    const total = (Number(it.price) || 0) + shipping;
-    const code = orderCode();
-    const causale = `${code} ${it.title}`.slice(0, 120);
-    const cover = safeImg(it.photos[0]);
-    const hasIban = !!s.iban;
-    const saved = (() => { try { return JSON.parse(localGet('buyer') || '{}'); } catch (_) { return {}; } })();
-    const f = (name, label, opts = {}) => `
-      <label class="field">
-        <span>${label}${opts.req ? ' *' : ''}</span>
-        <input name="${name}" type="${opts.type || 'text'}" autocomplete="${opts.ac || 'on'}" value="${esc(saved[name] || '')}" ${opts.req ? 'required' : ''} ${opts.extra || ''}>
-      </label>`;
-
-    openModal(`
-      <div class="checkout-head">
-        <div class="mini">${cover ? `<img src="${cover}" alt="">` : noPhoto()}</div>
-        <div>
-          <div class="item-meta">Stai acquistando</div>
-          <h2 id="modalTitle">${esc(it.title)}</h2>
-        </div>
-      </div>
-
-      <div class="totals">
-        <div><span>Prezzo</span><span>${money(it.price)}</span></div>
-        <div><span>Spedizione</span><span>${shipping > 0 ? money(shipping) : 'Inclusa'}</span></div>
-        <div class="total"><span>Totale da pagare</span><span>${money(total)}</span></div>
-      </div>
-
-      <div class="iban-box">
-        <h3>1 · Paga con bonifico bancario</h3>
-        ${hasIban ? `
-          ${copyLine('Intestatario', s.ibanHolder || s.ownerName || '—', s.ibanHolder || s.ownerName)}
-          ${copyLine('IBAN', formatIban(s.iban), String(s.iban).replace(/\s+/g, ''))}
-          ${s.bank ? copyLine('Banca', s.bank, s.bank) : ''}
-          ${s.bic ? copyLine('BIC / SWIFT', s.bic, s.bic) : ''}
-          ${copyLine('Importo', money(total), total.toFixed(2).replace('.', ','))}
-          ${copyLine('Causale', causale, causale)}
-          ${s.paymentNote ? `<p class="iban-note">${esc(s.paymentNote)}</p>` : ''}
-        ` : `<p class="iban-note">I dati per il bonifico ti verranno comunicati dopo l'invio dell'ordine.</p>`}
-      </div>
-
-      <form id="checkoutForm" class="stack" novalidate data-item="${esc(it.id)}" data-code="${esc(code)}" data-causale="${esc(causale)}" data-total="${total}">
-        <div class="section-label">2 · Dove devo spedirlo?</div>
-        ${f('name', 'Nome e cognome', { req: true, ac: 'name' })}
-        <div class="grid-2">
-          ${f('email', 'Email', { type: 'email', ac: 'email', req: true })}
-          ${f('phone', 'Telefono', { type: 'tel', ac: 'tel' })}
-        </div>
-        ${f('address', 'Indirizzo e numero civico', { req: true, ac: 'street-address' })}
-        <div class="grid-3">
-          ${f('city', 'Città', { req: true, ac: 'address-level2' })}
-          ${f('zip', 'CAP', { req: true, ac: 'postal-code', extra: 'inputmode="numeric" maxlength="10"' })}
-          ${f('province', 'Provincia', { ac: 'address-level1', extra: 'maxlength="30"' })}
-        </div>
-        <label class="field">
-          <span>Note per il venditore</span>
-          <textarea name="notes" rows="2" placeholder="Es. citofono, orari di consegna, domande…"></textarea>
-        </label>
-
-        <div class="section-label">3 · Invia l'ordine</div>
-        <div class="row">
-          ${s.email ? `<button class="btn" type="submit" data-via="email">${ICONS.mail} Invia ordine via email</button>` : ''}
-          ${s.whatsapp ? `<button class="btn whatsapp" type="submit" data-via="whatsapp">${ICONS.chat} Invia su WhatsApp</button>` : ''}
-          ${!s.email && !s.whatsapp ? '<div class="notice">Il venditore non ha ancora configurato un contatto per ricevere gli ordini.</div>' : ''}
-        </div>
-        <small class="item-meta">Riceverò i tuoi dati di spedizione e ti confermerò la disponibilità. Spedisco appena ricevo il bonifico.</small>
-      </form>`);
-  }
-
-  function copyLine(label, display, value) {
-    return `
-      <div class="iban-line">
-        <div><small>${esc(label)}</small><code>${esc(display)}</code></div>
-        <button type="button" class="btn secondary small" data-action="copy" data-value="${esc(value || '')}" aria-label="Copia ${esc(label)}">${ICONS.copy} Copia</button>
-      </div>`;
-  }
-
-  function submitCheckout(form, via) {
-    const fd = new FormData(form);
-    const v = Object.fromEntries([...fd.entries()].map(([k, val]) => [k, String(val).trim()]));
-    form.querySelectorAll('.field').forEach((el) => { el.classList.remove('invalid'); el.querySelector('.err') && el.querySelector('.err').remove(); });
-    const errors = {};
-    if (!v.name) errors.name = 'Inserisci nome e cognome';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) errors.email = 'Email non valida';
-    if (!v.address) errors.address = 'Inserisci l\'indirizzo';
-    if (!v.city) errors.city = 'Inserisci la città';
-    if (!/^[\w\s-]{3,10}$/.test(v.zip)) errors.zip = 'CAP non valido';
-    const keys = Object.keys(errors);
-    if (keys.length) {
-      keys.forEach((k) => {
-        const input = form.querySelector(`[name="${k}"]`);
-        const field = input.closest('.field');
-        field.classList.add('invalid');
-        field.insertAdjacentHTML('beforeend', `<span class="err">${errors[k]}</span>`);
-      });
-      form.querySelector(`[name="${keys[0]}"]`).focus();
-      return;
-    }
-    localSet('buyer', JSON.stringify({ name: v.name, email: v.email, phone: v.phone, address: v.address, city: v.city, zip: v.zip, province: v.province }));
-
-    const it = findItem(form.dataset.item);
-    const s = state.data.settings;
-    const total = Number(form.dataset.total);
-    const lines = [
-      `Ciao${s.ownerName ? ' ' + s.ownerName.split(' ')[0] : ''}, vorrei acquistare ${it.kind === 'libro' ? 'questo libro dal tuo sito' : 'questo articolo dal tuo Shop usato'}:`,
-      '',
-      `${it.kind === 'libro' ? 'LIBRO' : 'ARTICOLO'}: ${it.title}`,
-      `Prezzo: ${money(it.price)} · Spedizione: ${Number(it.shipping) > 0 ? money(it.shipping) : 'inclusa'}`,
-      `TOTALE: ${money(total)}`,
-      `Codice ordine: ${form.dataset.code}`,
-      '',
-      'DATI DI SPEDIZIONE',
-      v.name,
-      v.address,
-      `${v.zip} ${v.city}${v.province ? ' (' + v.province + ')' : ''}`,
-      `Email: ${v.email}`,
-      v.phone ? `Telefono: ${v.phone}` : '',
-      v.notes ? `\nNote: ${v.notes}` : '',
-      '',
-      `Effettuerò il bonifico con causale: "${form.dataset.causale}"`
-    ].filter((l, i, arr) => !(l === '' && arr[i - 1] === ''));
-    const body = lines.join('\n');
-
-    if (via === 'whatsapp') {
-      window.open(`https://wa.me/${waNumber(s.whatsapp)}?text=${encodeURIComponent(body)}`, '_blank', 'noopener');
-    } else {
-      location.href = `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent('Ordine ' + form.dataset.code + ' - ' + it.title)}&body=${encodeURIComponent(body)}`;
-    }
-    insight.click('order', it.title, total);
-    insight.click('order-via', via === 'whatsapp' ? 'WhatsApp' : 'Email');
-    showOrderSent(it, form.dataset, via);
-  }
-
-  function showOrderSent(it, ds, via) {
-    const s = state.data.settings;
-    const box = modalBody.querySelector('.iban-box');
-    const ibanHtml = box ? box.outerHTML.replace('1 · Paga con bonifico bancario', 'Dati per il bonifico') : '';
-    modalBody.innerHTML = `
-      <div class="success">
-        <div class="tick">${ICONS.check}</div>
-        <h2 id="modalTitle" style="margin:0 0 6px">Ci siamo quasi!</h2>
-        <p class="item-meta" style="margin:0 0 18px">
-          Si è aperto ${via === 'whatsapp' ? 'WhatsApp' : 'il tuo programma di posta'} con l'ordine già compilato: <strong>premi Invia</strong> per mandarmelo.
-          Poi effettua il bonifico di <strong>${money(ds.total)}</strong>.
-        </p>
-      </div>
-      ${ibanHtml}
-      <div class="row between">
-        <span class="item-meta">Codice ordine: <strong>${esc(ds.code)}</strong></span>
-        <div class="row">
-          ${via === 'email' && s.email ? `<button class="btn secondary small" data-action="copy" data-value="${esc(s.email)}">${ICONS.copy} Copia la mia email</button>` : ''}
-          <button class="btn small" data-close>Fatto</button>
-        </div>
-      </div>
-      ${via === 'email' ? `<p class="item-meta" style="font-size:.84rem;margin-top:14px">Non si è aperto nulla? Scrivimi a <a href="mailto:${esc(s.email)}">${esc(s.email)}</a> indicando il codice ordine e il tuo indirizzo.</p>` : ''}`;
-    modalCard.scrollTop = 0;
-  }
 
   /* =========================================================
      Programmi (pubblico)
@@ -867,60 +523,6 @@
   }
 
   /* =========================================================
-     Libri (pubblico)
-     ========================================================= */
-
-  function renderBooks() {
-    const s = state.data.settings;
-    const order = { disponibile: 0, riservato: 1, venduto: 2 };
-    const list = state.data.books.map((b, i) => [b, i])
-      .sort(([a, i], [b, j]) => (order[a.status] - order[b.status]) || (i - j)).map(([b]) => b);
-    return `
-      <section class="page-head">
-        <h1>Libri</h1>
-        <p>${esc(s.booksIntro)}</p>
-      </section>
-      ${list.length ? `<div class="programs">${list.map(renderBook).join('')}</div>`
-        : '<div class="empty"><strong>Nessun libro in vendita al momento</strong>Torna a trovarci presto!</div>'}`;
-  }
-
-  // Scheda di un libro: copertina a sinistra, descrizione, prezzo e acquisto a lato.
-  function renderBook(b) {
-    const cover = safeImg(b.cover);
-    const shipping = Number(b.shipping) || 0;
-    return `
-      <article class="program book${b.status === 'venduto' ? ' sold' : ''}" id="libro-${esc(b.id)}">
-        <div class="program-media book-media">${cover ? `
-          <button type="button" class="book-cover" data-action="zoom-cover" data-id="${esc(b.id)}" aria-label="Ingrandisci la copertina di ${esc(b.title)}">
-            <img src="${cover}" alt="Copertina di ${esc(b.title)}" loading="lazy">
-          </button>` : `<span class="initial">${esc((b.title || '?').trim().charAt(0).toUpperCase())}</span>`}
-          ${b.status !== 'disponibile' ? `<span class="badge status-${esc(b.status)}">${statusLabel(b.status)}</span>` : ''}
-        </div>
-        <div class="program-body">
-          <div>
-            <h2>${esc(b.title)}</h2>
-            ${b.author ? `<p class="tagline">${esc(b.author)}</p>` : ''}
-          </div>
-          ${b.genre || b.publisher || b.condition ? `<div class="spec">
-            ${b.genre ? `<span class="badge">${esc(b.genre)}</span>` : ''}
-            ${b.publisher ? `<span class="badge">${esc(b.publisher)}</span>` : ''}
-            ${b.condition ? `<span class="badge">${esc(b.condition)}</span>` : ''}
-          </div>` : ''}
-          ${b.description ? `<div class="text">${linkify(b.description)}</div>` : ''}
-          <div class="book-buy">
-            <div>
-              <div class="price-big">${money(b.price)}</div>
-              <div class="item-meta">${shipping > 0 ? `+ ${money(shipping)} di spedizione` : 'Spedizione inclusa'}</div>
-            </div>
-            ${b.status === 'disponibile'
-              ? `<button class="btn" data-action="buy" data-id="${esc(b.id)}">Acquista</button>`
-              : `<div class="notice">${b.status === 'venduto' ? 'Questo libro è già stato venduto.' : 'Questo libro è riservato: un altro acquirente sta completando l\'acquisto.'}</div>`}
-          </div>
-        </div>
-      </article>`;
-  }
-
-  /* =========================================================
      Info e contatti (pubblico)
      ========================================================= */
 
@@ -978,16 +580,14 @@
     }
     if (!state.isAdmin) return renderLogin();
     const d = state.data;
-    if (state.editing) return renderEditor();
+    if (state.editing) return renderProgramEditor(state.editing);
     const tabs = [
-      ['articoli', 'Articoli', d.items.length],
       ['programmi', 'Programmi', d.programs.length],
-      ['libri', 'Libri', d.books.length],
       ['insight', 'Insight'],
       ['dati', 'I miei dati'],
       ['pubblica', state.localServer ? 'Online' : (state.hasDraft ? 'Pubblica ●' : 'Pubblica')]
     ];
-    const bodies = { articoli: adminItems, programmi: adminPrograms, libri: adminBooks, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
+    const bodies = { programmi: adminPrograms, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
     return `
       <div class="admin-head">
         <h1>Area admin</h1>
@@ -1008,7 +608,7 @@
     return `
       <div class="login card">
         <h2>${hasPass ? 'Accedi all\'area admin' : 'Crea la tua password admin'}</h2>
-        <p class="item-meta" style="margin-top:0">${hasPass ? 'Inserisci la password per gestire articoli, programmi e dati.' : 'È il tuo primo accesso da questo computer: scegli una password (almeno 6 caratteri) per proteggere l\'area admin.'}</p>
+        <p class="item-meta" style="margin-top:0">${hasPass ? 'Inserisci la password per gestire programmi e dati.' : 'È il tuo primo accesso da questo computer: scegli una password (almeno 6 caratteri) per proteggere l\'area admin.'}</p>
         <form id="loginForm" class="stack" data-mode="${hasPass ? 'login' : 'setup'}">
           <label class="field"><span>Password</span><input type="password" name="pass" autocomplete="${hasPass ? 'current-password' : 'new-password'}" required minlength="6"></label>
           ${hasPass ? '' : '<label class="field"><span>Ripeti password</span><input type="password" name="pass2" autocomplete="new-password" required minlength="6"></label>'}
@@ -1021,27 +621,7 @@
       </div>`;
   }
 
-  /* ---------- Articoli ---------- */
-
-  function adminItems() {
-    const items = [...state.data.items].sort((a, b) => b.createdAt - a.createdAt);
-    return `
-      <div class="row between" style="margin-bottom:14px">
-        <p class="item-meta" style="margin:0">Aggiungi gli oggetti da vendere. Quando qualcuno paga, cambia lo stato in <strong>Venduto</strong>.</p>
-        <button class="btn" data-action="new-item">+ Nuovo articolo</button>
-      </div>
-      ${items.length ? `<div class="admin-list">${items.map((it) => `
-        <div class="admin-row">
-          <div class="thumb">${safeImg(it.photos[0]) ? `<img src="${safeImg(it.photos[0])}" alt="">` : noPhoto()}</div>
-          <div class="info"><strong>${esc(it.title) || '(senza titolo)'}</strong><span>${money(it.price)} · ${it.photos.length} foto</span></div>
-          <select data-action="item-status" data-id="${esc(it.id)}" aria-label="Stato">
-            ${STATUSES.map((st) => `<option value="${st.value}" ${it.status === st.value ? 'selected' : ''}>${st.label}</option>`).join('')}
-          </select>
-          <button class="btn secondary small" data-action="edit-item" data-id="${esc(it.id)}">Modifica</button>
-          <button class="btn danger small" data-action="delete-item" data-id="${esc(it.id)}">Elimina</button>
-        </div>`).join('')}</div>`
-        : '<div class="empty"><strong>Nessun articolo</strong>Clicca su "Nuovo articolo" e carica la prima foto.</div>'}`;
-  }
+  /* ---------- Programmi ---------- */
 
   function adminPrograms() {
     const list = state.data.programs;
@@ -1062,29 +642,7 @@
         : '<div class="empty"><strong>Nessun programma</strong>Clicca su "Nuovo programma" per aggiungerne uno.</div>'}`;
   }
 
-  function adminBooks() {
-    const list = state.data.books;
-    return `
-      <div class="row between" style="margin-bottom:14px">
-        <p class="item-meta" style="margin:0">I libri della scheda Libri, nell'ordine di questa lista. Quando qualcuno paga, cambia lo stato in <strong>Venduto</strong>.</p>
-        <button class="btn" data-action="new-book">+ Nuovo libro</button>
-      </div>
-      ${list.length ? `<div class="admin-list">${list.map((b, i) => `
-        <div class="admin-row">
-          <div class="thumb">${safeImg(b.cover) ? `<img src="${safeImg(b.cover)}" alt="">` : noPhoto()}</div>
-          <div class="info"><strong>${esc(b.title) || '(senza titolo)'}</strong><span>${money(b.price)}${b.author ? ' · ' + esc(b.author) : ''}</span></div>
-          <select data-action="book-status" data-id="${esc(b.id)}" aria-label="Stato">
-            ${STATUSES.map((st) => `<option value="${st.value}" ${b.status === st.value ? 'selected' : ''}>${st.label}</option>`).join('')}
-          </select>
-          <button class="btn ghost small" data-action="move-book" data-id="${esc(b.id)}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Sposta su">↑</button>
-          <button class="btn ghost small" data-action="move-book" data-id="${esc(b.id)}" data-dir="1" ${i === list.length - 1 ? 'disabled' : ''} aria-label="Sposta giù">↓</button>
-          <button class="btn secondary small" data-action="edit-book" data-id="${esc(b.id)}">Modifica</button>
-          <button class="btn danger small" data-action="delete-book" data-id="${esc(b.id)}">Elimina</button>
-        </div>`).join('')}</div>`
-        : '<div class="empty"><strong>Nessun libro</strong>Clicca su "Nuovo libro" e carica la copertina.</div>'}`;
-  }
-
-  /* ---------- Editor (articolo / programma / libro) ---------- */
+  /* ---------- Editor del programma ---------- */
 
   function field(name, label, value, opts = {}) {
     const attrs = `name="${name}" ${opts.req ? 'required' : ''} ${opts.placeholder ? `placeholder="${esc(opts.placeholder)}"` : ''} ${opts.extra || ''}`;
@@ -1097,65 +655,6 @@
     }).join('')}</select>`;
     else control = `<input type="${opts.type || 'text'}" ${attrs} value="${esc(value)}">`;
     return `<label class="field"><span>${label}${opts.req ? ' *' : ''}</span>${control}${opts.hint ? `<small>${opts.hint}</small>` : ''}</label>`;
-  }
-
-  function renderEditor() {
-    const ed = state.editing;
-    if (ed.type === 'book') return renderBookEditor(ed);
-    return ed.type === 'item' ? renderItemEditor(ed) : renderProgramEditor(ed);
-  }
-
-  function renderItemEditor(ed) {
-    const it = ed.draft;
-    const cats = [...new Set(state.data.items.map((i) => i.category).filter(Boolean))];
-    return `
-      <div class="admin-head">
-        <h1>${ed.isNew ? 'Nuovo articolo' : 'Modifica articolo'}</h1>
-        <button class="btn ghost small" data-action="cancel-edit">← Torna alla lista</button>
-      </div>
-      <form id="itemForm" class="form-card stack" novalidate>
-        <div class="form-section" style="margin-top:0">Foto (fino a ${MAX_PHOTOS})</div>
-        <div id="photoArea">${renderPhotoArea(it.photos)}</div>
-        <input type="file" id="photoInput" accept="image/*" multiple hidden>
-
-        <div class="form-section">Descrizione</div>
-        ${field('title', 'Titolo', it.title, { req: true, placeholder: 'Es. Bicicletta da corsa Bianchi taglia 54' })}
-        <div class="grid-2">
-          ${field('price', 'Prezzo (€)', it.price || '', { req: true, type: 'text', extra: 'inputmode="decimal"', placeholder: '0,00' })}
-          ${field('shipping', 'Spese di spedizione (€)', it.shipping, { type: 'text', extra: 'inputmode="decimal"', hint: '0 = spedizione inclusa' })}
-        </div>
-        <div class="grid-2">
-          ${field('condition', 'Condizioni', it.condition, { options: CONDITIONS })}
-          ${field('category', 'Categoria', it.category, { placeholder: 'Es. Elettronica, Libri, Casa…', extra: 'list="catList"' })}
-        </div>
-        <datalist id="catList">${cats.map((c) => `<option value="${esc(c)}">`).join('')}</datalist>
-        ${field('description', 'Descrizione', it.description, { textarea: true, rows: 5, placeholder: 'Stato, misure, difetti, cosa è incluso…' })}
-        ${field('status', 'Stato', it.status, { options: STATUSES })}
-
-        <div class="sticky-actions row end">
-          <button type="button" class="btn secondary" data-action="cancel-edit">Annulla</button>
-          <button type="submit" class="btn">Salva articolo</button>
-        </div>
-      </form>`;
-  }
-
-  function renderPhotoArea(photos) {
-    return `
-      ${photos.length < MAX_PHOTOS ? `
-        <div class="dropzone" id="dropzone" data-action="pick-photos" role="button" tabindex="0">
-          ${ICONS.upload}
-          <div><strong>Clicca per caricare le foto</strong> oppure trascinale qui</div>
-          <small>JPG, PNG o foto dal telefono. Vengono ridimensionate automaticamente.</small>
-        </div>` : ''}
-      ${photos.length ? `<div class="photo-grid">${photos.map((p, i) => `
-        <div class="photo-tile ${i === 0 ? 'cover' : ''}">
-          <img src="${safeImg(p)}" alt="Foto ${i + 1}">
-          ${i === 0 ? '<span class="cover-label">Copertina</span>' : ''}
-          <div class="tile-actions">
-            ${i > 0 ? `<button type="button" data-action="photo-cover" data-index="${i}">★ Copertina</button>` : '<span></span>'}
-            <button type="button" data-action="photo-remove" data-index="${i}" aria-label="Rimuovi foto">✕</button>
-          </div>
-        </div>`).join('')}</div>` : ''}`;
   }
 
   function renderProgramEditor(ed) {
@@ -1204,51 +703,6 @@
       </form>`;
   }
 
-  function renderBookEditor(ed) {
-    const b = ed.draft;
-    const cover = safeImg(b.cover);
-    return `
-      <div class="admin-head">
-        <h1>${ed.isNew ? 'Nuovo libro' : 'Modifica libro'}</h1>
-        <button class="btn ghost small" data-action="cancel-edit">← Torna alla lista</button>
-      </div>
-      <form id="bookForm" class="form-card stack" novalidate>
-        <div class="form-section" style="margin-top:0">Copertina</div>
-        <div class="field">
-          <div class="row">
-            ${cover ? `<div class="photo-tile cover" style="width:120px"><img src="${cover}" alt=""></div>` : ''}
-            <button type="button" class="btn secondary small" data-action="pick-book-cover">${cover ? 'Cambia copertina' : 'Carica copertina'}</button>
-            ${cover ? '<button type="button" class="btn ghost small" data-action="remove-book-cover">Rimuovi</button>' : ''}
-          </div>
-          <input type="file" id="bookCoverInput" accept="image/*" hidden>
-        </div>
-
-        <div class="form-section">Il libro</div>
-        ${field('title', 'Titolo', b.title, { req: true })}
-        <div class="grid-2">
-          ${field('author', 'Autore', b.author)}
-          ${field('publisher', 'Editore', b.publisher)}
-        </div>
-        <div class="grid-2">
-          ${field('genre', 'Genere', b.genre, { placeholder: 'Es. Psicologia, Spiritualità…' })}
-          ${field('condition', 'Condizioni', b.condition, { options: [{ value: '', label: 'Non indicate' }, ...CONDITIONS] })}
-        </div>
-        ${field('description', 'Descrizione', b.description, { textarea: true, rows: 6, placeholder: 'Di cosa parla, a chi è rivolto…' })}
-
-        <div class="form-section">Prezzo e vendita</div>
-        <div class="grid-2">
-          ${field('price', 'Prezzo (€)', b.price || '', { req: true, extra: 'inputmode="decimal"', placeholder: '0,00' })}
-          ${field('shipping', 'Spese di spedizione (€)', b.shipping, { extra: 'inputmode="decimal"', hint: '0 = spedizione inclusa' })}
-        </div>
-        ${field('status', 'Stato', b.status, { options: STATUSES })}
-
-        <div class="sticky-actions row end">
-          <button type="button" class="btn secondary" data-action="cancel-edit">Annulla</button>
-          <button type="submit" class="btn">Salva libro</button>
-        </div>
-      </form>`;
-  }
-
   function readForm(form) {
     const o = {};
     new FormData(form).forEach((v, k) => { o[k] = String(v).trim(); });
@@ -1256,54 +710,8 @@
   }
 
   function syncEditorFromForm() {
-    const form = document.getElementById('itemForm') || document.getElementById('programForm') || document.getElementById('bookForm');
+    const form = document.getElementById('programForm');
     if (form && state.editing) Object.assign(state.editing.draft, readForm(form));
-  }
-
-  async function addPhotos(files) {
-    const ed = state.editing;
-    if (!ed || ed.type !== 'item') return;
-    syncEditorFromForm();
-    const list = [...files].filter((f) => f.type.startsWith('image/'));
-    const room = MAX_PHOTOS - ed.draft.photos.length;
-    if (list.length > room) toast(`Puoi caricare al massimo ${MAX_PHOTOS} foto`, true);
-    for (const f of list.slice(0, room)) {
-      try { ed.draft.photos.push(await compressImage(f)); } catch (err) { toast(err.message, true); }
-    }
-    document.getElementById('photoArea').innerHTML = renderPhotoArea(ed.draft.photos);
-    bindDropzone();
-  }
-
-  function bindDropzone() {
-    const dz = document.getElementById('dropzone');
-    if (!dz) return;
-    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('over'); });
-    dz.addEventListener('dragleave', () => dz.classList.remove('over'));
-    dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('over'); addPhotos(e.dataTransfer.files); });
-    dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('photoInput').click(); } });
-  }
-
-  async function saveItemForm(form) {
-    const v = readForm(form);
-    const ed = state.editing;
-    if (!v.title) { toast('Inserisci un titolo', true); form.elements['title'].focus(); return; }
-    if (!num(v.price)) { toast('Inserisci un prezzo valido', true); form.elements['price'].focus(); return; }
-    const item = Object.assign(ed.draft, {
-      title: v.title,
-      price: num(v.price),
-      shipping: num(v.shipping),
-      condition: v.condition,
-      category: v.category,
-      description: v.description,
-      status: v.status
-    });
-    if (ed.isNew) state.data.items.push(item);
-    else state.data.items = state.data.items.map((i) => (i.id === item.id ? item : i));
-    if (await saveDraft()) {
-      state.editing = null;
-      toast('Articolo salvato');
-      render();
-    }
   }
 
   async function saveProgramForm(form) {
@@ -1320,26 +728,10 @@
     }
   }
 
-  async function saveBookForm(form) {
-    const v = readForm(form);
-    const ed = state.editing;
-    if (!v.title) { toast('Inserisci il titolo', true); form.elements['title'].focus(); return; }
-    if (!num(v.price)) { toast('Inserisci un prezzo valido', true); form.elements['price'].focus(); return; }
-    const book = Object.assign(ed.draft, v, { price: num(v.price), shipping: num(v.shipping) });
-    if (ed.isNew) state.data.books.push(book);
-    else state.data.books = state.data.books.map((b) => (b.id === book.id ? book : b));
-    if (await saveDraft()) {
-      state.editing = null;
-      toast('Libro salvato');
-      render();
-    }
-  }
-
   /* ---------- I miei dati ---------- */
 
   function adminSettings() {
     const s = state.data.settings;
-    const ibanOk = !s.iban || ibanValid(s.iban);
     return `
       <form id="settingsForm" class="form-card stack" novalidate>
         <div class="form-section" style="margin-top:0">Il sito</div>
@@ -1347,28 +739,9 @@
           ${field('siteName', 'Nome del sito', s.siteName, { req: true })}
           ${field('tagline', 'Sottotitolo', s.tagline)}
         </div>
-        ${field('shopIntro', 'Testo introduttivo dello Shop usato', s.shopIntro, { textarea: true, rows: 2 })}
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
         ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
         ${field('gamesIntro', 'Testo introduttivo della scheda Giochi', s.gamesIntro, { textarea: true, rows: 2 })}
-        ${field('booksIntro', 'Testo introduttivo della scheda Libri', s.booksIntro, { textarea: true, rows: 2 })}
-
-        <div class="form-section">Pagamento con bonifico</div>
-        <div class="notice ok">Questi dati compaiono nella finestra di acquisto, con i pulsanti per copiarli.</div>
-        ${field('ibanHolder', 'Intestatario del conto', s.ibanHolder, { placeholder: 'Nome e cognome come in banca' })}
-        <label class="field ${ibanOk ? '' : 'invalid'}">
-          <span>IBAN</span>
-          <input name="iban" value="${esc(formatIban(s.iban))}" placeholder="IT00 X000 0000 0000 0000 0000 000" autocomplete="off" spellcheck="false">
-          <small id="ibanHint">${s.iban ? (ibanOk ? '✓ IBAN valido' : '⚠ Controlla l\'IBAN: il codice di controllo non torna') : ''}</small>
-        </label>
-        <div class="grid-2">
-          ${field('bank', 'Banca', s.bank, { placeholder: 'Facoltativo' })}
-          ${field('bic', 'BIC / SWIFT', s.bic, { placeholder: 'Facoltativo, per bonifici dall\'estero' })}
-        </div>
-        <div class="grid-2">
-          ${field('defaultShipping', 'Spese di spedizione predefinite (€)', s.defaultShipping, { extra: 'inputmode="decimal"', hint: 'Proposte automaticamente per i nuovi articoli' })}
-        </div>
-        ${field('paymentNote', 'Messaggio sotto i dati di pagamento', s.paymentNote, { textarea: true, rows: 2 })}
 
         <div class="form-section">Contatti (pagina Info)</div>
         <div class="grid-2">
@@ -1376,11 +749,11 @@
           ${field('city', 'Città / zona', s.city)}
         </div>
         <div class="grid-2">
-          ${field('email', 'Email', s.email, { type: 'email', hint: 'Qui ricevi gli ordini e i messaggi' })}
+          ${field('email', 'Email', s.email, { type: 'email', hint: 'Qui ricevi i messaggi dal modulo della pagina Info' })}
           ${field('phone', 'Telefono', s.phone, { type: 'tel' })}
         </div>
         <div class="grid-2">
-          ${field('whatsapp', 'Numero WhatsApp', s.whatsapp, { type: 'tel', hint: 'Se lo inserisci, gli acquirenti potranno ordinare anche via WhatsApp' })}
+          ${field('whatsapp', 'Numero WhatsApp', s.whatsapp, { type: 'tel' })}
           ${field('website', 'Sito web', s.website, { placeholder: 'Facoltativo' })}
         </div>
         <div class="grid-2">
@@ -1408,12 +781,10 @@
   async function saveSettingsForm(form) {
     const v = readForm(form);
     if (!v.siteName) { toast('Inserisci il nome del sito', true); return; }
-    v.iban = v.iban.replace(/\s+/g, '').toUpperCase();
-    v.defaultShipping = num(v.defaultShipping);
     if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) { toast('Email non valida', true); form.elements['email'].focus(); return; }
     Object.assign(state.data.settings, v);
     if (await saveDraft()) {
-      toast(v.iban && !ibanValid(v.iban) ? 'Salvato, ma controlla l\'IBAN' : 'Dati salvati', v.iban && !ibanValid(v.iban));
+      toast('Dati salvati');
       render();
     }
   }
@@ -1421,17 +792,13 @@
   /* ---------- Insight (statistiche del sito) ---------- */
 
   const INSIGHT_PERIODS = [[1, 'Oggi'], [7, '7 giorni'], [30, '30 giorni'], [90, '3 mesi'], [365, '12 mesi']];
-  const SECTION_NAMES = { shop: 'Shop usato', libri: 'Libri', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
+  const SECTION_NAMES = { programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
   const CLICK_NAMES = {
     'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
-    'open-item': 'Articoli aperti', 'zoom-cover': 'Copertine di libri ingrandite', 'buy': 'Clic su Acquista',
-    'order': 'Ordini inviati', 'order-via': 'Ordini: canale usato', 'search': 'Ricerche nello shop',
-    'category': 'Filtri per categoria', 'show-sold': 'Mostra venduti', 'zoom-image': 'Immagini dei programmi ingrandite',
-    'ask-info': 'Richieste di informazioni', 'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo',
-    'external-link': 'Link esterni aperti', 'copy': 'Dati del bonifico copiati'
+    'zoom-image': 'Immagini dei programmi ingrandite', 'ask-info': 'Richieste di informazioni',
+    'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo', 'external-link': 'Link esterni aperti'
   };
-  const LABEL_GROUPS = ['open-program', 'play-game', 'open-item', 'zoom-cover', 'buy', 'order', 'search', 'contact',
-    'download', 'ask-info', 'external-link', 'order-via', 'category', 'copy', 'zoom-image'];
+  const LABEL_GROUPS = ['open-program', 'play-game', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
   const WEEKDAYS = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
   const nf = new Intl.NumberFormat('it-IT');
   const fmt = (n) => nf.format(Math.round(Number(n) || 0));
@@ -1495,8 +862,8 @@
       ['Durata media visita', fmtDur(avgDur), avgDur, p.sessions ? p.seconds / p.sessions : 0, false, 'Tempo passato sul sito con la pagina in primo piano'],
       ['Pagine per visita', (t.sessions ? t.views / t.sessions : 0).toLocaleString('it-IT', { maximumFractionDigits: 1 }), t.sessions ? t.views / t.sessions : 0, p.sessions ? p.views / p.sessions : 0, false, 'Quante schede guarda in media chi entra'],
       ['Frequenza di rimbalzo', pct(t.bounces, t.sessions) + '%', pct(t.bounces, t.sessions), pct(p.bounces, p.sessions), true, 'Visite con una sola scheda vista e nessun click: più è bassa, meglio è'],
-      ['Click importanti', fmt(t.clicks), t.clicks, p.clicks, false, 'Articoli, programmi, giochi, acquisti, contatti…'],
-      ['Ordini inviati', fmt(t.orders), t.orders, p.orders, false, 'Ordini mandati via email o WhatsApp dal modulo di acquisto']
+      ['Click importanti', fmt(t.clicks), t.clicks, p.clicks, false, 'Programmi, giochi, contatti, link…'],
+      ['Programmi e giochi aperti', fmt(t.launches), t.launches, p.launches, false, 'Clic su Apri il programma, Scarica e Gioca ora']
     ];
     const liveSections = Object.entries(d.live.sections).map(([s, n]) => `${esc(SECTION_NAMES[s] || s)} ${n}`).join(' · ');
     const noData = !d.database.events;
@@ -1536,10 +903,6 @@
           ${d.clicks.length ? barList(d.clicks.map((c) => ({ k: CLICK_NAMES[c.k] || c.k, n: c.n, extra: c.sessions === 1 ? '1 visita' : `${fmt(c.sessions)} visite` }))) : '<p class="item-meta">Nessun click registrato nel periodo.</p>'}
         </div>
         ${insightLabelCards(d)}
-        <div class="form-card">
-          <div class="ins-head"><h2>Percorso di acquisto</h2><span class="item-meta">visite</span></div>
-          ${insightFunnel(d.funnel)}
-        </div>
         <div class="form-card">
           <div class="ins-head"><h2>Da dove arrivano</h2><span class="item-meta">visite</span></div>
           ${barList(d.sources.referrers.map((r) => ({ k: r.k === '?' ? 'Accesso diretto o app' : r.k, n: r.n })))}
@@ -1622,21 +985,6 @@
       </div>`).join('');
   }
 
-  function insightFunnel(f) {
-    const steps = [
-      ['Hanno visto Shop o Libri', f.visited],
-      ['Hanno aperto un articolo o una copertina', f.opened],
-      ['Hanno cliccato Acquista', f.checkout],
-      ['Hanno inviato l\'ordine', f.ordered]
-    ];
-    if (!f.visited) return '<p class="item-meta">Ancora nessuna visita allo Shop o ai Libri nel periodo.</p>';
-    return `<div class="ins-funnel">${steps.map(([label, n], i) => `
-      <div class="ins-step">
-        <div class="ins-step-top"><span>${esc(label)}</span><strong>${fmt(n)}${i ? ` <small>${pct(n, f.visited)}%</small>` : ''}</strong></div>
-        <span class="ins-bar-track"><span style="width:${n ? Math.max(1.5, pct(n, f.visited)) : 0}%"></span></span>
-      </div>`).join('')}</div>`;
-  }
-
   function hourChart(hours) {
     const max = Math.max(...hours, 1);
     return `<div class="ins-hours" role="img" aria-label="Visualizzazioni per ora del giorno">
@@ -1653,7 +1001,7 @@
           <td>${esc(new Date(r.ts).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))}</td>
           <td>${r.type === 'view' ? 'Visualizzazione' : esc(CLICK_NAMES[r.name] || r.name)}</td>
           <td>${esc(SECTION_NAMES[r.section] || r.section || '—')}</td>
-          <td>${esc(r.label || '')}${r.name === 'order' && r.value ? ` · ${money(r.value)}` : ''}</td>
+          <td>${esc(r.label || '')}</td>
           <td>${esc([r.device, r.browser].filter(Boolean).join(' · '))}</td>
           <td>${esc(regionName(r.country))}</td>
         </tr>`).join('')}</tbody></table></div>`;
@@ -1900,15 +1248,6 @@
      ========================================================= */
 
   const actions = {
-    'shop-cat': (el) => { state.shop.cat = el.dataset.cat; render(); },
-    'toggle-sold': () => { state.shop.showSold = !state.shop.showSold; render(); },
-    'open-item': (el) => openItem(el.dataset.id),
-    'gallery': (el) => {
-      const i = Number(el.dataset.index);
-      const src = modalBody._photos[i];
-      document.getElementById('galleryMain').innerHTML = `<img src="${src}" alt="${esc(modalBody._title)}">`;
-      modalBody.querySelectorAll('.thumbs button').forEach((b, j) => b.classList.toggle('active', i === j));
-    },
     'zoom-shot': (el) => {
       const p = state.data.programs.find((x) => x.id === el.dataset.id);
       const src = p && safeImg(p.image);
@@ -1917,56 +1256,9 @@
         <h2 id="modalTitle" class="shot-title">${esc(p.name)}</h2>
         <img class="shot-full" src="${src}" alt="${esc(p.name)}">`, { wide: true });
     },
-    'zoom-cover': (el) => {
-      const b = findBook(el.dataset.id);
-      const src = b && safeImg(b.cover);
-      if (!src) return;
-      openModal(`
-        <h2 id="modalTitle" class="shot-title">${esc(b.title)}</h2>
-        <img class="shot-full" src="${src}" alt="Copertina di ${esc(b.title)}">`, { wide: true });
-    },
-    'buy': (el) => openCheckout(el.dataset.id),
-    'copy': (el) => copy(el.dataset.value),
-
     'logout': () => { sessionSet('admin_ok', null); localSet('admin_remember', null); state.isAdmin = false; state.editing = null; location.hash = '#programmi'; },
     'tab': (el, e) => { e.preventDefault(); state.adminTab = el.dataset.tab; state.editing = null; render(); },
 
-    'new-item': () => {
-      state.editing = { type: 'item', isNew: true, draft: {
-        id: uid(), title: '', price: 0, shipping: state.data.settings.defaultShipping || 0, condition: CONDITIONS[2],
-        category: '', description: '', photos: [], status: 'disponibile', createdAt: Date.now()
-      } };
-      render();
-      window.scrollTo(0, 0);
-    },
-    'edit-item': (el) => {
-      const it = findItem(el.dataset.id);
-      if (!it) return;
-      state.editing = { type: 'item', isNew: false, draft: clone(it) };
-      render();
-      window.scrollTo(0, 0);
-    },
-    'delete-item': async (el) => {
-      const it = findItem(el.dataset.id);
-      if (!it || !confirm(`Eliminare "${it.title}"?`)) return;
-      state.data.items = state.data.items.filter((i) => i.id !== it.id);
-      await saveDraft();
-      render();
-    },
-    'pick-photos': () => document.getElementById('photoInput').click(),
-    'photo-remove': (el) => {
-      syncEditorFromForm();
-      state.editing.draft.photos.splice(Number(el.dataset.index), 1);
-      document.getElementById('photoArea').innerHTML = renderPhotoArea(state.editing.draft.photos);
-      bindDropzone();
-    },
-    'photo-cover': (el) => {
-      const photos = state.editing.draft.photos;
-      const [p] = photos.splice(Number(el.dataset.index), 1);
-      photos.unshift(p);
-      document.getElementById('photoArea').innerHTML = renderPhotoArea(photos);
-      bindDropzone();
-    },
     'cancel-edit': () => { state.editing = null; render(); },
 
     'new-program': () => {
@@ -2003,37 +1295,6 @@
     'pick-program-image': () => document.getElementById('programImageInput').click(),
     'remove-program-image': () => { syncEditorFromForm(); state.editing.draft.image = ''; render(); },
 
-    'new-book': () => {
-      state.editing = { type: 'book', isNew: true, draft: Object.assign(newBook(), { shipping: state.data.settings.defaultShipping || 0 }) };
-      render();
-      window.scrollTo(0, 0);
-    },
-    'edit-book': (el) => {
-      const b = findBook(el.dataset.id);
-      if (!b) return;
-      state.editing = { type: 'book', isNew: false, draft: clone(b) };
-      render();
-      window.scrollTo(0, 0);
-    },
-    'delete-book': async (el) => {
-      const b = findBook(el.dataset.id);
-      if (!b || !confirm(`Eliminare "${b.title}"?`)) return;
-      state.data.books = state.data.books.filter((x) => x.id !== b.id);
-      await saveDraft();
-      render();
-    },
-    'move-book': async (el) => {
-      const list = state.data.books;
-      const i = list.findIndex((x) => x.id === el.dataset.id);
-      const j = i + Number(el.dataset.dir);
-      if (i < 0 || j < 0 || j >= list.length) return;
-      [list[i], list[j]] = [list[j], list[i]];
-      await saveDraft();
-      render();
-    },
-    'pick-book-cover': () => document.getElementById('bookCoverInput').click(),
-    'remove-book-cover': () => { syncEditorFromForm(); state.editing.draft.cover = ''; render(); },
-
     'export': exportData,
     'publish-local': publishLocal,
     'sync-now': (el) => syncNow(el),
@@ -2059,49 +1320,9 @@
   app.addEventListener('click', handleClick);
   modalBody.addEventListener('click', handleClick);
 
-  let searchTimer = null;
-  app.addEventListener('input', (e) => {
-    if (e.target.id === 'shopSearch') {
-      state.shop.q = e.target.value;
-      document.getElementById('itemsGrid').innerHTML = renderItemsGrid();
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => { const q = state.shop.q.trim().toLowerCase(); if (q.length >= 2) insight.click('search', q); }, 1500);
-    }
-    if (e.target.name === 'iban' && e.target.form && e.target.form.id === 'settingsForm') {
-      const val = e.target.value;
-      const hint = document.getElementById('ibanHint');
-      const ok = !val.trim() || ibanValid(val);
-      e.target.closest('.field').classList.toggle('invalid', !ok);
-      hint.textContent = !val.trim() ? '' : ok ? '✓ IBAN valido' : '⚠ IBAN non valido o incompleto';
-    }
-  });
-
   app.addEventListener('change', async (e) => {
     const t = e.target;
-    if (t.dataset.action === 'item-status') {
-      const it = findItem(t.dataset.id);
-      if (!it) return;
-      it.status = t.value;
-      await saveDraft();
-      toast(`Stato: ${statusLabel(t.value)}`);
-      render();
-    } else if (t.dataset.action === 'book-status') {
-      const b = findBook(t.dataset.id);
-      if (!b) return;
-      b.status = t.value;
-      await saveDraft();
-      toast(`Stato: ${statusLabel(t.value)}`);
-      render();
-    } else if (t.id === 'bookCoverInput' && t.files[0]) {
-      syncEditorFromForm();
-      try {
-        state.editing.draft.cover = await compressImage(t.files[0], 1000, 0.82);
-        render();
-      } catch (err) { toast(err.message, true); }
-    } else if (t.id === 'photoInput') {
-      await addPhotos(t.files);
-      t.value = '';
-    } else if (t.id === 'programImageInput' && t.files[0]) {
+    if (t.id === 'programImageInput' && t.files[0]) {
       syncEditorFromForm();
       try {
         state.editing.draft.image = await compressImage(t.files[0], 1400, 0.82);
@@ -2117,9 +1338,6 @@
     const form = e.target;
     e.preventDefault();
     switch (form.id) {
-      case 'checkoutForm':
-        submitCheckout(form, (e.submitter && e.submitter.dataset.via) || (state.data.settings.email ? 'email' : 'whatsapp'));
-        break;
       case 'contactForm': {
         const v = readForm(form);
         if (!v.message) { toast('Scrivi un messaggio', true); return; }
@@ -2165,15 +1383,12 @@
         toast('Password aggiornata');
         break;
       }
-      case 'itemForm': await saveItemForm(form); break;
       case 'programForm': await saveProgramForm(form); break;
-      case 'bookForm': await saveBookForm(form); break;
       case 'settingsForm': await saveSettingsForm(form); break;
     }
   });
 
   function afterRender() {
-    bindDropzone();
     loadSyncStatus();
     watchInsight();
   }

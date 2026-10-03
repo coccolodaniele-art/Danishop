@@ -2,7 +2,7 @@
 
 Il sito online (`dist/app.js`, sezione "Statistiche") manda in forma anonima a un piccolo
 servizio Cloudflare (`worker.js` + database D1) le schede viste, il tempo passato in ognuna,
-quanto si scorre la pagina e i click importanti (articoli, programmi, giochi, acquisti, contatti).
+quanto si scorre la pagina e i click importanti (programmi aperti, giochi avviati, contatti, link).
 Il Gestore (`admin/gestione_sito.pyw`) legge i riepiloghi con una chiave segreta e li mostra
 nella scheda **Insight** dell'area admin, con la possibilità di scaricare tutti gli eventi in CSV.
 
