@@ -29,7 +29,7 @@ check(r.status === 204, "eventi accettati (204)");
 check(r.headers.get("access-control-allow-origin") === ORIGIN, "intestazione CORS per l'origine consentita");
 await send({ sid: "bot1", events: [{ t: "view", s: "info", e: 1 }] }, "Googlebot/2.1");
 await send({ sid: "evil1", events: [{ t: "view", s: "info", e: 1 }] }, undefined, "https://sito-estraneo.example");
-await send({ sid: sid + "b", lang: "en", screen: 1920, events: [{ t: "view", s: "info", e: 1 }] }, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36");
+await send({ sid: sid + "b", lang: "en", screen: 1920, events: [{ t: "view", s: "home", e: 1 }] }, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36");
 
 check((await stats("chiave-sbagliata")).status === 401, "chiave sbagliata rifiutata");
 const res = await stats();
