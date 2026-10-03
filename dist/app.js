@@ -14,6 +14,7 @@
       homeIntro: '',
       siteAbout: '',
       certsIntro: '',
+      photo: '',
       skills: '',
       services: '',
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
@@ -590,7 +591,9 @@
             <a class="btn secondary" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Contattami">${ICONS.mail} Contattami</a>
           </div>
         </div>
-        <div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>
+        ${safeImg(s.photo)
+          ? `<div class="hero-photo"><img src="${safeImg(s.photo)}" alt="${esc(s.ownerName || s.siteName)}"></div>`
+          : `<div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>`}
       </section>
 
       <section class="home-section">
@@ -958,6 +961,16 @@
 
         <div class="form-section">Pagina Home</div>
         ${field('homeTitle', 'Titolo principale', s.homeTitle, { placeholder: 'La frase grande in cima alla Home' })}
+        <div class="field">
+          <span>La tua foto</span>
+          <div class="row">
+            ${safeImg(s.photo) ? `<div class="photo-tile cover" style="width:96px;aspect-ratio:4/5"><img src="${safeImg(s.photo)}" alt=""></div>` : ''}
+            <button type="button" class="btn secondary small" data-action="pick-home-photo">${safeImg(s.photo) ? 'Cambia foto' : 'Carica foto'}</button>
+            ${safeImg(s.photo) ? '<button type="button" class="btn ghost small" data-action="remove-home-photo">Rimuovi</button>' : ''}
+          </div>
+          <small>Compare in cima alla Home; senza foto si vedono le tue iniziali. Meglio una foto verticale. Si salva subito.</small>
+          <input type="file" id="homePhotoInput" accept="image/*" hidden>
+        </div>
         ${field('homeIntro', 'Presentazione breve', s.homeIntro, { textarea: true, rows: 3, hint: 'Compare sotto il titolo, in cima alla Home.' })}
         ${field('about', 'Chi sono', s.about, { textarea: true, rows: 6, placeholder: 'Qualche riga su di te, cosa fai, di cosa ti occupi…' })}
         ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono come etichette sotto "Chi sono".' })}
@@ -1561,6 +1574,12 @@
       render();
     },
     'pick-cert-image': () => document.getElementById('certImageInput').click(),
+    'pick-home-photo': () => document.getElementById('homePhotoInput').click(),
+    'remove-home-photo': async () => {
+      if (!confirm('Togliere la foto dalla Home?')) return;
+      state.data.settings.photo = '';
+      if (await saveDraft()) { toast('Foto tolta'); render(); }
+    },
     'remove-cert-image': () => { syncEditorFromForm(); state.editing.draft.image = ''; render(); },
 
     'export': exportData,
@@ -1596,6 +1615,18 @@
       try {
         state.editing.draft.image = await compressImage(t.files[0], t.id === 'certImageInput' ? 1280 : 1400, 0.82);
         render();
+      } catch (err) { toast(err.message, true); }
+    } else if (t.id === 'homePhotoInput' && t.files[0]) {
+      // La foto si salva subito; il resto del modulo resta com'è finché non premi "Salva".
+      try {
+        state.data.settings.photo = await compressImage(t.files[0], 900, 0.86);
+        const pending = readForm(t.form);
+        if (await saveDraft()) {
+          toast('Foto salvata');
+          render();
+          const form = document.getElementById('settingsForm');
+          Object.entries(pending).forEach(([k, v]) => { if (form && form.elements[k]) form.elements[k].value = v; });
+        }
       } catch (err) { toast(err.message, true); }
     } else if (t.id === 'importInput' && t.files[0]) {
       await importData(t.files[0]);
