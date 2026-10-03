@@ -9,7 +9,12 @@
     version: 1,
     settings: {
       siteName: 'Il mio sito',
-      tagline: 'Oggetti usati, programmi e contatti',
+      tagline: 'Programmi, giochi e contatti',
+      homeTitle: '',
+      homeIntro: '',
+      siteAbout: '',
+      skills: '',
+      services: '',
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
       tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
       gamesIntro: 'Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.',
@@ -46,7 +51,7 @@
     published: clone(DEFAULT_DATA),
     hasDraft: false,
     isAdmin: sessionGet('admin_ok') === '1' || isRemembered(),
-    route: 'programmi',
+    route: 'home',
     adminTab: 'programmi',
     insight: { days: 30, data: null, loading: false, error: '' },
     editing: null,
@@ -295,7 +300,8 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    return ['programmi', 'trading', 'giochi', 'info', 'admin'].includes(r) ? r : 'programmi';
+    if (r === 'info' || r === 'contatti') return 'home';
+    return ['home', 'programmi', 'trading', 'giochi', 'admin'].includes(r) ? r : 'home';
   }
 
   function render() {
@@ -303,7 +309,7 @@
     insight.section(state.route);
     updateChrome();
     const views = {
-      info: renderInfo, admin: renderAdmin,
+      home: renderHome, admin: renderAdmin,
       programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1]),
       giochi: () => renderPrograms(PROGRAM_SECTIONS[2])
     };
@@ -315,7 +321,7 @@
     const s = state.data.settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { home: s.tagline || 'Home', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -327,8 +333,16 @@
     if (!modal.hidden) closeModal();
     const prev = state.route;
     render();
-    if (prev !== state.route) window.scrollTo(0, 0);
+    if (wantsContacts()) scrollToContacts();
+    else if (prev !== state.route) window.scrollTo(0, 0);
   });
+
+  // #contatti apre la Home direttamente sui contatti (anche i vecchi link #info portano alla Home).
+  function wantsContacts() { return /^#\/?contatti/.test(location.hash); }
+  function scrollToContacts() {
+    const el = document.getElementById('contatti');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   /* =========================================================
      Statistiche: raccolta anonima di visite e click
@@ -413,12 +427,16 @@
     };
   })();
 
-  // Quali click contano per le statistiche: programmi, giochi e contatti.
+  // Quali click contano per le statistiche: programmi, giochi, contatti e i riquadri della Home.
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-action], a[href]');
     if (!el) return;
     const card = el.closest('article');
     const cardName = card && card.querySelector('h2') ? card.querySelector('h2').textContent.trim() : '';
+    if (el.dataset.track) {
+      insight.click(el.dataset.track, el.dataset.label);
+      return;
+    }
     if (el.dataset.action) {
       if (el.dataset.action === 'zoom-shot') insight.click('zoom-image', cardName);
       return;
@@ -427,7 +445,7 @@
     if (el.classList.contains('play-now')) insight.click('play-game', cardName);
     else if (card && el.closest('.trial') && /^https?:|^[\w-]+\//.test(href)) {
       insight.click(/\.(exe|msi|zip|rar|7z|dmg|apk)([?#]|$)/i.test(href) ? 'download' : 'open-program', cardName);
-    } else if (href === '#info' && card) insight.click('ask-info', cardName);
+    } else if (href === '#contatti' && card) insight.click('ask-info', cardName);
     else if (href.startsWith('mailto:')) insight.click('contact', 'Email');
     else if (href.startsWith('tel:')) insight.click('contact', 'Telefono');
     else if (/^https:\/\/wa\.me\//.test(href)) insight.click('contact', 'WhatsApp');
@@ -514,19 +532,94 @@
                 ${trialUrl ? (/\.(exe|msi|zip|rar|7z|dmg|apk)([?#]|$)/i.test(trialUrl)
                   ? `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.download} Scarica il programma</a>`
                   : `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.play} Apri il programma</a>`) : ''}
-                <a class="btn secondary small" href="#info">Contattami per informazioni</a>
+                <a class="btn secondary small" href="#contatti">Contattami per informazioni</a>
               </div>
-            </div>` : `<div><a class="btn secondary small" href="#info">Contattami per informazioni</a></div>`}
+            </div>` : `<div><a class="btn secondary small" href="#contatti">Contattami per informazioni</a></div>`}
           ${p.requirements ? `<details><summary class="details-toggle">Requisiti di sistema</summary><div class="req" style="margin-top:6px">${linkify(p.requirements)}</div></details>` : ''}
         </div>
       </article>`;
   }
 
   /* =========================================================
-     Info e contatti (pubblico)
+     Home (pubblico): chi sono, cosa faccio, il sito e i contatti
      ========================================================= */
 
-  function renderInfo() {
+  const HOME_ICONS = {
+    programmi: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>',
+    trading: '<path d="M3 20h18"/><path d="M5 16l5-5 3 3 6-7"/><path d="M15 7h4v4"/>',
+    giochi: '<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="17.5" cy="13.5" r=".6"/>',
+    servizi: '<path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 5-4 14"/>'
+  };
+  const homeIcon = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${HOME_ICONS[k]}</svg>`;
+  const lines = (text) => String(text || '').split('\n').map((x) => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+
+  function renderHome() {
+    const s = state.data.settings;
+    const initials = (s.ownerName || s.siteName || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+    const skills = lines(s.skills);
+    const services = lines(s.services);
+    const bySection = (sec) => state.data.programs.filter((p) => p.category === sec.value);
+    const nPrograms = state.data.programs.filter((p) => p.category !== 'giochi').length;
+    const nGames = bySection(PROGRAM_SECTIONS[2]).length;
+    const areas = PROGRAM_SECTIONS.map((sec) => {
+      const list = bySection(sec);
+      const isGame = sec.value === 'giochi';
+      return {
+        key: sec.route, href: `#${sec.route}`, title: sec.title, text: s[sec.introKey], names: list.map((p) => p.name),
+        more: list.length ? `${list.length} ${isGame ? (list.length === 1 ? 'gioco' : 'giochi') : (list.length === 1 ? 'programma' : 'programmi')} →` : 'Scopri di più →'
+      };
+    });
+    if (services.length) areas.push({ key: 'servizi', href: '#contatti', action: 'go-contacts', title: 'Servizi su misura', list: services, more: 'Parliamone →' });
+
+    return `
+      <section class="hero">
+        <div class="hero-text">
+          <span class="hero-eyebrow">${s.ownerName ? `Ciao, sono ${esc(s.ownerName)}` : esc(s.siteName)}${s.city ? ` · ${esc(s.city)}` : ''}</span>
+          <h1>${esc(s.homeTitle || s.siteName)}</h1>
+          ${s.homeIntro ? `<p>${esc(s.homeIntro)}</p>` : ''}
+          <div class="row">
+            <a class="btn" href="#programmi" data-track="home-link" data-label="Scopri i progetti">Scopri i progetti</a>
+            <a class="btn secondary" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Contattami">${ICONS.mail} Contattami</a>
+          </div>
+        </div>
+        <div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>
+      </section>
+
+      <section class="home-section">
+        <h2 class="section-title">Cosa faccio</h2>
+        <div class="home-areas">${areas.map((a) => `
+          <a class="area-card" href="${a.href}" ${a.action ? `data-action="${a.action}"` : ''} data-track="home-link" data-label="${esc(a.title)}">
+            <span class="area-ico">${homeIcon(a.key)}</span>
+            <h3>${esc(a.title)}</h3>
+            ${a.text ? `<p>${esc(a.text)}</p>` : ''}
+            ${a.names && a.names.length ? `<span class="area-tags">${a.names.map((n) => `<span class="badge">${esc(n)}</span>`).join('')}</span>` : ''}
+            ${a.list ? `<ul class="features">${a.list.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+            <span class="area-more">${a.more}</span>
+          </a>`).join('')}
+        </div>
+      </section>
+
+      <section class="home-section home-two">
+        <div class="card">
+          <h2>Chi sono</h2>
+          ${s.about ? `<div class="text">${esc(s.about)}</div>` : '<p class="item-meta">Presentazione in arrivo.</p>'}
+          ${skills.length ? `<div class="skill-tags">${skills.map((k) => `<span class="badge">${esc(k)}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="card">
+          <h2>Il sito</h2>
+          ${s.siteAbout ? `<div class="text">${esc(s.siteAbout)}</div>` : ''}
+          <div class="home-facts">
+            <div><strong>${nPrograms}</strong><span>${nPrograms === 1 ? 'programma' : 'programmi'}</span></div>
+            <div><strong>${nGames}</strong><span>${nGames === 1 ? 'gioco' : 'giochi'}</span></div>
+            <div><strong>Web</strong><span>niente da installare</span></div>
+          </div>
+        </div>
+      </section>
+
+      ${renderContacts()}`;
+  }
+
+  function renderContacts() {
     const s = state.data.settings;
     const contacts = [];
     if (s.email) contacts.push({ ico: ICONS.mail, label: 'Email', text: s.email, href: `mailto:${s.email}` });
@@ -537,37 +630,32 @@
       const u = safeUrl(s[k]);
       if (u) contacts.push({ ico, label, text: u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''), href: u, ext: true });
     });
-
+    const list = `
+      <div class="card">
+        <h2>Recapiti</h2>
+        ${contacts.length ? `<ul class="contact-list">${contacts.map((c) => `
+          <li>
+            <span class="ico">${c.ico}</span>
+            <div><small>${esc(c.label)}</small>${c.href ? `<a href="${esc(c.href)}" ${c.ext ? 'target="_blank" rel="noopener"' : ''}>${esc(c.text)}</a>` : `<strong>${esc(c.text)}</strong>`}</div>
+          </li>`).join('')}</ul>` : '<p class="item-meta">Contatti in arrivo.</p>'}
+      </div>`;
     return `
-      <section class="page-head">
-        <h1>Info e contatti</h1>
-        <p>Per qualsiasi domanda, curiosità o proposta scrivimi pure: rispondo il prima possibile.</p>
-      </section>
-      <div class="info-grid">
-        <div class="stack">
-          <div class="card">
-            <h2>${s.ownerName ? `Ciao, sono ${esc(s.ownerName)}` : 'Chi sono'}</h2>
-            ${s.about ? `<div class="text">${esc(s.about)}</div>` : '<p class="item-meta">Presentazione in arrivo.</p>'}
-          </div>
+      <section class="home-section" id="contatti">
+        <h2 class="section-title">Contatti</h2>
+        <p class="section-sub">Per domande, proposte o per un lavoro su misura scrivimi pure: rispondo il prima possibile.</p>
+        <div class="${s.email ? 'info-grid' : ''}">
           ${s.email ? `
           <div class="card">
             <h2>Scrivimi un messaggio</h2>
             <form id="contactForm" class="stack" novalidate>
               <label class="field"><span>Il tuo nome</span><input name="name" autocomplete="name" required></label>
-              <label class="field"><span>Messaggio</span><textarea name="message" rows="4" required placeholder="Di cosa vuoi parlarmi?"></textarea></label>
+              <label class="field"><span>Messaggio</span><textarea name="message" rows="5" required placeholder="Di cosa vuoi parlarmi?"></textarea></label>
               <div class="row end"><button class="btn" type="submit">${ICONS.mail} Invia messaggio</button></div>
             </form>
           </div>` : ''}
+          ${list}
         </div>
-        <div class="card">
-          <h2>Contatti</h2>
-          ${contacts.length ? `<ul class="contact-list">${contacts.map((c) => `
-            <li>
-              <span class="ico">${c.ico}</span>
-              <div><small>${esc(c.label)}</small>${c.href ? `<a href="${esc(c.href)}" ${c.ext ? 'target="_blank" rel="noopener"' : ''}>${esc(c.text)}</a>` : `<strong>${esc(c.text)}</strong>`}</div>
-            </li>`).join('')}</ul>` : '<p class="item-meta">Contatti in arrivo.</p>'}
-        </div>
-      </div>`;
+      </section>`;
   }
 
   /* =========================================================
@@ -576,7 +664,7 @@
 
   function renderAdmin() {
     if (!IS_LOCAL) {
-      return `<div class="login card"><h2>Area riservata</h2><p class="item-meta" style="margin:0">Questa sezione non è disponibile online.</p><p><a class="btn secondary" href="#programmi">Torna al sito</a></p></div>`;
+      return `<div class="login card"><h2>Area riservata</h2><p class="item-meta" style="margin:0">Questa sezione non è disponibile online.</p><p><a class="btn secondary" href="#home">Torna al sito</a></p></div>`;
     }
     if (!state.isAdmin) return renderLogin();
     const d = state.data;
@@ -592,7 +680,7 @@
       <div class="admin-head">
         <h1>Area admin</h1>
         <div class="row">
-          <a class="btn secondary small" href="#programmi">Vedi il sito</a>
+          <a class="btn secondary small" href="#home">Vedi il sito</a>
           <button class="btn ghost small" data-action="logout">Esci</button>
         </div>
       </div>
@@ -739,17 +827,27 @@
           ${field('siteName', 'Nome del sito', s.siteName, { req: true })}
           ${field('tagline', 'Sottotitolo', s.tagline)}
         </div>
+
+        <div class="form-section">Pagina Home</div>
+        ${field('homeTitle', 'Titolo principale', s.homeTitle, { placeholder: 'La frase grande in cima alla Home' })}
+        ${field('homeIntro', 'Presentazione breve', s.homeIntro, { textarea: true, rows: 3, hint: 'Compare sotto il titolo, in cima alla Home.' })}
+        ${field('about', 'Chi sono', s.about, { textarea: true, rows: 6, placeholder: 'Qualche riga su di te, cosa fai, di cosa ti occupi…' })}
+        ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono come etichette sotto "Chi sono".' })}
+        ${field('services', 'Servizi su misura', s.services, { textarea: true, rows: 3, hint: 'Uno per riga. Se lasci vuoto, il riquadro "Servizi su misura" non compare.' })}
+        ${field('siteAbout', 'Il sito', s.siteAbout, { textarea: true, rows: 3, hint: 'Cosa si trova nel sito e come si usa.' })}
+
+        <div class="form-section">Testi delle schede</div>
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
         ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
         ${field('gamesIntro', 'Testo introduttivo della scheda Giochi', s.gamesIntro, { textarea: true, rows: 2 })}
 
-        <div class="form-section">Contatti (pagina Info)</div>
+        <div class="form-section">Contatti (in fondo alla Home)</div>
         <div class="grid-2">
           ${field('ownerName', 'Il tuo nome', s.ownerName)}
           ${field('city', 'Città / zona', s.city)}
         </div>
         <div class="grid-2">
-          ${field('email', 'Email', s.email, { type: 'email', hint: 'Qui ricevi i messaggi dal modulo della pagina Info' })}
+          ${field('email', 'Email', s.email, { type: 'email', hint: 'Qui ricevi i messaggi dal modulo della Home' })}
           ${field('phone', 'Telefono', s.phone, { type: 'tel' })}
         </div>
         <div class="grid-2">
@@ -761,7 +859,6 @@
           ${field('facebook', 'Facebook (link)', s.facebook, { placeholder: 'https://facebook.com/…' })}
         </div>
         ${field('linkedin', 'LinkedIn (link)', s.linkedin, { placeholder: 'https://linkedin.com/in/…' })}
-        ${field('about', 'Chi sono', s.about, { textarea: true, rows: 5, placeholder: 'Qualche riga su di te, cosa fai, di cosa ti occupi…' })}
 
         <div class="sticky-actions row end">
           <button type="submit" class="btn">Salva i miei dati</button>
@@ -792,13 +889,14 @@
   /* ---------- Insight (statistiche del sito) ---------- */
 
   const INSIGHT_PERIODS = [[1, 'Oggi'], [7, '7 giorni'], [30, '30 giorni'], [90, '3 mesi'], [365, '12 mesi']];
-  const SECTION_NAMES = { programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
+  const SECTION_NAMES = { home: 'Home', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
   const CLICK_NAMES = {
     'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
     'zoom-image': 'Immagini dei programmi ingrandite', 'ask-info': 'Richieste di informazioni',
-    'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo', 'external-link': 'Link esterni aperti'
+    'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo', 'external-link': 'Link esterni aperti',
+    'home-link': 'Clic sui riquadri della Home'
   };
-  const LABEL_GROUPS = ['open-program', 'play-game', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
+  const LABEL_GROUPS = ['open-program', 'play-game', 'home-link', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
   const WEEKDAYS = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
   const nf = new Intl.NumberFormat('it-IT');
   const fmt = (n) => nf.format(Math.round(Number(n) || 0));
@@ -1256,7 +1354,7 @@
         <h2 id="modalTitle" class="shot-title">${esc(p.name)}</h2>
         <img class="shot-full" src="${src}" alt="${esc(p.name)}">`, { wide: true });
     },
-    'logout': () => { sessionSet('admin_ok', null); localSet('admin_remember', null); state.isAdmin = false; state.editing = null; location.hash = '#programmi'; },
+    'logout': () => { sessionSet('admin_ok', null); localSet('admin_remember', null); state.isAdmin = false; state.editing = null; location.hash = '#home'; },
     'tab': (el, e) => { e.preventDefault(); state.adminTab = el.dataset.tab; state.editing = null; render(); },
 
     'cancel-edit': () => { state.editing = null; render(); },
@@ -1300,6 +1398,7 @@
     'sync-now': (el) => syncNow(el),
     'insight-days': (el) => { state.insight.days = Number(el.dataset.days); state.insight.data = null; state.insight.error = ''; render(); },
     'insight-reload': () => loadInsight(true),
+    'go-contacts': (el, e) => { e.preventDefault(); if (state.route === 'home') scrollToContacts(); else location.hash = '#contatti'; },
     'import': () => document.getElementById('importInput').click(),
     'discard': async () => {
       if (!confirm('Tornare alla versione pubblicata? Le modifiche non pubblicate andranno perse.')) return;
@@ -1402,5 +1501,6 @@
     await detectLocalServer();
     await loadData();
     render();
+    if (wantsContacts()) setTimeout(scrollToContacts, 50);
   })();
 })();
