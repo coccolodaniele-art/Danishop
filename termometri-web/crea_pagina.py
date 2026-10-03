@@ -2,7 +2,7 @@
 
 Uso:  python crea_pagina.py https://<indirizzo-intermediario>
 
-- modello.html          interfaccia (stesso aspetto e comportamento del programma desktop)
+- modello.html          interfaccia (stesso comportamento del programma desktop, aspetto del sito)
 - logica.js             logica, tradotta riga per riga da sp500_vertical_thermometer.py
 - dati_programma.json   costanti, elenchi e prompt esportati dal programma desktop
                         (rigenerarlo con esporta_dati.py dopo ogni modifica al programma)
