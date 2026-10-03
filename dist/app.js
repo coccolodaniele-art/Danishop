@@ -610,19 +610,28 @@
         </div>
       </section>
 
-      <section class="home-section home-two">
-        <div class="card">
-          <h2>Chi sono</h2>
-          ${s.about ? `<div class="text">${esc(s.about)}</div>` : '<p class="item-meta">Presentazione in arrivo.</p>'}
-          ${skills.length ? `<div class="skill-tags">${skills.map((k) => `<span class="badge">${esc(k)}</span>`).join('')}</div>` : ''}
-        </div>
-        <div class="card">
-          <h2>Il sito</h2>
-          ${s.siteAbout ? `<div class="text">${esc(s.siteAbout)}</div>` : ''}
-          <div class="home-facts">
-            <div><strong>${nPrograms}</strong><span>${nPrograms === 1 ? 'programma' : 'programmi'}</span></div>
-            <div><strong>${nGames}</strong><span>${nGames === 1 ? 'gioco' : 'giochi'}</span></div>
-            <div><strong>Web</strong><span>niente da installare</span></div>
+      <section class="home-section">
+        <h2 class="section-title">Chi sono</h2>
+        <div class="home-two">
+          <div class="card">
+            <h2>Il mio lavoro</h2>
+            ${s.about ? `<div class="text">${esc(s.about)}</div>` : '<p class="item-meta">Presentazione in arrivo.</p>'}
+            ${skills.length ? `
+            <div class="code-card">
+              <div class="code-bar" aria-hidden="true"><i></i><i></i><i></i><span>competenze.py</span></div>
+              <pre><code><span class="tok-var">competenze</span> <span class="tok-op">=</span> [
+${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
+]</code></pre>
+            </div>` : ''}
+          </div>
+          <div class="card">
+            <h2>Il sito</h2>
+            ${s.siteAbout ? `<div class="text">${esc(s.siteAbout)}</div>` : ''}
+            <div class="home-facts">
+              <div><strong>${nPrograms}</strong><span>${nPrograms === 1 ? 'programma' : 'programmi'}</span></div>
+              <div><strong>${nGames}</strong><span>${nGames === 1 ? 'gioco' : 'giochi'}</span></div>
+              <div><strong>Web</strong><span>niente da installare</span></div>
+            </div>
           </div>
         </div>
       </section>
@@ -973,7 +982,7 @@
         </div>
         ${field('homeIntro', 'Presentazione breve', s.homeIntro, { textarea: true, rows: 3, hint: 'Compare sotto il titolo, in cima alla Home.' })}
         ${field('about', 'Chi sono', s.about, { textarea: true, rows: 6, placeholder: 'Qualche riga su di te, cosa fai, di cosa ti occupi…' })}
-        ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono come etichette sotto "Chi sono".' })}
+        ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono sotto "Chi sono", scritte come un piccolo file di codice.' })}
         ${field('services', 'Servizi su misura', s.services, { textarea: true, rows: 3, hint: 'Uno per riga. Se lasci vuoto, il riquadro "Servizi su misura" non compare.' })}
         ${field('siteAbout', 'Il sito', s.siteAbout, { textarea: true, rows: 3, hint: 'Cosa si trova nel sito e come si usa.' })}
         ${field('certsIntro', 'Formazione e attestati', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati (si gestiscono nella scheda Attestati).' })}
