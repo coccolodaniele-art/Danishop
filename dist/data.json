@@ -3,7 +3,6 @@
  "settings": {
   "siteName": "Laboratorio del Dany",
   "tagline": "Programmi, giochi e contatti",
-  "shopIntro": "Oggetti di seconda mano in buono stato, fotografati e descritti con cura. Clicca su un articolo per vederlo da vicino e acquistarlo.",
   "programsIntro": "Programmi per imparare divertendosi: programmazione, inglese e altro ancora. Si usano direttamente dal browser, anche da telefono.",
   "ownerName": "Daniele Coccolo",
   "email": "coccolo.daniele@yahoo.it",
@@ -23,7 +22,6 @@
   "defaultShipping": 6,
   "tradingIntro": "Programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale. Si usano direttamente dal browser, anche da telefono."
  },
- "items": [],
  "programs": [
   {
    "id": "mun4oc3661ldu",
