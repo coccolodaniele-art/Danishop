@@ -13,6 +13,7 @@
       homeTitle: '',
       homeIntro: '',
       siteAbout: '',
+      certsIntro: '',
       skills: '',
       services: '',
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
@@ -29,7 +30,8 @@
       linkedin: '',
       about: ''
     },
-    programs: []
+    programs: [],
+    certificates: []
   };
 
   // Sezioni della pagina Programmi: ogni programma appartiene a una delle schede.
@@ -121,11 +123,16 @@
       id: uid(), name: '', tagline: '', image: '', platform: '', version: '', description: '',
       features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: '', category: PROGRAM_SECTIONS[0].value
     }, p)).map((p) => Object.assign(p, { category: sectionByValue(p.category).value })) : [];
+    d.certificates = Array.isArray(raw.certificates) ? raw.certificates.map((c) => Object.assign(newCert(), c)) : [];
     // Articoli e libri delle schede Shop usato e Libri (tolte dal sito): non si vedono più,
     // ma restano nel file così come sono.
     if (Array.isArray(raw.items)) d.items = raw.items;
     if (Array.isArray(raw.books)) d.books = raw.books;
     return d;
+  }
+
+  function newCert() {
+    return { id: uid(), title: '', issuer: '', teacher: '', tag: '', date: '', hours: '', url: '', image: '' };
   }
 
   function isLocalHost() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
@@ -439,6 +446,7 @@
     }
     if (el.dataset.action) {
       if (el.dataset.action === 'zoom-shot') insight.click('zoom-image', cardName);
+      else if (el.dataset.action === 'zoom-cert') insight.click('zoom-cert', (findCert(el.dataset.id) || {}).title);
       return;
     }
     const href = el.getAttribute('href') || '';
@@ -616,7 +624,50 @@
         </div>
       </section>
 
+      ${renderCertificates()}
+
       ${renderContacts()}`;
+  }
+
+  /* ---------- Formazione e attestati ---------- */
+
+  function findCert(id) { return state.data.certificates.find((c) => c.id === id); }
+  function certHours(c) { const n = parseFloat(String(c.hours || '').replace(',', '.')); return isFinite(n) && n > 0 ? n : 0; }
+  function certDate(c, opts = { day: 'numeric', month: 'long', year: 'numeric' }) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(c.date || '') ? new Date(c.date + 'T12:00:00').toLocaleDateString('it-IT', opts) : '';
+  }
+  const hoursLabel = (h) => `${h.toLocaleString('it-IT', { maximumFractionDigits: 1 })} ${h === 1 ? 'ora' : 'ore'}`;
+
+  function renderCertificates() {
+    const s = state.data.settings;
+    const list = state.data.certificates.filter((c) => c.title);
+    if (!list.length) return '';
+    const total = list.reduce((a, c) => a + certHours(c), 0);
+    return `
+      <section class="home-section" id="attestati">
+        <h2 class="section-title">Formazione e attestati</h2>
+        <p class="section-sub">${s.certsIntro ? esc(s.certsIntro) + ' ' : ''}<strong>${list.length} ${list.length === 1 ? 'corso completato' : 'corsi completati'}${total ? ` · ${hoursLabel(total)} di formazione` : ''}</strong></p>
+        <div class="certs">${list.map((c) => {
+          const img = safeImg(c.image);
+          const url = safeUrl(c.url);
+          const meta = [certDate(c), certHours(c) ? hoursLabel(certHours(c)) : ''].filter(Boolean).join(' · ');
+          return `
+          <article class="cert">
+            ${img ? `<button type="button" class="cert-shot" data-action="zoom-cert" data-id="${esc(c.id)}" aria-label="Ingrandisci l'attestato ${esc(c.title)}">
+              <img src="${img}" alt="Attestato: ${esc(c.title)}" loading="lazy">
+              <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
+            </button>` : ''}
+            <div class="cert-body">
+              ${c.tag ? `<span class="badge">${esc(c.tag)}</span>` : ''}
+              <h3>${esc(c.title)}</h3>
+              ${c.issuer || c.teacher ? `<p class="cert-issuer">${esc(c.issuer)}${c.issuer && c.teacher ? ' · ' : ''}${c.teacher ? 'docente ' + esc(c.teacher) : ''}</p>` : ''}
+              ${meta ? `<p class="cert-meta">${esc(meta)}</p>` : ''}
+              ${url ? `<a class="cert-verify" href="${esc(url)}" target="_blank" rel="noopener" data-track="cert-verify" data-label="${esc(c.title)}">Verifica l'attestato ↗</a>` : ''}
+            </div>
+          </article>`;
+        }).join('')}
+        </div>
+      </section>`;
   }
 
   function renderContacts() {
@@ -668,14 +719,15 @@
     }
     if (!state.isAdmin) return renderLogin();
     const d = state.data;
-    if (state.editing) return renderProgramEditor(state.editing);
+    if (state.editing) return state.editing.type === 'cert' ? renderCertEditor(state.editing) : renderProgramEditor(state.editing);
     const tabs = [
       ['programmi', 'Programmi', d.programs.length],
+      ['attestati', 'Attestati', d.certificates.length],
       ['insight', 'Insight'],
       ['dati', 'I miei dati'],
       ['pubblica', state.localServer ? 'Online' : (state.hasDraft ? 'Pubblica ●' : 'Pubblica')]
     ];
-    const bodies = { programmi: adminPrograms, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
+    const bodies = { programmi: adminPrograms, attestati: adminCerts, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
     return `
       <div class="admin-head">
         <h1>Area admin</h1>
@@ -728,6 +780,82 @@
           <button class="btn danger small" data-action="delete-program" data-id="${esc(p.id)}">Elimina</button>
         </div>`).join('')}</div>`
         : '<div class="empty"><strong>Nessun programma</strong>Clicca su "Nuovo programma" per aggiungerne uno.</div>'}`;
+  }
+
+  /* ---------- Attestati ---------- */
+
+  function adminCerts() {
+    const list = state.data.certificates;
+    return `
+      <div class="row between" style="margin-bottom:14px">
+        <p class="item-meta" style="margin:0">Gli attestati compaiono nella Home, nella sezione "Formazione e attestati", nell'ordine di questa lista.</p>
+        <button class="btn" data-action="new-cert">+ Nuovo attestato</button>
+      </div>
+      ${list.length ? `<div class="admin-list">${list.map((c, i) => `
+        <div class="admin-row">
+          <div class="thumb">${safeImg(c.image) ? `<img src="${safeImg(c.image)}" alt="">` : noPhoto()}</div>
+          <div class="info"><strong>${esc(c.title) || '(senza titolo)'}</strong><span>${esc([c.issuer, certDate(c, { day: 'numeric', month: 'short', year: 'numeric' })].filter(Boolean).join(' · '))}</span></div>
+          <button class="btn ghost small" data-action="move-cert" data-id="${esc(c.id)}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Sposta su">↑</button>
+          <button class="btn ghost small" data-action="move-cert" data-id="${esc(c.id)}" data-dir="1" ${i === list.length - 1 ? 'disabled' : ''} aria-label="Sposta giù">↓</button>
+          <button class="btn secondary small" data-action="edit-cert" data-id="${esc(c.id)}">Modifica</button>
+          <button class="btn danger small" data-action="delete-cert" data-id="${esc(c.id)}">Elimina</button>
+        </div>`).join('')}</div>`
+        : '<div class="empty"><strong>Nessun attestato</strong>Clicca su "Nuovo attestato" per aggiungerne uno.</div>'}`;
+  }
+
+  function renderCertEditor(ed) {
+    const c = ed.draft;
+    const img = safeImg(c.image);
+    return `
+      <div class="admin-head">
+        <h1>${ed.isNew ? 'Nuovo attestato' : 'Modifica attestato'}</h1>
+        <button class="btn ghost small" data-action="cancel-edit">← Torna alla lista</button>
+      </div>
+      <form id="certForm" class="form-card stack" novalidate>
+        <div class="form-section" style="margin-top:0">Il corso</div>
+        ${field('title', 'Titolo del corso', c.title, { req: true })}
+        <div class="grid-2">
+          ${field('issuer', 'Rilasciato da', c.issuer, { placeholder: 'Es. Udemy' })}
+          ${field('teacher', 'Docente', c.teacher, { placeholder: 'Facoltativo' })}
+        </div>
+        <div class="grid-2">
+          ${field('date', 'Data di completamento', c.date, { type: 'date' })}
+          ${field('hours', 'Durata (ore)', c.hours, { extra: 'inputmode="decimal"', placeholder: 'Es. 5,5' })}
+        </div>
+        <div class="grid-2">
+          ${field('tag', 'Etichetta', c.tag, { placeholder: 'Es. Python, SQL, Excel', hint: 'Una parola che compare sopra il titolo.' })}
+          ${field('url', 'Link di verifica', c.url, { type: 'url', placeholder: 'https://ude.my/UC-…', hint: 'Il link scritto sull\'attestato, per verificarlo.' })}
+        </div>
+        <div class="field">
+          <span>Immagine dell'attestato</span>
+          <div class="row">
+            ${img ? `<div class="photo-tile cover" style="width:160px;aspect-ratio:4/3"><img src="${img}" alt=""></div>` : ''}
+            <button type="button" class="btn secondary small" data-action="pick-cert-image">${img ? 'Cambia immagine' : 'Carica immagine'}</button>
+            ${img ? '<button type="button" class="btn ghost small" data-action="remove-cert-image">Rimuovi</button>' : ''}
+          </div>
+          <small>JPG o PNG. Se hai solo il PDF, basta uno screenshot dell'attestato.</small>
+          <input type="file" id="certImageInput" accept="image/*" hidden>
+        </div>
+
+        <div class="sticky-actions row end">
+          <button type="button" class="btn secondary" data-action="cancel-edit">Annulla</button>
+          <button type="submit" class="btn">Salva attestato</button>
+        </div>
+      </form>`;
+  }
+
+  async function saveCertForm(form) {
+    const v = readForm(form);
+    const ed = state.editing;
+    if (!v.title) { toast('Inserisci il titolo del corso', true); form.elements['title'].focus(); return; }
+    const cert = Object.assign(ed.draft, v);
+    if (ed.isNew) state.data.certificates.push(cert);
+    else state.data.certificates = state.data.certificates.map((c) => (c.id === cert.id ? cert : c));
+    if (await saveDraft()) {
+      state.editing = null;
+      toast('Attestato salvato');
+      render();
+    }
   }
 
   /* ---------- Editor del programma ---------- */
@@ -798,7 +926,7 @@
   }
 
   function syncEditorFromForm() {
-    const form = document.getElementById('programForm');
+    const form = document.getElementById('programForm') || document.getElementById('certForm');
     if (form && state.editing) Object.assign(state.editing.draft, readForm(form));
   }
 
@@ -835,6 +963,7 @@
         ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono come etichette sotto "Chi sono".' })}
         ${field('services', 'Servizi su misura', s.services, { textarea: true, rows: 3, hint: 'Uno per riga. Se lasci vuoto, il riquadro "Servizi su misura" non compare.' })}
         ${field('siteAbout', 'Il sito', s.siteAbout, { textarea: true, rows: 3, hint: 'Cosa si trova nel sito e come si usa.' })}
+        ${field('certsIntro', 'Formazione e attestati', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati (si gestiscono nella scheda Attestati).' })}
 
         <div class="form-section">Testi delle schede</div>
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
@@ -894,9 +1023,9 @@
     'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
     'zoom-image': 'Immagini dei programmi ingrandite', 'ask-info': 'Richieste di informazioni',
     'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo', 'external-link': 'Link esterni aperti',
-    'home-link': 'Clic sui riquadri della Home'
+    'home-link': 'Clic sui riquadri della Home', 'zoom-cert': 'Attestati ingranditi', 'cert-verify': 'Attestati verificati'
   };
-  const LABEL_GROUPS = ['open-program', 'play-game', 'home-link', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
+  const LABEL_GROUPS = ['open-program', 'play-game', 'home-link', 'zoom-cert', 'cert-verify', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
   const WEEKDAYS = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
   const nf = new Intl.NumberFormat('it-IT');
   const fmt = (n) => nf.format(Math.round(Number(n) || 0));
@@ -1393,6 +1522,47 @@
     'pick-program-image': () => document.getElementById('programImageInput').click(),
     'remove-program-image': () => { syncEditorFromForm(); state.editing.draft.image = ''; render(); },
 
+    'zoom-cert': (el) => {
+      const c = findCert(el.dataset.id);
+      const src = c && safeImg(c.image);
+      if (!src) return;
+      const url = safeUrl(c.url);
+      openModal(`
+        <h2 id="modalTitle" class="shot-title">${esc(c.title)}</h2>
+        <img class="shot-full cert-full" src="${src}" alt="Attestato: ${esc(c.title)}">
+        ${url ? `<p class="cert-modal-link"><a href="${esc(url)}" target="_blank" rel="noopener" data-track="cert-verify" data-label="${esc(c.title)}">Verifica l'autenticità sul sito di ${esc(c.issuer || 'chi l\'ha rilasciato')} ↗</a></p>` : ''}`, { wide: true });
+    },
+    'new-cert': () => {
+      state.editing = { type: 'cert', isNew: true, draft: newCert() };
+      render();
+      window.scrollTo(0, 0);
+    },
+    'edit-cert': (el) => {
+      const c = findCert(el.dataset.id);
+      if (!c) return;
+      state.editing = { type: 'cert', isNew: false, draft: clone(c) };
+      render();
+      window.scrollTo(0, 0);
+    },
+    'delete-cert': async (el) => {
+      const c = findCert(el.dataset.id);
+      if (!c || !confirm(`Eliminare l'attestato "${c.title}"?`)) return;
+      state.data.certificates = state.data.certificates.filter((x) => x.id !== c.id);
+      await saveDraft();
+      render();
+    },
+    'move-cert': async (el) => {
+      const list = state.data.certificates;
+      const i = list.findIndex((x) => x.id === el.dataset.id);
+      const j = i + Number(el.dataset.dir);
+      if (i < 0 || j < 0 || j >= list.length) return;
+      [list[i], list[j]] = [list[j], list[i]];
+      await saveDraft();
+      render();
+    },
+    'pick-cert-image': () => document.getElementById('certImageInput').click(),
+    'remove-cert-image': () => { syncEditorFromForm(); state.editing.draft.image = ''; render(); },
+
     'export': exportData,
     'publish-local': publishLocal,
     'sync-now': (el) => syncNow(el),
@@ -1421,10 +1591,10 @@
 
   app.addEventListener('change', async (e) => {
     const t = e.target;
-    if (t.id === 'programImageInput' && t.files[0]) {
+    if ((t.id === 'programImageInput' || t.id === 'certImageInput') && t.files[0]) {
       syncEditorFromForm();
       try {
-        state.editing.draft.image = await compressImage(t.files[0], 1400, 0.82);
+        state.editing.draft.image = await compressImage(t.files[0], t.id === 'certImageInput' ? 1280 : 1400, 0.82);
         render();
       } catch (err) { toast(err.message, true); }
     } else if (t.id === 'importInput' && t.files[0]) {
@@ -1483,6 +1653,7 @@
         break;
       }
       case 'programForm': await saveProgramForm(form); break;
+      case 'certForm': await saveCertForm(form); break;
       case 'settingsForm': await saveSettingsForm(form); break;
     }
   });
