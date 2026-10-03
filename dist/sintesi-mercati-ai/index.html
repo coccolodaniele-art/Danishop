@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Raccoglie gli articoli finanziari più recenti da fonti attendibili e ne ricava un unico articolo in italiano.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><polyline points='13,43 26,30 36,38 51,19' fill='none' stroke='%237dd3fc' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='51' cy='19' r='4.5' fill='%236ee7b7'/></svg>">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230b2530'/><polyline points='13,43 26,30 36,38 51,19' fill='none' stroke='%235eead4' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='51' cy='19' r='4.5' fill='%2338bdf8'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,25 +14,25 @@
   /* Stesso tema chiaro "da sviluppatore" del sito: un solo accento blu, Inter + JetBrains Mono. */
   :root {
     color-scheme: light;
-    --bg: #f6f8fb;
+    --bg: #e9f4f3;
     --panel: #ffffff;
-    --panel-2: #f8fafc;
+    --panel-2: #f3faf9;
     --field: #ffffff;
-    --sunken: #f1f5f9;
-    --line: rgba(15, 23, 42, .1);
-    --line-strong: rgba(15, 23, 42, .18);
-    --ink: #0f172a;
-    --text-2: #334155;
-    --muted: #64748b;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --accent-soft: rgba(37, 99, 235, .07);
-    --accent-line: rgba(37, 99, 235, .3);
+    --sunken: #eaf5f3;
+    --line: rgba(11, 37, 48, .1);
+    --line-strong: rgba(11, 37, 48, .18);
+    --ink: #0b2530;
+    --text-2: #2b4752;
+    --muted: #5a7480;
+    --accent: #0f766e;
+    --accent-hover: #115e59;
+    --accent-soft: rgba(15, 118, 110, .07);
+    --accent-line: rgba(15, 118, 110, .3);
     --green: #047857;
     --violet: #6d28d9;
     --amber: #b45309;
     --danger: #dc2626;
-    --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .05);
+    --shadow: 0 1px 2px rgba(11, 37, 48, .05), 0 8px 24px rgba(11, 37, 48, .05);
     --font: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
   }
@@ -43,8 +43,8 @@
     font-family: var(--font);
     color: var(--ink);
     background:
-      radial-gradient(ellipse 70% 40% at 60% -5%, rgba(37, 99, 235, .08), transparent 70%),
-      radial-gradient(rgba(15, 23, 42, .1) 1px, transparent 1px) 0 0 / 26px 26px,
+      radial-gradient(ellipse 70% 40% at 60% -5%, rgba(15, 118, 110, .08), transparent 70%),
+      radial-gradient(rgba(11, 37, 48, .1) 1px, transparent 1px) 0 0 / 26px 26px,
       var(--bg);
     background-attachment: fixed;
     line-height: 1.6;
@@ -80,20 +80,20 @@
     background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
     background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
   select option { background: var(--panel); color: var(--ink); }
-  .input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, .14); }
+  .input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15, 118, 110, .14); }
   .input:hover, select:hover { border-color: var(--accent-line); }
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 11px 16px; border-radius: 8px; border: 1px solid var(--line-strong);
     background: var(--panel); color: var(--ink); font-weight: 600; cursor: pointer;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+    box-shadow: 0 1px 2px rgba(11, 37, 48, .05);
     transition: border-color .2s, color .2s, background .2s, transform .15s; text-decoration: none;
   }
   .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
   .btn:active { transform: translateY(1px); }
   .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .btn.primary { background: var(--accent); border-color: transparent; color: #fff; padding: 13px 16px; font-size: 1rem; box-shadow: 0 1px 2px rgba(15, 23, 42, .1), 0 4px 12px rgba(37, 99, 235, .2); }
+  .btn.primary { background: var(--accent); border-color: transparent; color: #fff; padding: 13px 16px; font-size: 1rem; box-shadow: 0 1px 2px rgba(11, 37, 48, .1), 0 4px 12px rgba(15, 118, 110, .2); }
   .btn.primary:hover { background: var(--accent-hover); color: #fff; }
   .btn[disabled] { opacity: .55; cursor: progress; }
   .btn.small { width: auto; padding: 7px 13px; font-size: .84rem; }
@@ -125,7 +125,7 @@
   @keyframes pulse { 50% { opacity: .35; transform: scale(.7); } }
 
   .activity { height: 2px; border-radius: 2px; background: var(--line); position: relative; overflow: hidden; }
-  .activity.busy { background: rgba(37, 99, 235, .15); }
+  .activity.busy { background: rgba(15, 118, 110, .15); }
   .activity.busy::after {
     content: ""; position: absolute; top: 0; bottom: 0; width: 22%; left: -22%;
     background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: scan 1.4s linear infinite;
@@ -159,7 +159,7 @@
   .disclaimer { color: var(--muted); font-size: .8rem; margin: 0; }
 
   .skeleton { display: grid; gap: 12px; margin-top: 8px; }
-  .skeleton span { height: 14px; border-radius: 6px; background: linear-gradient(90deg, #eef2f7, #dbe6f6, #eef2f7); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+  .skeleton span { height: 14px; border-radius: 6px; background: linear-gradient(90deg, #e6f3f1, #dbe6f6, #e6f3f1); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
   .skeleton span:first-child { height: 24px; width: 70%; }
   .skeleton span:nth-child(3n) { width: 82%; }
   @keyframes shimmer { to { background-position: -200% 0; } }
@@ -168,9 +168,9 @@
   dialog {
     width: min(620px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border-radius: 14px; color: var(--ink);
     background: var(--panel); border: 1px solid var(--line);
-    box-shadow: 0 30px 80px rgba(15, 23, 42, .25);
+    box-shadow: 0 30px 80px rgba(11, 37, 48, .25);
   }
-  dialog::backdrop { background: rgba(15, 23, 42, .45); backdrop-filter: blur(4px); }
+  dialog::backdrop { background: rgba(11, 37, 48, .45); backdrop-filter: blur(4px); }
   .dlg-bar { height: 3px; background: var(--accent); }
   .dlg { padding: 22px 26px 22px; display: grid; gap: 12px; }
   .dlg h3 { margin: 0; font-size: 1.25rem; letter-spacing: -.02em; }
@@ -183,7 +183,7 @@
   .keywrap button:hover { color: var(--accent); }
   .dlg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
 
-  .toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; transition: .25s; background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 9px; font-size: .9rem; box-shadow: 0 12px 40px rgba(15, 23, 42, .3); pointer-events: none; z-index: 10; }
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; transition: .25s; background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 9px; font-size: .9rem; box-shadow: 0 12px 40px rgba(11, 37, 48, .3); pointer-events: none; z-index: 10; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   @media (max-width: 900px) {
@@ -203,7 +203,7 @@
 <div class="app">
   <aside class="side">
     <div class="brand">
-      <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#0f172a"/><polyline points="13,43 26,30 36,38 51,19" fill="none" stroke="#7dd3fc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="51" cy="19" r="4.5" fill="#6ee7b7"/></svg>
+      <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#0b2530"/><polyline points="13,43 26,30 36,38 51,19" fill="none" stroke="#5eead4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="51" cy="19" r="4.5" fill="#38bdf8"/></svg>
       <div>
         <h1>Sintesi Mercati AI</h1>
         <p>Le notizie di mercato in sintesi</p>

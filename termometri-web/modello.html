@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Termometri SMA200 e POC per tutti i componenti dell'S&P 500, voto fondamentale da SEC EDGAR e spiegazioni con Gemini.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23e11d48'/><stop offset='.5' stop-color='%23f59e0b'/><stop offset='1' stop-color='%2310b981'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='%230f172a'/><rect x='24' y='6' width='16' height='52' rx='8' fill='url(%23g)'/><rect x='18' y='30' width='28' height='4' rx='2' fill='white'/></svg>">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23e11d48'/><stop offset='.5' stop-color='%23f59e0b'/><stop offset='1' stop-color='%2310b981'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='%230b2530'/><rect x='24' y='6' width='16' height='52' rx='8' fill='url(%23g)'/><rect x='18' y='30' width='28' height='4' rx='2' fill='white'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,13 +14,13 @@
   /* Stesso tema chiaro "da sviluppatore" del sito: un solo accento blu, Inter + JetBrains Mono. */
   :root {
     color-scheme: light;
-    --app-bg: #f6f8fb; --header-bg: #ffffff; --header-fg: #0f172a; --header-sub: #64748b;
-    --card-bg: #ffffff; --card-bg-2: #f8fafc; --card-border: rgba(15, 23, 42, .1); --text: #0f172a; --muted: #64748b;
-    --accent: #2563eb; --accent-hover: #1d4ed8; --accent-soft: rgba(37, 99, 235, .07); --accent-line: rgba(37, 99, 235, .3);
+    --app-bg: #e9f4f3; --header-bg: #ffffff; --header-fg: #0b2530; --header-sub: #5a7480;
+    --card-bg: #ffffff; --card-bg-2: #f3faf9; --card-border: rgba(11, 37, 48, .1); --text: #0b2530; --muted: #5a7480;
+    --accent: #0f766e; --accent-hover: #115e59; --accent-soft: rgba(15, 118, 110, .07); --accent-line: rgba(15, 118, 110, .3);
     --good: #059669; --bad: #e11d48;
-    --line: rgba(15, 23, 42, .1); --line-strong: rgba(15, 23, 42, .18);
-    --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .05);
-    --strip: linear-gradient(90deg, #2563eb, #0891b2, #059669);
+    --line: rgba(11, 37, 48, .1); --line-strong: rgba(11, 37, 48, .18);
+    --shadow: 0 1px 2px rgba(11, 37, 48, .05), 0 8px 24px rgba(11, 37, 48, .05);
+    --strip: linear-gradient(90deg, #0f766e, #0891b2, #059669);
     --font: "Inter", "Segoe UI", system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
   }
@@ -31,8 +31,8 @@
   body {
     min-height: 100vh;
     background:
-      radial-gradient(ellipse 70% 40% at 50% -5%, rgba(37, 99, 235, .08), transparent 70%),
-      radial-gradient(rgba(15, 23, 42, .1) 1px, transparent 1px) 0 0 / 26px 26px,
+      radial-gradient(ellipse 70% 40% at 50% -5%, rgba(15, 118, 110, .08), transparent 70%),
+      radial-gradient(rgba(11, 37, 48, .1) 1px, transparent 1px) 0 0 / 26px 26px,
       var(--app-bg);
     background-attachment: fixed;
   }
@@ -49,18 +49,18 @@
   .back:hover { color: var(--accent); }
   .search { flex: 1 1 280px; min-width: 240px; display: flex; align-items: center; background: #fff;
     border: 1px solid var(--line-strong); border-radius: 9px; padding: 3px; transition: border-color .2s, box-shadow .2s; }
-  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, .14); }
+  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15, 118, 110, .14); }
   .search .ico { color: var(--muted); padding: 0 4px 0 10px; font-size: 15px; }
   .search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; padding: 8px 6px; font-size: 15px; color: var(--text); }
   .search input::placeholder { color: #94a3b8; }
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .btn { border: 1px solid var(--line-strong); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13.5px; padding: 10px 16px; white-space: nowrap;
-    background: #fff; color: var(--text); box-shadow: 0 1px 2px rgba(15, 23, 42, .05); transition: background .15s, color .15s, border-color .15s; }
+    background: #fff; color: var(--text); box-shadow: 0 1px 2px rgba(11, 37, 48, .05); transition: background .15s, color .15s, border-color .15s; }
   .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
   .btn:disabled { cursor: default; opacity: .55; }
   .btn.accent { background: var(--accent); border-color: transparent; color: #fff; } .btn.accent:hover { background: var(--accent-hover); color: #fff; }
-  .btn.accent:disabled { background: #93b4f5; color: #fff; opacity: 1; }
-  .btn.magenta { background: #0f172a; border-color: transparent; color: #fff; } .btn.magenta:hover { background: #1e293b; color: #fff; }
+  .btn.accent:disabled { background: #8cc9c2; color: #fff; opacity: 1; }
+  .btn.magenta { background: #0b2530; border-color: transparent; color: #fff; } .btn.magenta:hover { background: #1e293b; color: #fff; }
   .btn.magenta:disabled { background: #94a3b8; color: #fff; opacity: 1; }
   .btn.search-btn { background: var(--accent); border-color: transparent; color: #fff; padding: 8px 14px; box-shadow: none; } .btn.search-btn:hover { background: var(--accent-hover); color: #fff; }
   .btn.small { padding: 10px 13px; min-width: 44px; }
@@ -87,17 +87,17 @@
   .empty { text-align: center; color: var(--muted); font-size: 16px; padding: 20px; white-space: pre-line; }
   .tile { position: relative; border-radius: 12px; cursor: pointer; content-visibility: auto; contain-intrinsic-size: 196px 214px;
     background: var(--card-bg); border: 1px solid var(--gl-border);
-    box-shadow: 0 0 0 1px var(--gl-1), 0 1px 2px rgba(15, 23, 42, .05), 0 8px 20px rgba(15, 23, 42, .06); transition: transform .12s, box-shadow .12s; }
-  .tile:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px var(--gl-2), 0 12px 28px rgba(15, 23, 42, .1); }
+    box-shadow: 0 0 0 1px var(--gl-1), 0 1px 2px rgba(11, 37, 48, .05), 0 8px 20px rgba(11, 37, 48, .06); transition: transform .12s, box-shadow .12s; }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px var(--gl-2), 0 12px 28px rgba(11, 37, 48, .1); }
   .tile svg { display: block; width: 100%; height: auto; }
   svg text { font-family: var(--font); }
   svg .help { cursor: pointer; }
 
   /* ---------- finestre ---------- */
-  .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, .45); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px;
+  .overlay { position: fixed; inset: 0; background: rgba(11, 37, 48, .45); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px;
     overscroll-behavior: contain; }
   body:has(.overlay) { overflow: hidden; }
-  .win { position: relative; background: var(--app-bg); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(15, 23, 42, .25);
+  .win { position: relative; background: var(--app-bg); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(11, 37, 48, .25);
     max-width: 100%; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; }
   .win .close { position: absolute; top: 8px; right: 10px; z-index: 2; background: transparent; border: 0; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 6px; }
   .win .close:hover { color: var(--text); }
@@ -107,17 +107,17 @@
   .card-win { width: 500px; background: var(--card-bg); padding: 18px 20px 20px; }
   .card-win h3 { margin: 0 30px 6px 0; font-size: 18px; letter-spacing: -.02em; }
   .card-win .sub { color: var(--muted); font-family: var(--mono); font-size: 11.5px; margin-bottom: 12px; }
-  .card-win .txt { font-size: 15px; white-space: pre-wrap; line-height: 1.5; overflow-wrap: anywhere; color: #334155;
+  .card-win .txt { font-size: 15px; white-space: pre-wrap; line-height: 1.5; overflow-wrap: anywhere; color: #2b4752;
     /* testi lunghi (spiegazioni Gemini): scorrono dentro la finestra, titolo e ✕ restano fermi */
     flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 8px; margin-right: -8px;
-    scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+    scrollbar-width: thin; scrollbar-color: #bcd6d3 transparent; }
   .card-win .txt::-webkit-scrollbar { width: 6px; }
-  .card-win .txt::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .card-win .txt::-webkit-scrollbar-thumb { background: #bcd6d3; border-radius: 3px; }
   .card-win .txt.more { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 40px), transparent);
     mask-image: linear-gradient(180deg, #000 calc(100% - 40px), transparent); }
   .card-win .txt.muted { color: var(--muted); } .card-win .txt.bad { color: var(--bad); }
   .card-win input { width: 100%; background: #fff; color: var(--text); border: 1px solid var(--line-strong); border-radius: 8px; outline: 0; padding: 9px 10px; margin: 10px 0 4px; font-family: var(--mono); font-size: 14px; }
-  .card-win input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, .14); }
+  .card-win input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15, 118, 110, .14); }
   .card-win .foot { color: var(--muted); font-size: 12.5px; margin-top: 12px; }
   .card-win .btns { display: flex; justify-content: center; margin-top: 16px; }
   .search-win { width: 980px; height: calc(100vh - 32px); }
@@ -197,10 +197,10 @@
      (verde = sopra la media / voto alto, rosso = sotto / voto basso, ambra = SMA200, viola = POC;
      la linea del prezzo è scura con un alone chiaro, SHADOW, per staccarsi dal tubo colorato) */
   const C = {
-    APP_BG: '#f6f8fb', HEADER_BG: '#ffffff', HEADER_FG: '#0f172a', CARD_BG: '#ffffff', CARD_BG_2: '#f8fafc',
-    CARD_BORDER: '#e2e8f0', SHADOW: '#ffffff', TEXT: '#0f172a', MUTED: '#64748b', ACCENT: '#0284c7', MAGENTA: '#db2777',
-    VIOLET: '#7c3aed', PURPLE: '#9333ea', GOOD: '#059669', BAD: '#e11d48', TUBE_BORDER: '#cbd5e1',
-    MARK_HIGH: '#e11d48', MARK_LOW: '#059669', MARK_SMA: '#d97706', PRICE: '#0f172a',
+    APP_BG: '#e9f4f3', HEADER_BG: '#ffffff', HEADER_FG: '#0b2530', CARD_BG: '#ffffff', CARD_BG_2: '#f3faf9',
+    CARD_BORDER: '#d6e8e6', SHADOW: '#ffffff', TEXT: '#0b2530', MUTED: '#5a7480', ACCENT: '#0284c7', MAGENTA: '#db2777',
+    VIOLET: '#7c3aed', PURPLE: '#9333ea', GOOD: '#059669', BAD: '#e11d48', TUBE_BORDER: '#bcd6d3',
+    MARK_HIGH: '#e11d48', MARK_LOW: '#059669', MARK_SMA: '#d97706', PRICE: '#0b2530',
   };
   const GRAD_RED = [244, 63, 94], GRAD_YELLOW = [251, 191, 36], GRAD_GREEN = [16, 185, 129];
   const hexRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
@@ -242,7 +242,7 @@
   }
   function neonStrip(x1, y1, x2, y2) {
     const id = 'st' + (++uid);
-    return `<defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="#2563eb"/><stop offset=".5" stop-color="#0891b2"/><stop offset="1" stop-color="#059669"/></linearGradient></defs><rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="url(#${id})"/>`;
+    return `<defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="#0f766e"/><stop offset=".5" stop-color="#0891b2"/><stop offset="1" stop-color="#059669"/></linearGradient></defs><rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="url(#${id})"/>`;
   }
   // Tubo del termometro: rosso in alto, giallo attorno alla media (SMA200), verde in basso.
   function tube(left, right, top, bottom, low, sma, high, price, bg, glowLayers, glowSpread, glowStrength) {
