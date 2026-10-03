@@ -341,7 +341,7 @@
   function wantsContacts() { return /^#\/?contatti/.test(location.hash); }
   function scrollToContacts() {
     const el = document.getElementById('contatti');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) el.scrollIntoView({ block: 'start' }); // morbido grazie a scroll-behavior nel CSS
   }
 
   /* =========================================================
