@@ -10,8 +10,18 @@
     settings: {
       siteName: 'Il mio sito',
       tagline: 'Programmi, giochi e contatti',
+      homeEyebrow: '',
       homeTitle: '',
       homeIntro: '',
+      homePoints: '',
+      painPoints: '',
+      steps: '',
+      ctaTitle: '',
+      ctaText: '',
+      aboutTitle: '',
+      aboutIntro: '',
+      aboutCta: '',
+      values: '',
       siteAbout: '',
       certsIntro: '',
       photo: '',
@@ -308,8 +318,9 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    if (r === 'info' || r === 'contatti') return 'home';
-    return ['home', 'programmi', 'trading', 'giochi', 'admin'].includes(r) ? r : 'home';
+    if (HOME_ANCHORS.includes(r) || r === 'info') return 'home';
+    if (r === 'chi-sono') return 'chisono';
+    return ['home', 'chisono', 'programmi', 'trading', 'giochi', 'admin'].includes(r) ? r : 'home';
   }
 
   function render() {
@@ -317,7 +328,7 @@
     insight.section(state.route);
     updateChrome();
     const views = {
-      home: renderHome, admin: renderAdmin,
+      home: renderHome, chisono: renderAbout, admin: renderAdmin,
       programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1]),
       giochi: () => renderPrograms(PROGRAM_SECTIONS[2])
     };
@@ -329,7 +340,7 @@
     const s = state.data.settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { home: s.tagline || 'Home', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { home: s.tagline || 'Home', chisono: 'Chi sono', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -345,12 +356,15 @@
     else if (prev !== state.route) window.scrollTo(0, 0);
   });
 
-  // #contatti apre la Home direttamente sui contatti (anche i vecchi link #info portano alla Home).
-  function wantsContacts() { return /^#\/?contatti/.test(location.hash); }
-  function scrollToContacts() {
-    const el = document.getElementById('contatti');
+  // #contatti e #attestati aprono la Home direttamente su quella parte (anche i vecchi link #info portano alla Home).
+  const HOME_ANCHORS = ['contatti', 'attestati'];
+  function homeAnchor() { const r = location.hash.replace(/^#\/?/, '').split('/')[0]; return HOME_ANCHORS.includes(r) ? r : ''; }
+  function wantsContacts() { return !!homeAnchor(); }
+  function scrollToId(id) {
+    const el = document.getElementById(id);
     if (el) el.scrollIntoView({ block: 'start' }); // morbido grazie a scroll-behavior nel CSS
   }
+  function scrollToContacts() { scrollToId(homeAnchor() || 'contatti'); }
 
   /* =========================================================
      Statistiche: raccolta anonima di visite e click
@@ -557,19 +571,74 @@
     programmi: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>',
     trading: '<path d="M3 20h18"/><path d="M5 16l5-5 3 3 6-7"/><path d="M15 7h4v4"/>',
     giochi: '<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="17.5" cy="13.5" r=".6"/>',
-    servizi: '<path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 5-4 14"/>'
+    servizi: '<path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 5-4 14"/>',
+    excel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/>',
+    doc: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/>',
+    db: '<ellipse cx="12" cy="5.5" rx="8" ry="2.5"/><path d="M4 5.5v13c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-13"/><path d="M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/>',
+    ai: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+    tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
+    arrow: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>'
   };
+  // Icone dei servizi, nell'ordine in cui compaiono (si ripetono se i servizi sono di più).
+  const SERVICE_ICONS = ['excel', 'doc', 'db', 'servizi', 'ai', 'tool'];
   const homeIcon = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${HOME_ICONS[k]}</svg>`;
   const lines = (text) => String(text || '').split('\n').map((x) => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+  // Righe "Titolo: descrizione" (la descrizione è facoltativa).
+  const pairs = (text) => lines(text).map((l) => {
+    const i = l.indexOf(':');
+    const text = i > 0 ? l.slice(i + 1).trim() : '';
+    return { title: i > 0 ? l.slice(0, i).trim() : l, text: text.charAt(0).toUpperCase() + text.slice(1) };
+  });
+  // Nei titoli le parole tra *asterischi* vengono evidenziate.
+  const hl = (text) => esc(text).replace(/\*([^*]+)\*/g, '<span class="hl">$1</span>');
+  const photoOf = (s) => safeImg(s.photo);
+
+  // Finto terminale della Home: mostra il genere di lavoro che un'automazione fa da sola.
+  function automationDemo() {
+    const steps = ['Lette 248 fatture PDF dalla cartella', 'Estratti importi, date e clienti', 'Aggiornato il foglio Excel "Contabilità"', 'Inviato il riepilogo via email'];
+    return `
+      <figure class="demo" aria-label="Esempio di automazione: 248 fatture elaborate in 41 secondi invece di circa 3 ore">
+        <div class="demo-frame"><div class="demo-win run" aria-hidden="true">
+          <div class="code-bar"><i></i><i></i><i></i><span>automazione_fatture.py</span><b class="demo-live">in esecuzione</b></div>
+          <div class="demo-body">
+            <div class="demo-cmd"><span class="tok-op">$</span> python automazione_fatture.py</div>
+            ${steps.map((t, i) => `<div class="demo-step" style="--i:${i}"><span class="demo-ok">✓</span>${esc(t)}</div>`).join('')}
+            <div class="demo-bar"><i></i></div>
+            <div class="demo-result">
+              <div><small>Con l'automazione</small><strong>41 secondi</strong></div>
+              <div><small>Prima, a mano</small><strong class="demo-old">circa 3 ore</strong></div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption>Un esempio del lavoro che un'automazione può fare al posto tuo.</figcaption>
+      </figure>`;
+  }
+
+  function ctaBand(title, text) {
+    const s = state.data.settings;
+    return `
+      <section class="cta-band">
+        <div>
+          <h2>${hl(title)}</h2>
+          ${text ? `<p>${esc(text)}</p>` : ''}
+        </div>
+        <div class="row">
+          <a class="btn light" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Banner: scrivimi">${ICONS.mail} Scrivimi</a>
+          ${s.whatsapp ? `<a class="btn outline-light" href="https://wa.me/${waNumber(s.whatsapp)}" target="_blank" rel="noopener">${ICONS.chat} WhatsApp</a>` : ''}
+        </div>
+      </section>`;
+  }
 
   function renderHome() {
     const s = state.data.settings;
-    const initials = (s.ownerName || s.siteName || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
-    const skills = lines(s.skills);
-    const services = lines(s.services);
+    const points = lines(s.homePoints);
+    const pains = lines(s.painPoints);
+    const services = pairs(s.services);
+    const steps = pairs(s.steps);
+    const photo = photoOf(s);
     const bySection = (sec) => state.data.programs.filter((p) => p.category === sec.value);
-    const nPrograms = state.data.programs.filter((p) => p.category !== 'giochi').length;
-    const nGames = bySection(PROGRAM_SECTIONS[2]).length;
     const areas = PROGRAM_SECTIONS.map((sec) => {
       const list = bySection(sec);
       const isGame = sec.value === 'giochi';
@@ -578,44 +647,128 @@
         more: list.length ? `${list.length} ${isGame ? (list.length === 1 ? 'gioco' : 'giochi') : (list.length === 1 ? 'programma' : 'programmi')} →` : 'Scopri di più →'
       };
     });
-    if (services.length) areas.push({ key: 'servizi', href: '#contatti', action: 'go-contacts', title: 'Servizi su misura', list: services, more: 'Parliamone →' });
 
     return `
       <section class="hero">
         <div class="hero-text">
-          <span class="hero-eyebrow">${s.ownerName ? `Ciao, sono ${esc(s.ownerName)}` : esc(s.siteName)}${s.city ? ` · ${esc(s.city)}` : ''}</span>
-          <h1>${esc(s.homeTitle || s.siteName)}</h1>
-          ${s.homeIntro ? `<p>${esc(s.homeIntro)}</p>` : ''}
+          <span class="hero-eyebrow">${esc(s.homeEyebrow || s.tagline || s.siteName)}</span>
+          <h1>${hl(s.homeTitle || s.siteName)}</h1>
+          ${s.homeIntro ? `<p class="hero-lead">${esc(s.homeIntro)}</p>` : ''}
           <div class="row">
-            <a class="btn" href="#programmi" data-track="home-link" data-label="Scopri i progetti">Scopri i progetti</a>
-            <a class="btn secondary" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Contattami">${ICONS.mail} Contattami</a>
+            <a class="btn big" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Raccontami il tuo problema">Raccontami il tuo problema ${homeIcon('arrow')}</a>
+            ${steps.length ? `<a class="btn secondary big" href="#metodo" data-action="scroll-to" data-target="metodo" data-track="home-link" data-label="Come funziona">Come funziona</a>` : ''}
           </div>
+          ${points.length ? `<ul class="hero-points">${points.map((p) => `<li>${homeIcon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
+          ${s.ownerName ? `
+          <a class="hero-me" href="#chisono" data-track="home-link" data-label="Scopri chi sono">
+            ${photo ? `<img src="${photo}" alt="">` : ''}
+            <span><strong>${esc(s.ownerName)}</strong><small>Chi c'è dietro queste automazioni? Scopri chi sono →</small></span>
+          </a>` : ''}
         </div>
-        ${safeImg(s.photo)
-          ? `<div class="hero-photo"><img src="${safeImg(s.photo)}" alt="${esc(s.ownerName || s.siteName)}"></div>`
-          : `<div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>`}
+        ${automationDemo()}
       </section>
 
+      ${pains.length ? `
       <section class="home-section">
-        <h2 class="section-title">Cosa faccio</h2>
+        <h2 class="section-title">Ti riconosci?</h2>
+        <p class="section-sub">Sono le attività che rubano più tempo in ufficio. E quasi sempre si possono automatizzare.</p>
+        <div class="pains">${pains.map((p) => `
+          <div class="pain"><span class="pain-ico">${homeIcon('clock')}</span><p>${esc(p)}</p></div>`).join('')}
+        </div>
+        <p class="pains-close">Se hai annuito almeno una volta, <strong>c'è qualcosa che posso automatizzare per te.</strong></p>
+      </section>` : ''}
+
+      ${services.length ? `
+      <section class="home-section">
+        <h2 class="section-title">Cosa posso fare per te</h2>
+        <p class="section-sub">Ogni soluzione è costruita su misura per il tuo modo di lavorare, con gli strumenti che usi già.</p>
+        <div class="services">${services.map((x, i) => `
+          <div class="service">
+            <span class="area-ico">${homeIcon(SERVICE_ICONS[i % SERVICE_ICONS.length])}</span>
+            <h3>${esc(x.title)}</h3>
+            ${x.text ? `<p>${esc(x.text)}</p>` : ''}
+          </div>`).join('')}
+        </div>
+      </section>` : ''}
+
+      ${steps.length ? `
+      <section class="home-section" id="metodo">
+        <h2 class="section-title">Come funziona</h2>
+        <p class="section-sub">Semplice e trasparente, dal primo messaggio alla soluzione funzionante.</p>
+        <ol class="steps">${steps.map((x, i) => `
+          <li class="step">
+            <span class="step-n">${String(i + 1).padStart(2, '0')}</span>
+            <h3>${esc(x.title)}</h3>
+            ${x.text ? `<p>${esc(x.text)}</p>` : ''}
+          </li>`).join('')}
+        </ol>
+      </section>` : ''}
+
+      <section class="home-section">
+        <h2 class="section-title">Cosa ho già costruito</h2>
+        <p class="section-sub">La prova concreta di quello che so fare: programmi completi che puoi provare subito, direttamente dal browser.</p>
         <div class="home-areas">${areas.map((a) => `
-          <a class="area-card" href="${a.href}" ${a.action ? `data-action="${a.action}"` : ''} data-track="home-link" data-label="${esc(a.title)}">
+          <a class="area-card" href="${a.href}" data-track="home-link" data-label="${esc(a.title)}">
             <span class="area-ico">${homeIcon(a.key)}</span>
             <h3>${esc(a.title)}</h3>
             ${a.text ? `<p>${esc(a.text)}</p>` : ''}
-            ${a.names && a.names.length ? `<span class="area-tags">${a.names.map((n) => `<span class="badge">${esc(n)}</span>`).join('')}</span>` : ''}
-            ${a.list ? `<ul class="features">${a.list.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+            ${a.names.length ? `<span class="area-tags">${a.names.map((n) => `<span class="badge">${esc(n)}</span>`).join('')}</span>` : ''}
             <span class="area-more">${a.more}</span>
           </a>`).join('')}
         </div>
       </section>
 
+      ${renderCertificates()}
+
+      ${ctaBand(s.ctaTitle || 'Hai un lavoro che ti ruba ore ogni settimana?', s.ctaText)}
+
+      ${renderContacts()}`;
+  }
+
+  /* ---------- Chi sono ---------- */
+
+  function renderAbout() {
+    const s = state.data.settings;
+    const photo = photoOf(s);
+    const initials = (s.ownerName || s.siteName || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+    const skills = lines(s.skills);
+    const values = pairs(s.values);
+    const story = String(s.about || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean); // il primo paragrafo fa da attacco
+    const nPrograms = state.data.programs.filter((p) => p.category !== 'giochi').length;
+    const nGames = state.data.programs.filter((p) => p.category === 'giochi').length;
+    const certs = state.data.certificates.filter((c) => c.title);
+    const hours = certs.reduce((a, c) => a + certHours(c), 0);
+    const facts = [
+      [nPrograms, nPrograms === 1 ? 'programma pubblicato' : 'programmi pubblicati'],
+      [nGames, nGames === 1 ? 'gioco nel browser' : 'giochi nel browser'],
+      certs.length ? [certs.length, certs.length === 1 ? 'corso certificato' : 'corsi certificati'] : null,
+      hours ? [hours.toLocaleString('it-IT', { maximumFractionDigits: 1 }), 'ore di formazione'] : null
+    ].filter(Boolean);
+
+    return `
+      <section class="about-hero">
+        ${photo
+          ? `<div class="hero-photo about-photo"><img src="${photo}" alt="${esc(s.ownerName || s.siteName)}"></div>`
+          : `<div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>`}
+        <div class="hero-text">
+          <span class="hero-eyebrow">Chi sono${s.city ? ` · ${esc(s.city)}` : ''}</span>
+          <h1>${hl(s.aboutTitle || (s.ownerName ? `Ciao, sono ${s.ownerName}` : 'Chi sono'))}</h1>
+          ${s.aboutIntro ? `<p class="hero-lead">${esc(s.aboutIntro)}</p>` : ''}
+          <div class="row">
+            <a class="btn big" href="#contatti" data-track="about-link" data-label="Contattami">${ICONS.mail} Contattami</a>
+            <a class="btn secondary big" href="#programmi" data-track="about-link" data-label="Guarda i miei progetti">Guarda i miei progetti</a>
+          </div>
+        </div>
+      </section>
+
       <section class="home-section">
-        <h2 class="section-title">Chi sono</h2>
+        <h2 class="section-title">La mia storia</h2>
         <div class="home-two">
-          <div class="card">
-            <h2>Il mio lavoro</h2>
-            ${s.about ? `<div class="text">${esc(s.about)}</div>` : '<p class="item-meta">Presentazione in arrivo.</p>'}
+          <div class="card about-story">
+            ${story.length ? `<p class="about-lead">${esc(story[0])}</p>${story.slice(1).map((x) => `<p>${esc(x)}</p>`).join('')}` : '<p class="item-meta">Presentazione in arrivo.</p>'}
+          </div>
+          <div class="about-side">
+            ${facts.length ? `<div class="home-facts about-facts">${facts.map(([n, l]) => `<div><strong>${esc(n)}</strong><span>${esc(l)}</span></div>`).join('')}</div>` : ''}
             ${skills.length ? `
             <div class="code-card">
               <div class="code-bar" aria-hidden="true"><i></i><i></i><i></i><span>competenze.py</span></div>
@@ -623,22 +776,30 @@
 ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
 ]</code></pre>
             </div>` : ''}
-          </div>
-          <div class="card">
-            <h2>Il sito</h2>
-            ${s.siteAbout ? `<div class="text">${esc(s.siteAbout)}</div>` : ''}
-            <div class="home-facts">
-              <div><strong>${nPrograms}</strong><span>${nPrograms === 1 ? 'programma' : 'programmi'}</span></div>
-              <div><strong>${nGames}</strong><span>${nGames === 1 ? 'gioco' : 'giochi'}</span></div>
-              <div><strong>Web</strong><span>niente da installare</span></div>
-            </div>
+            ${certs.length ? `<a class="about-certs" href="#attestati" data-track="about-link" data-label="Vedi gli attestati">Vedi gli attestati →</a>` : ''}
           </div>
         </div>
       </section>
 
-      ${renderCertificates()}
+      ${values.length ? `
+      <section class="home-section">
+        <h2 class="section-title">Come lavoro</h2>
+        <div class="services">${values.map((x) => `
+          <div class="service">
+            <span class="area-ico">${homeIcon('check')}</span>
+            <h3>${esc(x.title)}</h3>
+            ${x.text ? `<p>${esc(x.text)}</p>` : ''}
+          </div>`).join('')}
+        </div>
+      </section>` : ''}
 
-      ${renderContacts()}`;
+      ${s.siteAbout ? `
+      <section class="home-section">
+        <h2 class="section-title">Questo sito</h2>
+        <div class="card"><div class="text">${esc(s.siteAbout)}</div></div>
+      </section>` : ''}
+
+      ${ctaBand(s.aboutCta || 'Hai un problema da risolvere al computer? *Parliamone.*', s.ctaText)}`;
   }
 
   /* ---------- Formazione e attestati ---------- */
@@ -650,34 +811,21 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   }
   const hoursLabel = (h) => `${h.toLocaleString('it-IT', { maximumFractionDigits: 1 })} ${h === 1 ? 'ora' : 'ore'}`;
 
+  // Nella Home gli attestati si vedono solo come immagini (il titolo è già scritto sull'attestato).
   function renderCertificates() {
     const s = state.data.settings;
-    const list = state.data.certificates.filter((c) => c.title);
+    const list = state.data.certificates.filter((c) => c.title && safeImg(c.image));
     if (!list.length) return '';
     const total = list.reduce((a, c) => a + certHours(c), 0);
     return `
       <section class="home-section" id="attestati">
-        <h2 class="section-title">Formazione e attestati</h2>
+        <h2 class="section-title">Formazione certificata</h2>
         <p class="section-sub">${s.certsIntro ? esc(s.certsIntro) + ' ' : ''}<strong>${list.length} ${list.length === 1 ? 'corso completato' : 'corsi completati'}${total ? ` · ${hoursLabel(total)} di formazione` : ''}</strong></p>
-        <div class="certs">${list.map((c) => {
-          const img = safeImg(c.image);
-          const url = safeUrl(c.url);
-          const meta = [certDate(c), certHours(c) ? hoursLabel(certHours(c)) : ''].filter(Boolean).join(' · ');
-          return `
-          <article class="cert">
-            ${img ? `<button type="button" class="cert-shot" data-action="zoom-cert" data-id="${esc(c.id)}" aria-label="Ingrandisci l'attestato ${esc(c.title)}">
-              <img src="${img}" alt="Attestato: ${esc(c.title)}" loading="lazy">
-              <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
-            </button>` : ''}
-            <div class="cert-body">
-              ${c.tag ? `<span class="badge">${esc(c.tag)}</span>` : ''}
-              <h3>${esc(c.title)}</h3>
-              ${c.issuer || c.teacher ? `<p class="cert-issuer">${esc(c.issuer)}${c.issuer && c.teacher ? ' · ' : ''}${c.teacher ? 'docente ' + esc(c.teacher) : ''}</p>` : ''}
-              ${meta ? `<p class="cert-meta">${esc(meta)}</p>` : ''}
-              ${url ? `<a class="cert-verify" href="${esc(url)}" target="_blank" rel="noopener" data-track="cert-verify" data-label="${esc(c.title)}">Verifica l'attestato ↗</a>` : ''}
-            </div>
-          </article>`;
-        }).join('')}
+        <div class="certs">${list.map((c) => `
+          <button type="button" class="cert-shot" data-action="zoom-cert" data-id="${esc(c.id)}" aria-label="Ingrandisci l'attestato ${esc(c.title)}">
+            <img src="${safeImg(c.image)}" alt="Attestato: ${esc(c.title)}" loading="lazy">
+            <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
+          </button>`).join('')}
         </div>
       </section>`;
   }
@@ -705,7 +853,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     return `
       <section class="home-section" id="contatti">
         <h2 class="section-title">Contatti</h2>
-        <p class="section-sub">Per domande, proposte o per un lavoro su misura scrivimi pure: rispondo il prima possibile.</p>
+        <p class="section-sub">Raccontami in poche righe cosa ti fa perdere tempo o quale problema vuoi risolvere: ti rispondo il prima possibile.</p>
         <div class="${s.email ? 'info-grid' : ''}">
           ${s.email ? `
           <div class="card">
@@ -968,8 +1116,19 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
           ${field('tagline', 'Sottotitolo', s.tagline)}
         </div>
 
-        <div class="form-section">Pagina Home</div>
-        ${field('homeTitle', 'Titolo principale', s.homeTitle, { placeholder: 'La frase grande in cima alla Home' })}
+        <div class="form-section">Pagina Home (la pubblicità per le aziende)</div>
+        ${field('homeEyebrow', 'Riga sopra il titolo', s.homeEyebrow, { placeholder: 'Es. Automazioni su misura per aziende e professionisti' })}
+        ${field('homeTitle', 'Titolo principale', s.homeTitle, { placeholder: 'La frase grande in cima alla Home', hint: 'Le parole tra *asterischi* vengono evidenziate in colore.' })}
+        ${field('homeIntro', 'Presentazione breve', s.homeIntro, { textarea: true, rows: 3, hint: 'Compare sotto il titolo, in cima alla Home.' })}
+        ${field('homePoints', 'Punti di forza', s.homePoints, { textarea: true, rows: 3, hint: 'Uno per riga: brevi frasi con la spunta, sotto i pulsanti.' })}
+        ${field('painPoints', 'Ti riconosci? (i problemi del cliente)', s.painPoints, { textarea: true, rows: 5, hint: 'Uno per riga. Se lasci vuoto, la sezione non compare.' })}
+        ${field('services', 'Cosa posso fare per te', s.services, { textarea: true, rows: 6, hint: 'Uno per riga, nella forma "Titolo: descrizione". Se lasci vuoto, la sezione non compare.' })}
+        ${field('steps', 'Come funziona', s.steps, { textarea: true, rows: 3, hint: 'Un passaggio per riga, nella forma "Titolo: descrizione".' })}
+        ${field('certsIntro', 'Formazione certificata', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati (si gestiscono nella scheda Attestati).' })}
+        ${field('ctaTitle', 'Banner finale: titolo', s.ctaTitle, { placeholder: 'Hai un lavoro che ti ruba ore ogni settimana?', hint: 'Il riquadro scuro prima dei contatti. Le parole tra *asterischi* vengono evidenziate.' })}
+        ${field('ctaText', 'Banner finale: testo', s.ctaText, { textarea: true, rows: 2 })}
+
+        <div class="form-section">Pagina Chi sono</div>
         <div class="field">
           <span>La tua foto</span>
           <div class="row">
@@ -977,15 +1136,16 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
             <button type="button" class="btn secondary small" data-action="pick-home-photo">${safeImg(s.photo) ? 'Cambia foto' : 'Carica foto'}</button>
             ${safeImg(s.photo) ? '<button type="button" class="btn ghost small" data-action="remove-home-photo">Rimuovi</button>' : ''}
           </div>
-          <small>Compare in cima alla Home; senza foto si vedono le tue iniziali. Meglio una foto verticale. Si salva subito.</small>
+          <small>Compare grande nella pagina Chi sono e piccola nella Home; senza foto si vedono le tue iniziali. Meglio una foto verticale. Si salva subito.</small>
           <input type="file" id="homePhotoInput" accept="image/*" hidden>
         </div>
-        ${field('homeIntro', 'Presentazione breve', s.homeIntro, { textarea: true, rows: 3, hint: 'Compare sotto il titolo, in cima alla Home.' })}
-        ${field('about', 'Chi sono', s.about, { textarea: true, rows: 6, placeholder: 'Qualche riga su di te, cosa fai, di cosa ti occupi…' })}
-        ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono sotto "Chi sono", scritte come un piccolo file di codice.' })}
-        ${field('services', 'Servizi su misura', s.services, { textarea: true, rows: 3, hint: 'Uno per riga. Se lasci vuoto, il riquadro "Servizi su misura" non compare.' })}
-        ${field('siteAbout', 'Il sito', s.siteAbout, { textarea: true, rows: 3, hint: 'Cosa si trova nel sito e come si usa.' })}
-        ${field('certsIntro', 'Formazione e attestati', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati (si gestiscono nella scheda Attestati).' })}
+        ${field('aboutTitle', 'Titolo', s.aboutTitle, { placeholder: 'Ciao, sono…', hint: 'Le parole tra *asterischi* vengono evidenziate in colore.' })}
+        ${field('aboutIntro', 'Presentazione breve', s.aboutIntro, { textarea: true, rows: 3, hint: 'Compare sotto il titolo, accanto alla foto.' })}
+        ${field('about', 'La mia storia', s.about, { textarea: true, rows: 8, placeholder: 'Qualche riga su di te, cosa fai, di cosa ti occupi…' })}
+        ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono scritte come un piccolo file di codice.' })}
+        ${field('values', 'Come lavoro', s.values, { textarea: true, rows: 3, hint: 'Uno per riga, nella forma "Titolo: descrizione". Se lasci vuoto, la sezione non compare.' })}
+        ${field('siteAbout', 'Questo sito', s.siteAbout, { textarea: true, rows: 3, hint: 'Cosa si trova nel sito e come si usa.' })}
+        ${field('aboutCta', 'Banner finale: titolo', s.aboutCta, { placeholder: 'Hai un problema da risolvere al computer? *Parliamone.*' })}
 
         <div class="form-section">Testi delle schede</div>
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
@@ -1040,14 +1200,14 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   /* ---------- Insight (statistiche del sito) ---------- */
 
   const INSIGHT_PERIODS = [[1, 'Oggi'], [7, '7 giorni'], [30, '30 giorni'], [90, '3 mesi'], [365, '12 mesi']];
-  const SECTION_NAMES = { home: 'Home', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
+  const SECTION_NAMES = { home: 'Home', chisono: 'Chi sono', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
   const CLICK_NAMES = {
     'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
     'zoom-image': 'Immagini dei programmi ingrandite', 'ask-info': 'Richieste di informazioni',
     'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo', 'external-link': 'Link esterni aperti',
-    'home-link': 'Clic sui riquadri della Home', 'zoom-cert': 'Attestati ingranditi', 'cert-verify': 'Attestati verificati'
+    'home-link': 'Clic sui riquadri della Home', 'about-link': 'Clic nella pagina Chi sono', 'zoom-cert': 'Attestati ingranditi', 'cert-verify': 'Attestati verificati'
   };
-  const LABEL_GROUPS = ['open-program', 'play-game', 'home-link', 'zoom-cert', 'cert-verify', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
+  const LABEL_GROUPS = ['open-program', 'play-game', 'home-link', 'about-link', 'zoom-cert', 'cert-verify', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
   const WEEKDAYS = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
   const nf = new Intl.NumberFormat('it-IT');
   const fmt = (n) => nf.format(Math.round(Number(n) || 0));
@@ -1596,7 +1756,8 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     'sync-now': (el) => syncNow(el),
     'insight-days': (el) => { state.insight.days = Number(el.dataset.days); state.insight.data = null; state.insight.error = ''; render(); },
     'insight-reload': () => loadInsight(true),
-    'go-contacts': (el, e) => { e.preventDefault(); if (state.route === 'home') scrollToContacts(); else location.hash = '#contatti'; },
+    'go-contacts': (el, e) => { e.preventDefault(); if (state.route === 'home') scrollToId('contatti'); else location.hash = '#contatti'; },
+    'scroll-to': (el, e) => { e.preventDefault(); scrollToId(el.dataset.target); },
     'import': () => document.getElementById('importInput').click(),
     'discard': async () => {
       if (!confirm('Tornare alla versione pubblicata? Le modifiche non pubblicate andranno perse.')) return;
@@ -1701,6 +1862,22 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   function afterRender() {
     loadSyncStatus();
     watchInsight();
+    loopDemo();
+  }
+
+  // Il finto terminale della Home riparte da capo ogni tanto, per farsi notare.
+  let demoTimer = null;
+  function loopDemo() {
+    clearInterval(demoTimer);
+    if (!document.querySelector('.demo-win')) return;
+    demoTimer = setInterval(() => {
+      const w = document.querySelector('.demo-win');
+      if (!w) { clearInterval(demoTimer); return; }
+      if (document.hidden) return;
+      w.classList.remove('run');
+      void w.offsetWidth; // fa ripartire le animazioni CSS
+      w.classList.add('run');
+    }, 11000);
   }
 
   /* =========================================================
