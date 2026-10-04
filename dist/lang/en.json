@@ -100,7 +100,9 @@
   "contactsEmpty": "Contact details coming soon.",
   "formNeedMessage": "Please write a message",
   "mailSubject": "Message from the website",
-  "mailOpening": "Opening your email app"
+  "mailOpening": "Opening your email app",
+  "navTools": "Tools",
+  "sec_strumenti": "Useful tools"
  },
  "settings": {
   "tagline": "Custom automations and software",
@@ -124,7 +126,8 @@
   "programsIntro": "Apps for learning while having fun: programming, English and more. They run directly in the browser, on a phone too.",
   "tradingIntro": "Apps for investors and traders: official data, market analysis and artificial intelligence. They run directly in the browser, on a phone too.",
   "gamesIntro": "Games to play directly in the browser, on a phone too: nothing to download or install.",
-  "city": "Udine, Italy"
+  "city": "Udine, Italy",
+  "toolsIntro": "Practical tools for everyday work, used directly in the browser, on a phone too: nothing to install and no files uploaded to the internet."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -195,6 +198,15 @@
    "features": "Against the computer: 5 levels, hints and undo\nTwo players on the same device\nComplete Italian rules: compulsory capture, priorities, men cannot capture kings\nSaved game: close it and pick it up again later\nWin statistics for each level",
    "trialLabel": "Play now",
    "requirements": "Free, no sign-up and nothing to download: it runs in the browser, on a phone too."
+  },
+  "convertitore01": {
+   "tagline": "Convert images, PDFs, Excel and audio in one click, without uploading anything!",
+   "platform": "Browser, PC and phone",
+   "description": "A complete file converter that runs directly in your browser. Drop in your files and choose the format: images become JPG, PNG, WebP or a single PDF; PDFs turn into images or text, or get merged or split page by page; Excel sheets go to CSV, JSON or ODS and back; audio becomes MP3 or WAV, even when extracted from a video. Everything happens on your device: your files are never uploaded to a server, so you can use it with confidential documents too.",
+   "features": "JPG, PNG, WebP, GIF, BMP, SVG and AVIF images → JPG, PNG, WebP or PDF\nSeveral images in a single PDF, in the order you choose\nPDF → JPG or PNG images or text; merge several PDFs or split them into one page per file\nExcel, ODS, CSV and JSON in every direction, respecting the European decimal comma\nAudio and video → MP3 or WAV, stereo or mono\nAdjustable quality, size and resolution\nSeveral files at once and everything downloadable in a single ZIP\nPrivate: your files never leave your device\nAvailable in 6 languages",
+   "trialLabel": "Try it free!",
+   "trialInfo": "Free, with no sign-up and no limits: use it directly in the browser, on a phone too.",
+   "requirements": "An up-to-date browser (Chrome, Edge, Firefox or Safari). With very large files, your device's power matters."
   }
  },
  "certificates": {
@@ -232,6 +244,7 @@
   "settings.aboutCta": "fde282fe2a5f",
   "settings.programsIntro": "acdc38ce63ac",
   "settings.tradingIntro": "77a38acf63a4",
+  "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -282,6 +295,13 @@
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
+  "programs.convertitore01.tagline": "9ea979731580",
+  "programs.convertitore01.platform": "103c74273687",
+  "programs.convertitore01.description": "288cb5a775b0",
+  "programs.convertitore01.features": "a766b9e0f0a5",
+  "programs.convertitore01.trialLabel": "a61de77fbe80",
+  "programs.convertitore01.trialInfo": "cf4c9d9d513d",
+  "programs.convertitore01.requirements": "2cebca929df6",
   "certificates.cert-python.title": "f2371e6336df",
   "certificates.cert-sql.title": "cdf7421b4ea6",
   "certificates.cert-vba.title": "c70bf21af748",

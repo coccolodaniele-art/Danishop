@@ -100,7 +100,9 @@
   "contactsEmpty": "Datos de contacto próximamente.",
   "formNeedMessage": "Escribe un mensaje",
   "mailSubject": "Mensaje desde el sitio web",
-  "mailOpening": "Se está abriendo tu programa de correo"
+  "mailOpening": "Se está abriendo tu programa de correo",
+  "navTools": "Herramientas",
+  "sec_strumenti": "Herramientas útiles"
  },
  "settings": {
   "tagline": "Automatizaciones y software a medida",
@@ -124,7 +126,8 @@
   "programsIntro": "Programas para aprender divirtiéndose: programación, inglés y mucho más. Se usan directamente en el navegador, también en el móvil.",
   "tradingIntro": "Programas para quien invierte y hace trading: datos oficiales, análisis de los mercados e inteligencia artificial. Se usan directamente en el navegador, también en el móvil.",
   "gamesIntro": "Juegos para jugar directamente en el navegador, también en el móvil: nada que descargar ni instalar.",
-  "city": "Udine, Italia"
+  "city": "Udine, Italia",
+  "toolsIntro": "Herramientas prácticas para el trabajo diario, para usar directamente en el navegador, también en el móvil: nada que instalar y ningún archivo subido a internet."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -195,6 +198,15 @@
    "features": "Contra el ordenador: 5 niveles, pistas y deshacer jugada\nDos jugadores en el mismo dispositivo\nReglas italianas completas: captura obligatoria, prioridades, los peones no capturan a las damas\nPartida guardada: puedes cerrar y seguir más tarde\nEstadísticas de victorias para cada nivel",
    "trialLabel": "Jugar ahora",
    "requirements": "Gratis, sin registro y sin descargar nada: funciona en el navegador, también en el móvil."
+  },
+  "convertitore01": {
+   "tagline": "¡Convierte imágenes, PDF, Excel y audio con un clic, sin subir nada a internet!",
+   "platform": "Navegador, PC y móvil",
+   "description": "Un conversor de archivos completo que funciona directamente en el navegador. Arrastra tus archivos y elige el formato: las imágenes se convierten en JPG, PNG, WebP o en un único PDF; los PDF se transforman en imágenes o en texto, se unen o se dividen página a página; las hojas de Excel pasan a CSV, JSON u ODS y viceversa; el audio se convierte en MP3 o WAV, incluso extrayéndolo de un vídeo. Todo ocurre en tu dispositivo: los archivos nunca se suben a un servidor, así que puedes usarlo también con documentos confidenciales.",
+   "features": "Imágenes JPG, PNG, WebP, GIF, BMP, SVG y AVIF → JPG, PNG, WebP o PDF\nVarias imágenes en un único PDF, en el orden que elijas\nPDF → imágenes JPG o PNG o texto; une varios PDF o divídelos en una página por archivo\nExcel, ODS, CSV y JSON en todas las direcciones, respetando la coma decimal europea\nAudio y vídeo → MP3 o WAV, en estéreo o mono\nCalidad, tamaño y resolución ajustables\nVarios archivos a la vez y descarga de todo en un único ZIP\nPrivado: los archivos nunca salen de tu dispositivo\nDisponible en 6 idiomas",
+   "trialLabel": "¡Pruébalo gratis!",
+   "trialInfo": "Gratis, sin registro y sin límites: se usa directamente en el navegador, también en el móvil.",
+   "requirements": "Un navegador actualizado (Chrome, Edge, Firefox o Safari). Con archivos muy grandes cuenta la potencia del dispositivo."
   }
  },
  "certificates": {
@@ -232,6 +244,7 @@
   "settings.aboutCta": "fde282fe2a5f",
   "settings.programsIntro": "acdc38ce63ac",
   "settings.tradingIntro": "77a38acf63a4",
+  "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -282,6 +295,13 @@
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
+  "programs.convertitore01.tagline": "9ea979731580",
+  "programs.convertitore01.platform": "103c74273687",
+  "programs.convertitore01.description": "288cb5a775b0",
+  "programs.convertitore01.features": "a766b9e0f0a5",
+  "programs.convertitore01.trialLabel": "a61de77fbe80",
+  "programs.convertitore01.trialInfo": "cf4c9d9d513d",
+  "programs.convertitore01.requirements": "2cebca929df6",
   "certificates.cert-python.title": "f2371e6336df",
   "certificates.cert-sql.title": "cdf7421b4ea6",
   "certificates.cert-vba.title": "c70bf21af748",

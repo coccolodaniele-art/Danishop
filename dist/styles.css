@@ -821,10 +821,8 @@ input[type="checkbox"] { accent-color: var(--accent); }
 @media (max-width: 600px) {
   /* Su telefono le schede diventano una griglia ordinata 2 x 2 di caselle uguali, con icona */
   .topbar { position: relative; padding-top: 12px; padding-bottom: 12px; gap: 12px; }
-  /* 5 schede: Home e Chi sono sopra (larghe), le altre tre sotto */
-  .nav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
-  .nav a { grid-column: span 2; }
-  .nav a:nth-child(-n+2) { grid-column: span 3; }
+  /* 6 schede: una griglia ordinata 3 x 2 */
+  .nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .nav a {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
     min-height: 58px; padding: 8px 4px;

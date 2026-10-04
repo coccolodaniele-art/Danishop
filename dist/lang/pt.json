@@ -100,7 +100,9 @@
   "contactsEmpty": "Dados de contato em breve.",
   "formNeedMessage": "Escreva uma mensagem",
   "mailSubject": "Mensagem enviada pelo site",
-  "mailOpening": "Abrindo o seu programa de e-mail"
+  "mailOpening": "Abrindo o seu programa de e-mail",
+  "navTools": "Ferramentas",
+  "sec_strumenti": "Ferramentas úteis"
  },
  "settings": {
   "tagline": "Automações e software sob medida",
@@ -124,7 +126,8 @@
   "programsIntro": "Programas para aprender se divertindo: programação, inglês e muito mais. Funcionam direto no navegador, também no celular.",
   "tradingIntro": "Programas para quem investe e faz trading: dados oficiais, análise de mercado e inteligência artificial. Funcionam direto no navegador, também no celular.",
   "gamesIntro": "Jogos para jogar direto no navegador, também no celular: nada para baixar ou instalar.",
-  "city": "Udine, Itália"
+  "city": "Udine, Itália",
+  "toolsIntro": "Ferramentas práticas para o trabalho do dia a dia, para usar direto no navegador, também no celular: nada para instalar e nenhum arquivo enviado para a internet."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -195,6 +198,15 @@
    "features": "Contra o computador: 5 níveis, dicas e desfazer jogada\nDois jogadores no mesmo dispositivo\nRegras italianas completas: captura obrigatória, prioridades, as pedras não capturam as damas\nPartida salva: você pode fechar e continuar depois\nEstatísticas de vitórias para cada nível",
    "trialLabel": "Jogar agora",
    "requirements": "Grátis, sem cadastro e sem baixar nada: funciona no navegador, também no celular."
+  },
+  "convertitore01": {
+   "tagline": "Converta imagens, PDFs, Excel e áudio com um clique, sem enviar nada para a internet!",
+   "platform": "Navegador, PC e celular",
+   "description": "Um conversor de arquivos completo que funciona direto no navegador. Arraste seus arquivos e escolha o formato: as imagens viram JPG, PNG, WebP ou um único PDF; os PDFs se transformam em imagens ou em texto, podem ser unidos ou divididos página por página; as planilhas do Excel viram CSV, JSON ou ODS e vice-versa; o áudio vira MP3 ou WAV, inclusive extraído de um vídeo. Tudo acontece no seu dispositivo: os arquivos nunca são enviados a um servidor, então você pode usar até com documentos confidenciais.",
+   "features": "Imagens JPG, PNG, WebP, GIF, BMP, SVG e AVIF → JPG, PNG, WebP ou PDF\nVárias imagens em um único PDF, na ordem que você escolher\nPDF → imagens JPG ou PNG ou texto; junte vários PDFs ou divida em uma página por arquivo\nExcel, ODS, CSV e JSON em todas as direções, respeitando a vírgula decimal\nÁudio e vídeo → MP3 ou WAV, em estéreo ou mono\nQualidade, tamanho e resolução ajustáveis\nVários arquivos de uma vez e download de tudo em um único ZIP\nPrivado: os arquivos nunca saem do seu dispositivo\nDisponível em 6 idiomas",
+   "trialLabel": "Experimente grátis!",
+   "trialInfo": "Grátis, sem cadastro e sem limites: funciona direto no navegador, também no celular.",
+   "requirements": "Um navegador atualizado (Chrome, Edge, Firefox ou Safari). Com arquivos muito grandes, conta a potência do dispositivo."
   }
  },
  "certificates": {
@@ -232,6 +244,7 @@
   "settings.aboutCta": "fde282fe2a5f",
   "settings.programsIntro": "acdc38ce63ac",
   "settings.tradingIntro": "77a38acf63a4",
+  "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -282,6 +295,13 @@
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
+  "programs.convertitore01.tagline": "9ea979731580",
+  "programs.convertitore01.platform": "103c74273687",
+  "programs.convertitore01.description": "288cb5a775b0",
+  "programs.convertitore01.features": "a766b9e0f0a5",
+  "programs.convertitore01.trialLabel": "a61de77fbe80",
+  "programs.convertitore01.trialInfo": "cf4c9d9d513d",
+  "programs.convertitore01.requirements": "2cebca929df6",
   "certificates.cert-python.title": "f2371e6336df",
   "certificates.cert-sql.title": "cdf7421b4ea6",
   "certificates.cert-vba.title": "c70bf21af748",

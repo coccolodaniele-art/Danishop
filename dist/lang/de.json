@@ -100,7 +100,9 @@
   "contactsEmpty": "Kontaktdaten folgen in Kürze.",
   "formNeedMessage": "Bitte schreiben Sie eine Nachricht",
   "mailSubject": "Nachricht über die Website",
-  "mailOpening": "Ihr E-Mail-Programm wird geöffnet"
+  "mailOpening": "Ihr E-Mail-Programm wird geöffnet",
+  "navTools": "Werkzeuge",
+  "sec_strumenti": "Nützliche Werkzeuge"
  },
  "settings": {
   "tagline": "Maßgeschneiderte Automatisierungen und Software",
@@ -124,7 +126,8 @@
   "programsIntro": "Programme, mit denen Lernen Spaß macht: Programmierung, Englisch und mehr. Sie laufen direkt im Browser, auch auf dem Smartphone.",
   "tradingIntro": "Programme für Anleger und Trader: offizielle Daten, Marktanalyse und künstliche Intelligenz. Sie laufen direkt im Browser, auch auf dem Smartphone.",
   "gamesIntro": "Spiele direkt im Browser, auch auf dem Smartphone: nichts herunterzuladen oder zu installieren.",
-  "city": "Udine, Italien"
+  "city": "Udine, Italien",
+  "toolsIntro": "Praktische Werkzeuge für den Arbeitsalltag – direkt im Browser nutzbar, auch auf dem Smartphone: keine Installation und keine Dateien, die ins Internet hochgeladen werden."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -195,6 +198,15 @@
    "features": "Gegen den Computer: 5 Stufen, Tipps und Zugrücknahme\nZwei Spieler am selben Gerät\nVollständige italienische Regeln: Schlagzwang, Vorrangregeln, einfache Steine schlagen keine Damen\nGespeicherte Partie: Sie können das Spiel schließen und später weiterspielen\nSiegstatistiken für jede Stufe",
    "trialLabel": "Jetzt spielen",
    "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone."
+  },
+  "convertitore01": {
+   "tagline": "Bilder, PDFs, Excel und Audio mit einem Klick konvertieren – ohne etwas hochzuladen!",
+   "platform": "Browser, PC und Smartphone",
+   "description": "Ein vollständiger Dateikonverter, der direkt im Browser läuft. Ziehen Sie Ihre Dateien hinein und wählen Sie das Format: Bilder werden zu JPG, PNG, WebP oder zu einer einzigen PDF; PDFs werden zu Bildern oder Text, lassen sich zusammenführen oder Seite für Seite aufteilen; Excel-Tabellen werden zu CSV, JSON oder ODS und umgekehrt; Audio wird zu MP3 oder WAV – auch direkt aus einem Video extrahiert. Alles geschieht auf Ihrem Gerät: Die Dateien werden nie auf einen Server hochgeladen, sodass Sie den Konverter auch für vertrauliche Dokumente nutzen können.",
+   "features": "Bilder in JPG, PNG, WebP, GIF, BMP, SVG und AVIF → JPG, PNG, WebP oder PDF\nMehrere Bilder in einer PDF, in der von Ihnen gewählten Reihenfolge\nPDF → JPG- oder PNG-Bilder oder Text; mehrere PDFs zusammenführen oder in Einzelseiten aufteilen\nExcel, ODS, CSV und JSON in alle Richtungen, mit korrektem europäischem Dezimalkomma\nAudio und Video → MP3 oder WAV, in Stereo oder Mono\nQualität, Größe und Auflösung einstellbar\nMehrere Dateien gleichzeitig und alles in einer ZIP-Datei herunterladen\nPrivat: Ihre Dateien verlassen nie Ihr Gerät\nIn 6 Sprachen verfügbar",
+   "trialLabel": "Kostenlos testen!",
+   "trialInfo": "Kostenlos, ohne Anmeldung und ohne Begrenzung: direkt im Browser nutzbar, auch auf dem Smartphone.",
+   "requirements": "Ein aktueller Browser (Chrome, Edge, Firefox oder Safari). Bei sehr großen Dateien kommt es auf die Leistung des Geräts an."
   }
  },
  "certificates": {
@@ -232,6 +244,7 @@
   "settings.aboutCta": "fde282fe2a5f",
   "settings.programsIntro": "acdc38ce63ac",
   "settings.tradingIntro": "77a38acf63a4",
+  "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -282,6 +295,13 @@
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
+  "programs.convertitore01.tagline": "9ea979731580",
+  "programs.convertitore01.platform": "103c74273687",
+  "programs.convertitore01.description": "288cb5a775b0",
+  "programs.convertitore01.features": "a766b9e0f0a5",
+  "programs.convertitore01.trialLabel": "a61de77fbe80",
+  "programs.convertitore01.trialInfo": "cf4c9d9d513d",
+  "programs.convertitore01.requirements": "2cebca929df6",
   "certificates.cert-python.title": "f2371e6336df",
   "certificates.cert-sql.title": "cdf7421b4ea6",
   "certificates.cert-vba.title": "c70bf21af748",

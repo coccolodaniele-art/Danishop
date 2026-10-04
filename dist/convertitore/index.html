@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convertitore di file — immagini, PDF, Excel e audio</title>
+<meta name="description" content="Converti immagini, PDF, fogli Excel e audio direttamente nel browser. I file non lasciano mai il tuo dispositivo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230b2530'/%3E%3Cstop offset='1' stop-color='%2312384a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M18 26h24l-6-6M46 38H22l6 6' fill='none' stroke='%235eead4' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#e3f3f0">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  /* Tema del sito (Coccolo Digital): fondo acqua, un accento verde petrolio, dettagli blu-petrolio scuro. */
+  :root {
+    --panel: #ffffff;
+    --sunken: #f1f8f7;
+    --line: rgba(13, 79, 87, .12);
+    --line-strong: rgba(13, 79, 87, .22);
+    --ink: #0b2530;
+    --text-2: #2b4752;
+    --muted: #5a7480;
+    --accent: #0f766e;
+    --accent-hover: #115e59;
+    --accent-soft: rgba(15, 118, 110, .08);
+    --accent-line: rgba(15, 118, 110, .32);
+    --ok: #059669;
+    --bad: #dc2626;
+    --deep: #0b2530;
+    --deep-2: #12384a;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(11, 37, 48, .05), 0 10px 28px rgba(13, 79, 87, .08);
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { background: #eaf4f3; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif; line-height: 1.55;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse 60% 45% at 10% -5%, rgba(20, 184, 166, .2), transparent 70%),
+      radial-gradient(ellipse 55% 40% at 95% 0%, rgba(14, 165, 233, .16), transparent 70%),
+      linear-gradient(180deg, #e3f3f0, #eef5f8);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: radial-gradient(rgba(13, 79, 87, .13) 1px, transparent 1px); background-size: 26px 26px; mask-image: linear-gradient(180deg, #000, transparent 70%); -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- barra in alto ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 14px; padding: 12px clamp(16px, 4vw, 40px);
+    background: rgba(240, 249, 247, .85); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, #14b8a6, #0ea5e9 60%, transparent); opacity: .5; }
+  .logo { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 800; font-size: 18px; letter-spacing: -.02em; }
+  .logo-mark { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; background: linear-gradient(135deg, var(--deep), var(--deep-2)); color: #5eead4; }
+  .logo-mark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .spacer { flex: 1; }
+  .lang { border: 1px solid var(--line-strong); border-radius: 8px; background: var(--panel); padding: 6px 10px; font-size: 13.5px; font-weight: 600; color: var(--text-2); }
+  .back { font-size: 13.5px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+  .back:hover { color: var(--accent); }
+
+  /* ---------- testata ---------- */
+  main { max-width: 1160px; margin: 0 auto; padding: clamp(28px, 5vw, 56px) clamp(16px, 4vw, 40px) 64px; }
+  .hero { text-align: center; max-width: 760px; margin: 0 auto 30px; }
+  .hero h1 { margin: 0 0 12px; font-size: clamp(1.9rem, 4.4vw, 2.9rem); line-height: 1.08; letter-spacing: -.04em; font-weight: 800; text-wrap: balance; }
+  .hero p { margin: 0 auto; max-width: 620px; color: var(--text-2); font-size: 1.06rem; }
+  .pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--accent-line); color: var(--accent); font-size: 13px; font-weight: 600; }
+  .pill svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- schede delle categorie ---------- */
+  .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-width: 760px; margin: 0 auto 22px; padding: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+  .tabs button { display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; background: none; padding: 11px 8px; border-radius: 10px; font-weight: 600; font-size: 14.5px; color: var(--text-2); transition: background .2s, color .2s; }
+  .tabs button svg { width: 19px; height: 19px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .tabs button:hover { background: var(--accent-soft); color: var(--accent); }
+  .tabs button.active { background: linear-gradient(135deg, #0f766e, #0e7490); color: #fff; box-shadow: 0 6px 16px rgba(15, 118, 110, .25); }
+
+  /* ---------- area di lavoro ---------- */
+  .work { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+  .card h2 { margin: 0 0 14px; font-size: 1.02rem; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+  .card h2 .count { font-family: var(--mono); font-size: .75rem; font-weight: 500; color: var(--muted); background: var(--sunken); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; }
+  .card h2 .link { margin-left: auto; border: 0; background: none; color: var(--muted); font-size: .82rem; font-weight: 500; padding: 0; }
+  .card h2 .link:hover { color: var(--bad); }
+
+  .drop {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+    padding: 30px 18px; margin-bottom: 18px; border-radius: 12px; cursor: pointer;
+    border: 2px dashed var(--accent-line); background: radial-gradient(rgba(15, 118, 110, .12) 1px, transparent 1px) 0 0 / 14px 14px, var(--sunken);
+    transition: border-color .2s, background-color .2s, transform .2s;
+  }
+  .drop:hover, .drop.over { border-color: var(--accent); background-color: #e6f4f1; }
+  .drop.over { transform: scale(1.01); }
+  .drop-ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, var(--deep), var(--deep-2)); color: #5eead4; box-shadow: 0 8px 20px rgba(11, 37, 48, .2); margin-bottom: 6px; }
+  .drop-ico svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .drop strong { font-size: 1.05rem; }
+  .drop .or { color: var(--muted); font-size: .92rem; }
+  .drop .or u { color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--accent-line); }
+  .drop small { color: var(--muted); font-family: var(--mono); font-size: .74rem; max-width: 460px; }
+
+  .files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .file { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: #fff; transition: border-color .2s, box-shadow .2s, opacity .2s; }
+  .file.dragging { opacity: .45; }
+  .file.drop-before { box-shadow: 0 -3px 0 var(--accent); }
+  .grip { flex: none; width: 14px; color: #a7c4c2; cursor: grab; display: grid; place-items: center; }
+  .grip svg { width: 14px; height: 14px; fill: currentColor; }
+  .thumb { flex: none; width: 42px; height: 42px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: var(--sunken); border: 1px solid var(--line); font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--accent); text-transform: uppercase; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .meta { flex: 1; min-width: 0; }
+  .meta b { display: block; font-size: .9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta span { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+  .meta .st-work { color: var(--accent); }
+  .meta .st-done { color: var(--ok); }
+  .meta .st-error { color: var(--bad); }
+  .x { flex: none; width: 30px; height: 30px; border-radius: 8px; border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1; }
+  .x:hover { background: #fef2f2; color: var(--bad); }
+  .empty { margin: 0; padding: 14px; text-align: center; color: var(--muted); font-size: .9rem; border-radius: 10px; background: var(--sunken); }
+  .hint { margin: 12px 0 0; color: var(--muted); font-size: .82rem; }
+
+  /* ---------- impostazioni ---------- */
+  .side { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 84px; }
+  .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .field > span { font-size: .84rem; font-weight: 600; color: var(--text-2); }
+  .field select, .field input[type=number] { width: 100%; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--line-strong); background: #fff; }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button { border: 1px solid var(--line-strong); background: #fff; padding: 7px 13px; border-radius: 8px; font-weight: 600; font-size: .86rem; font-family: var(--mono); color: var(--text-2); }
+  .chips button:hover { border-color: var(--accent); color: var(--accent); }
+  .chips button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chips.wide button { font-family: inherit; flex: 1 1 auto; }
+  .range { display: flex; align-items: center; gap: 12px; }
+  .range input { flex: 1; accent-color: var(--accent); }
+  .range output { width: 44px; text-align: right; font-family: var(--mono); font-size: .85rem; font-weight: 600; color: var(--accent); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .color { display: flex; align-items: center; gap: 10px; }
+  .color input { width: 42px; height: 34px; padding: 2px; border-radius: 8px; border: 1px solid var(--line-strong); background: #fff; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: 10px; border: 1px solid transparent; background: var(--accent); color: #fff; font-weight: 700; font-size: 1rem; box-shadow: 0 1px 2px rgba(11, 37, 48, .1), 0 8px 20px rgba(15, 118, 110, .25); transition: background .2s, transform .1s; }
+  .btn:hover { background: var(--accent-hover); }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .btn.secondary { background: #fff; color: var(--ink); border-color: var(--line-strong); box-shadow: none; font-size: .92rem; padding: 10px 14px; }
+  .btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .results { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow: auto; }
+  .result { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; background: #f0fdf9; border: 1px solid #b7ebdc; }
+  .result .meta b { font-size: .86rem; }
+  .result a { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 7px; background: var(--accent); color: #fff; text-decoration: none; font-size: .8rem; font-weight: 600; }
+  .result a:hover { background: var(--accent-hover); }
+  .result a svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- come funziona ---------- */
+  .how { margin-top: 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .how div { display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border-radius: 12px; background: rgba(255, 255, 255, .7); border: 1px solid var(--line); color: var(--text-2); font-size: .92rem; }
+  .how svg { flex: none; width: 34px; height: 34px; padding: 8px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .how-title { margin: 40px 0 0; text-align: center; font-size: 1.2rem; letter-spacing: -.02em; }
+  .how-title + .how { margin-top: 14px; }
+  footer { padding: 22px; text-align: center; color: var(--muted); font-size: .84rem; border-top: 1px solid var(--line); background: rgba(240, 249, 247, .7); }
+  footer a { font-weight: 600; text-decoration: none; }
+
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; padding: 10px 16px; border-radius: 10px; background: var(--deep); color: #fff; font-size: .9rem; box-shadow: 0 12px 30px rgba(11, 37, 48, .3); transition: opacity .25s, transform .25s; pointer-events: none; z-index: 50; max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 860px) {
+    .work { grid-template-columns: minmax(0, 1fr); }
+    .side { position: static; }
+    .how { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .logo { font-size: 16px; }
+    .topbar { gap: 10px; }
+    .back { font-size: 0; }
+    .back::before { content: "←"; font-size: 22px; line-height: 1; }
+    .card { padding: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="./">
+      <span class="logo-mark"><svg viewBox="0 0 24 24"><path d="M5 9h13l-4-4"/><path d="M19 15H6l4 4"/></svg></span>
+      <span data-t="appName">Convertitore</span>
+    </a>
+    <span class="spacer"></span>
+    <select class="lang" id="lang" aria-label="Lingua"></select>
+    <a class="back" href="../#strumenti" id="back"><span data-t="back">← Torna al sito</span></a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 data-t="heroTitle">Converti i tuoi file, direttamente nel browser</h1>
+      <p data-t="heroSub"></p>
+      <div class="pills">
+        <span class="pill"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span data-t="pillPrivate"></span></span>
+        <span class="pill"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span data-t="pillFree"></span></span>
+        <span class="pill"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span data-t="pillNoInstall"></span></span>
+      </div>
+    </section>
+
+    <nav class="tabs" id="tabs" role="tablist"></nav>
+
+    <section class="work">
+      <div class="card">
+        <label class="drop" id="drop">
+          <input type="file" id="picker" multiple hidden>
+          <span class="drop-ico"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
+          <strong data-t="dropTitle"></strong>
+          <span class="or"><span data-t="dropOr"></span> <u data-t="dropPick"></u></span>
+          <small id="hint"></small>
+        </label>
+        <h2><span data-t="filesTitle"></span><span class="count" id="count">0</span><button class="link" id="clear" data-t="clear"></button></h2>
+        <ul class="files" id="files"></ul>
+        <p class="hint" id="orderHint" hidden></p>
+      </div>
+
+      <div class="side">
+        <div class="card">
+          <h2 data-t="optTitle"></h2>
+          <div id="options"></div>
+          <button class="btn" id="go"></button>
+        </div>
+        <div class="card" id="resultsCard" hidden>
+          <h2><span data-t="resultsTitle"></span><span class="count" id="rcount">0</span></h2>
+          <ul class="results" id="results"></ul>
+          <button class="btn secondary" id="zip"></button>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="how-title" data-t="howTitle"></h2>
+    <section class="how">
+      <div><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span data-t="how1"></span></div>
+      <div><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.4 8.6 8 9 4.6-.4 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span data-t="how2"></span></div>
+      <div><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span data-t="how3"></span></div>
+    </section>
+  </main>
+
+  <footer><span data-t="madeBy"></span> <a href="../" id="home">Coccolo Digital</a></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

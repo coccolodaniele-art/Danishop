@@ -15,7 +15,7 @@
 
 const ALLOWED_ORIGINS = ["https://coccolodaniele-art.github.io"];
 const LOCAL_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-const SECTIONS = ["home", "chisono", "programmi", "trading", "giochi", "info"];
+const SECTIONS = ["home", "chisono", "programmi", "trading", "strumenti", "giochi", "info"];
 const BOTS = /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|preview|facebookexternalhit|embedly|curl|wget|python|java\/|monitor|uptime/i;
 const KEEP_DAYS = 400;
 const TZ = "Europe/Rome";

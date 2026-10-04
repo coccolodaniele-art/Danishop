@@ -1,0 +1,9 @@
+Librerie usate dal Convertitore di file (copie originali, non modificate):
+
+- pdf.js 4.4.168 (Mozilla) - Apache License 2.0 - https://github.com/mozilla/pdf.js
+- pdf-lib 1.17.1 - MIT License - https://github.com/Hopding/pdf-lib
+- SheetJS Community Edition 0.20.3 - Apache License 2.0 - https://sheetjs.com
+- lamejs 1.2.1 - LGPL 3.0 - https://github.com/zhuker/lamejs
+  (usata come file separato e sostituibile, come richiesto dalla licenza LGPL)
+
+Rimosse solo le righe "sourceMappingURL" per evitare richieste a file inesistenti.

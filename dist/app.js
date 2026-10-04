@@ -30,6 +30,7 @@
       programsIntro: 'I programmi che ho sviluppato: cosa fanno, come funzionano e come provarli.',
       tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
       gamesIntro: 'Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.',
+      toolsIntro: 'Strumenti pratici per il lavoro di tutti i giorni, da usare direttamente nel browser.',
       ownerName: '',
       email: '',
       phone: '',
@@ -49,6 +50,7 @@
   const PROGRAM_SECTIONS = [
     { value: 'apprendimento', route: 'programmi', nav: 'Apprendimento', title: "Programmi per l'apprendimento", introKey: 'programsIntro' },
     { value: 'finanza', route: 'trading', nav: 'Trading e finanza', title: 'Programmi per trading e finanza', introKey: 'tradingIntro' },
+    { value: 'strumenti', route: 'strumenti', nav: 'Strumenti', title: 'Strumenti utili', introKey: 'toolsIntro' },
     { value: 'giochi', route: 'giochi', nav: 'Giochi', title: 'Giochi', introKey: 'gamesIntro' }
   ];
   const sectionByValue = (v) => PROGRAM_SECTIONS.find((s) => s.value === v) || PROGRAM_SECTIONS[0];
@@ -74,14 +76,14 @@
   const TR_FIELDS = {
     settings: ['tagline', 'homeEyebrow', 'homeTitle', 'homeIntro', 'homePoints', 'painPoints', 'services', 'steps', 'certsIntro',
       'ctaTitle', 'ctaText', 'aboutTitle', 'aboutIntro', 'about', 'skills', 'values', 'siteAbout', 'aboutCta',
-      'programsIntro', 'tradingIntro', 'gamesIntro', 'city'],
+      'programsIntro', 'tradingIntro', 'toolsIntro', 'gamesIntro', 'city'],
     programs: ['tagline', 'platform', 'description', 'features', 'trialLabel', 'trialInfo', 'requirements'],
     certificates: ['title']
   };
 
   const UI_IT = {
-    navHome: 'Home', navAbout: 'Chi sono', navLearning: 'Apprendimento', navTrading: 'Trading e finanza', navGames: 'Giochi',
-    sec_apprendimento: "Programmi per l'apprendimento", sec_finanza: 'Programmi per trading e finanza', sec_giochi: 'Giochi',
+    navHome: 'Home', navAbout: 'Chi sono', navLearning: 'Apprendimento', navTrading: 'Trading e finanza', navTools: 'Strumenti', navGames: 'Giochi',
+    sec_apprendimento: "Programmi per l'apprendimento", sec_finanza: 'Programmi per trading e finanza', sec_strumenti: 'Strumenti utili', sec_giochi: 'Giochi',
     langLabel: 'Lingua', close: 'Chiudi',
     metaDescription: 'Daniele Coccolo crea automazioni su misura per aziende e professionisti: meno lavoro ripetitivo al computer, con Python, Excel, SQL e intelligenza artificiale.',
     emptyGames: 'Nessun gioco pubblicato', emptyGamesSub: 'A breve troverai qui i miei giochi.',
@@ -464,7 +466,7 @@
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
     if (HOME_ANCHORS.includes(r) || r === 'info') return 'home';
     if (r === 'chi-sono') return 'chisono';
-    return ['home', 'chisono', 'programmi', 'trading', 'giochi', 'admin'].includes(r) ? r : 'home';
+    return ['home', 'chisono', 'admin'].concat(PROGRAM_SECTIONS.map((x) => x.route)).includes(r) ? r : 'home';
   }
 
   function render() {
@@ -472,12 +474,9 @@
     state.view = localizedData();
     insight.section(state.route);
     updateChrome();
-    const views = {
-      home: renderHome, chisono: renderAbout, admin: renderAdmin,
-      programmi: () => renderPrograms(PROGRAM_SECTIONS[0]), trading: () => renderPrograms(PROGRAM_SECTIONS[1]),
-      giochi: () => renderPrograms(PROGRAM_SECTIONS[2])
-    };
-    app.innerHTML = views[state.route]();
+    const views = { home: renderHome, chisono: renderAbout, admin: renderAdmin };
+    const section = PROGRAM_SECTIONS.find((x) => x.route === state.route);
+    app.innerHTML = section ? renderPrograms(section) : views[state.route]();
     afterRender();
   }
 
@@ -485,8 +484,9 @@
     const s = (state.view || state.data).settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { home: s.tagline || t('navHome'), chisono: t('navAbout'), programmi: t('sec_apprendimento'), trading: t('sec_finanza'), giochi: t('sec_giochi'), admin: 'Area admin' };
-    const navKeys = { home: 'navHome', chisono: 'navAbout', programmi: 'navLearning', trading: 'navTrading', giochi: 'navGames' };
+    const titles = { home: s.tagline || t('navHome'), chisono: t('navAbout'), admin: 'Area admin' };
+    PROGRAM_SECTIONS.forEach((x) => { titles[x.route] = t('sec_' + x.value); });
+    const navKeys = { home: 'navHome', chisono: 'navAbout', programmi: 'navLearning', trading: 'navTrading', strumenti: 'navTools', giochi: 'navGames' };
     document.querySelectorAll('[data-nav]').forEach((a) => { a.querySelector('span').textContent = t(navKeys[a.dataset.nav]); });
     const pick = document.getElementById('langSelect');
     if (!pick.options.length) pick.innerHTML = LANGS.map((l) => `<option value="${l.code}">${esc(l.name)}</option>`).join('');
@@ -649,7 +649,7 @@
 
   // Fuori dall'italiano, ogni scheda avvisa che il programma stesso è in italiano.
   function appLangNote(p) {
-    return i18n.lang === 'it' ? '' : `<span class="badge lang-note">${ICONS.globe} ${esc(p.langNote || t('appLangNote'))}</span>`;
+    return i18n.lang === 'it' || p.multilang ? '' : `<span class="badge lang-note">${ICONS.globe} ${esc(p.langNote || t('appLangNote'))}</span>`;
   }
 
   function programShot(p, img) {
@@ -733,6 +733,7 @@
     programmi: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>',
     trading: '<path d="M3 20h18"/><path d="M5 16l5-5 3 3 6-7"/><path d="M15 7h4v4"/>',
     giochi: '<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="17.5" cy="13.5" r=".6"/>',
+    strumenti: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
     servizi: '<path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 5-4 14"/>',
     excel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/>',
     doc: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/>',
@@ -1207,6 +1208,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         <div class="form-section" style="margin-top:0">Presentazione</div>
         ${field('name', 'Nome del programma', p.name, { req: true })}
         ${field('category', 'Scheda del sito', p.category, { options: PROGRAM_SECTIONS.map((s) => ({ value: s.value, label: s.nav })), hint: 'In quale scheda compare il programma.' })}
+        ${field('multilang', 'Lingue del programma', p.multilang ? '1' : '', { options: [{ value: '', label: 'Solo in italiano' }, { value: '1', label: 'In tutte le lingue del sito' }], hint: 'Se è solo in italiano, nelle altre lingue la scheda lo segnala ai visitatori.' })}
         ${field('tagline', 'Frase breve', p.tagline, { placeholder: 'Es. Gestisci il magazzino in pochi clic' })}
         <div class="grid-2">
           ${field('platform', 'Piattaforma', p.platform, { placeholder: 'Es. Windows 10/11' })}
@@ -1312,6 +1314,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         <div class="form-section">Testi delle schede</div>
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
         ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
+        ${field('toolsIntro', 'Testo introduttivo della scheda Strumenti', s.toolsIntro, { textarea: true, rows: 2 })}
         ${field('gamesIntro', 'Testo introduttivo della scheda Giochi', s.gamesIntro, { textarea: true, rows: 2 })}
 
         <div class="form-section">Contatti (in fondo alla Home)</div>
@@ -1362,7 +1365,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   /* ---------- Insight (statistiche del sito) ---------- */
 
   const INSIGHT_PERIODS = [[1, 'Oggi'], [7, '7 giorni'], [30, '30 giorni'], [90, '3 mesi'], [365, '12 mesi']];
-  const SECTION_NAMES = { home: 'Home', chisono: 'Chi sono', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
+  const SECTION_NAMES = { home: 'Home', chisono: 'Chi sono', strumenti: 'Strumenti', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
   const CLICK_NAMES = {
     'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
     'zoom-image': 'Immagini dei programmi ingrandite', 'ask-info': 'Richieste di informazioni',
