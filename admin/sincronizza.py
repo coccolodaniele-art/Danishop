@@ -199,4 +199,11 @@ if __name__ == "__main__":
         ("Modifiche registrate. " if outcome["committed"] else "Nessuna nuova modifica. ")
         + ("Copia online aggiornata." if outcome["pushed"] else "")
     )
+    try:
+        from traduzioni import summary
+        note = summary()
+        if note:
+            print(note)
+    except Exception:  # il controllo delle traduzioni non deve mai bloccare la sincronizzazione
+        pass
     sys.exit(0 if outcome["ok"] else 1)

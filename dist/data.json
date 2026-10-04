@@ -13,8 +13,8 @@
   "programsIntro": "Programmi per imparare divertendosi: programmazione, inglese e altro ancora. Si usano direttamente dal browser, anche da telefono.",
   "ownerName": "Daniele Coccolo",
   "email": "coccolo.daniele@yahoo.it",
-  "phone": "3497698210",
-  "whatsapp": "3497698210",
+  "phone": "+39 349 769 8210",
+  "whatsapp": "+39 349 769 8210",
   "city": "Udine",
   "website": "",
   "instagram": "",
@@ -29,7 +29,7 @@
   "defaultShipping": 6,
   "tradingIntro": "Programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale. Si usano direttamente dal browser, anche da telefono.",
   "homeEyebrow": "Automazioni su misura per aziende e professionisti",
-  "homePoints": "Soluzioni su misura, non pacchetti preconfezionati\nPython, Excel, SQL e intelligenza artificiale\nUdine e tutta Italia, anche da remoto",
+  "homePoints": "Soluzioni su misura, non pacchetti preconfezionati\nPython, Excel, SQL e intelligenza artificiale\nLavoro da remoto con clienti in Italia e nel mondo",
   "painPoints": "Copi e incolli dati tra email, PDF e fogli Excel\nPrepari a mano gli stessi report ogni settimana\nInserisci gli stessi dati in più programmi diversi\nPerdi tempo a cercare informazioni sparse tra file e cartelle\nCorreggi errori nati da operazioni fatte a mano\nUsi un programma che non fa esattamente ciò che ti serve",
   "steps": "Mi racconti cosa ti fa perdere tempo: bastano due righe o una telefonata per capire il problema e come lavori oggi.\nTi propongo la soluzione: ti spiego cosa si può automatizzare e come, in parole semplici, prima di iniziare.\nLa costruisco e te la consegno: testata, spiegata passo passo e pronta da usare dal primo giorno.",
   "ctaTitle": "Hai un lavoro che ti ruba *ore ogni settimana*?",
@@ -37,7 +37,8 @@
   "aboutTitle": "Ciao, sono Daniele. Insegno ai computer a *lavorare al posto tuo*.",
   "aboutIntro": "Sviluppo automazioni e programmi su misura con Python, Excel, SQL e intelligenza artificiale. La mia ossessione è semplice: se un lavoro al computer si ripete, prima o poi lo automatizzo.",
   "values": "Parlo chiaro: niente gergo tecnico. Ti spiego cosa faccio e perché, in parole semplici.\nSu misura, sempre: parto da come lavori tu, non da una soluzione già pronta da adattare.\nSemplice da usare: uno strumento è utile solo se lo usi davvero, senza manuali di cento pagine.",
-  "aboutCta": "Hai un problema da risolvere al computer? *Parliamone.*"
+  "aboutCta": "Hai un problema da risolvere al computer? *Parliamone.*",
+  "gamesIntro": "Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare."
  },
  "programs": [
   {

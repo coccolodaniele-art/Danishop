@@ -52,6 +52,150 @@
     { value: 'giochi', route: 'giochi', nav: 'Giochi', title: 'Giochi', introKey: 'gamesIntro' }
   ];
   const sectionByValue = (v) => PROGRAM_SECTIONS.find((s) => s.value === v) || PROGRAM_SECTIONS[0];
+
+  /* =========================================================
+     Lingue
+     =========================================================
+     L'italiano è la lingua base: i testi dell'interfaccia sono qui sotto (UI_IT) e i contenuti
+     in data.json, modificabili dal Gestore. Le altre lingue stanno in lang/<codice>.json:
+     "ui" (testi dell'interfaccia), "settings", "programs", "certificates" (contenuti tradotti)
+     e "source" (impronta del testo italiano da cui è nata ogni traduzione, per accorgersi
+     quando l'italiano cambia). L'area admin resta sempre in italiano. */
+
+  const LANGS = [
+    { code: 'it', name: 'Italiano', locale: 'it-IT' },
+    { code: 'en', name: 'English', locale: 'en-GB' },
+    { code: 'es', name: 'Español', locale: 'es-ES' },
+    { code: 'de', name: 'Deutsch', locale: 'de-DE' },
+    { code: 'fr', name: 'Français', locale: 'fr-FR' },
+    { code: 'pt', name: 'Português', locale: 'pt-PT' }
+  ];
+  // Contenuti di data.json che vengono tradotti (gli stessi elenchi sono in admin/traduzioni.py).
+  const TR_FIELDS = {
+    settings: ['tagline', 'homeEyebrow', 'homeTitle', 'homeIntro', 'homePoints', 'painPoints', 'services', 'steps', 'certsIntro',
+      'ctaTitle', 'ctaText', 'aboutTitle', 'aboutIntro', 'about', 'skills', 'values', 'siteAbout', 'aboutCta',
+      'programsIntro', 'tradingIntro', 'gamesIntro', 'city'],
+    programs: ['tagline', 'platform', 'description', 'features', 'trialLabel', 'trialInfo', 'requirements'],
+    certificates: ['title']
+  };
+
+  const UI_IT = {
+    navHome: 'Home', navAbout: 'Chi sono', navLearning: 'Apprendimento', navTrading: 'Trading e finanza', navGames: 'Giochi',
+    sec_apprendimento: "Programmi per l'apprendimento", sec_finanza: 'Programmi per trading e finanza', sec_giochi: 'Giochi',
+    langLabel: 'Lingua', close: 'Chiudi',
+    metaDescription: 'Daniele Coccolo crea automazioni su misura per aziende e professionisti: meno lavoro ripetitivo al computer, con Python, Excel, SQL e intelligenza artificiale.',
+    emptyGames: 'Nessun gioco pubblicato', emptyGamesSub: 'A breve troverai qui i miei giochi.',
+    emptyPrograms: 'Nessun programma pubblicato', emptyProgramsSub: 'A breve troverai qui i miei programmi.',
+    zoom: 'Ingrandisci', zoomImage: "Ingrandisci l'immagine di {name}",
+    playNow: 'Gioca ora', version: 'Versione {v}', trialMode: 'Modalità di prova',
+    download: 'Scarica il programma', openProgram: 'Apri il programma', askInfo: 'Contattami per informazioni', requirements: 'Requisiti di sistema',
+    appLangNote: 'Interfaccia in italiano',
+    demoAria: 'Esempio di automazione: 248 fatture elaborate in 41 secondi invece di circa 3 ore',
+    demoFile: 'automazione_fatture.py', demoRunning: 'in esecuzione',
+    demoStep1: 'Lette 248 fatture PDF dalla cartella', demoStep2: 'Estratti importi, date e clienti',
+    demoStep3: 'Aggiornato il foglio Excel "Contabilità"', demoStep4: 'Inviato il riepilogo via email',
+    demoWith: "Con l'automazione", demoWithValue: '41 secondi', demoBefore: 'Prima, a mano', demoBeforeValue: 'circa 3 ore',
+    demoCaption: "Un esempio del lavoro che un'automazione può fare al posto tuo.",
+    ctaProblem: 'Raccontami il tuo problema', howItWorks: 'Come funziona',
+    whoIsBehind: "Chi c'è dietro queste automazioni? Scopri chi sono →",
+    painsTitle: 'Ti riconosci?', painsSub: 'Sono le attività che rubano più tempo in ufficio. E quasi sempre si possono automatizzare.',
+    painsClose: 'Se hai annuito almeno una volta,', painsCloseStrong: "c'è qualcosa che posso automatizzare per te.",
+    servicesTitle: 'Cosa posso fare per te', servicesSub: 'Ogni soluzione è costruita su misura per il tuo modo di lavorare, con gli strumenti che usi già.',
+    stepsTitle: 'Come funziona', stepsSub: 'Semplice e trasparente, dal primo messaggio alla soluzione funzionante.',
+    builtTitle: 'Cosa ho già costruito', builtSub: 'La prova concreta di quello che so fare: programmi completi che puoi provare subito, direttamente dal browser.',
+    programs_one: '{n} programma', programs_other: '{n} programmi', games_one: '{n} gioco', games_other: '{n} giochi', discoverMore: 'Scopri di più',
+    certsTitle: 'Formazione certificata', courses_one: '{n} corso completato', courses_other: '{n} corsi completati',
+    trainingHours: '{h} di formazione', hours_one: '{n} ora', hours_other: '{n} ore',
+    zoomCert: "Ingrandisci l'attestato {t}", certAlt: 'Attestato: {t}',
+    verifyCert: "Verifica l'autenticità sul sito di {issuer} ↗", verifyIssuerFallback: "chi l'ha rilasciato",
+    ctaDefault: 'Hai un lavoro che ti ruba ore ogni settimana?', writeMe: 'Scrivimi',
+    aboutHello: 'Ciao, sono {name}', contactMe: 'Contattami', seeProjects: 'Guarda i miei progetti',
+    storyTitle: 'La mia storia', storyEmpty: 'Presentazione in arrivo.',
+    factPrograms_one: 'programma pubblicato', factPrograms_other: 'programmi pubblicati',
+    factGames_one: 'gioco nel browser', factGames_other: 'giochi nel browser',
+    factCourses_one: 'corso certificato', factCourses_other: 'corsi certificati', factHours: 'ore di formazione',
+    skillsVar: 'competenze', seeCerts: 'Vedi gli attestati →', valuesTitle: 'Come lavoro', siteTitle: 'Questo sito',
+    aboutCtaDefault: 'Hai un problema da risolvere al computer? *Parliamone.*',
+    contactsTitle: 'Contatti', contactsSub: 'Raccontami in poche righe cosa ti fa perdere tempo o quale problema vuoi risolvere: ti rispondo il prima possibile.',
+    formTitle: 'Scrivimi un messaggio', formName: 'Il tuo nome', formMessage: 'Messaggio', formPlaceholder: 'Di cosa vuoi parlarmi?', formSend: 'Invia messaggio',
+    contactsBox: 'Recapiti', cEmail: 'Email', cPhone: 'Telefono', cArea: 'Zona', cWebsite: 'Sito web', contactsEmpty: 'Contatti in arrivo.',
+    formNeedMessage: 'Scrivi un messaggio', mailSubject: 'Messaggio dal sito', mailOpening: 'Si sta aprendo il tuo programma di posta'
+  };
+
+  const i18n = { lang: 'it', pack: null };
+  const isLang = (c) => LANGS.some((l) => l.code === c);
+  const locale = () => (LANGS.find((l) => l.code === i18n.lang) || LANGS[0]).locale;
+
+  // Lingua iniziale: ?lang= nell'indirizzo, poi l'ultima scelta, poi la lingua del browser; altrimenti inglese.
+  function pickLang() {
+    const q = new URLSearchParams(location.search).get('lang');
+    if (isLang(q)) return q;
+    const saved = localGet('lang');
+    if (isLang(saved)) return saved;
+    for (const l of navigator.languages || [navigator.language || '']) {
+      const c = String(l).slice(0, 2).toLowerCase();
+      if (isLang(c)) return c;
+    }
+    return 'en';
+  }
+
+  async function loadLang(code) {
+    let pack = null;
+    if (code !== 'it') {
+      try {
+        const res = await fetch(`lang/${code}.json`, { cache: 'no-cache' });
+        if (res.ok) pack = await res.json();
+      } catch (_) { /* file mancante: si resta in italiano */ }
+      if (!pack) code = 'it';
+    }
+    i18n.lang = code;
+    i18n.pack = pack;
+    document.documentElement.lang = code;
+  }
+
+  function t(key, vars) {
+    const ui = i18n.pack && i18n.pack.ui;
+    let s = ui && ui[key] != null ? ui[key] : UI_IT[key] != null ? UI_IT[key] : key;
+    if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? vars[k] : m));
+    return s;
+  }
+  function fmtNum(n) { return Number(n).toLocaleString(locale(), { maximumFractionDigits: 1 }); }
+  // Plurali: chiave_one / chiave_other, secondo le regole della lingua.
+  function tn(key, n, vars) {
+    const form = new Intl.PluralRules(locale()).select(n) === 'one' ? 'one' : 'other';
+    return t(`${key}_${form}`, Object.assign({ n: fmtNum(n) }, vars));
+  }
+
+  // Dati visti dai visitatori: l'italiano di data.json con sopra la traduzione nella lingua scelta.
+  // Un testo tolto in italiano resta tolto anche nelle altre lingue.
+  function overlay(base, tr, fields) {
+    if (!tr) return base;
+    const out = Object.assign({}, base);
+    for (const k of fields) if (base[k] && typeof tr[k] === 'string' && tr[k]) out[k] = tr[k];
+    if (tr.langNote) out.langNote = tr.langNote;
+    return out;
+  }
+  function localizedData() {
+    const d = state.data;
+    const p = i18n.pack;
+    if (!p) return d;
+    const each = (list, map, fields) => list.map((x) => overlay(x, map && map[x.id], fields));
+    return Object.assign({}, d, {
+      settings: overlay(d.settings, p.settings, TR_FIELDS.settings),
+      programs: each(d.programs, p.programs, TR_FIELDS.programs),
+      certificates: each(d.certificates, p.certificates, TR_FIELDS.certificates)
+    });
+  }
+
+  async function setLang(code) {
+    if (!isLang(code)) return;
+    localSet('lang', code);
+    const url = new URL(location.href);
+    url.searchParams.set('lang', code);
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+    await loadLang(code);
+    render();
+  }
   // L'area admin esiste solo sulla copia del sito in questo PC, mai su quella online.
   const IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
@@ -325,6 +469,7 @@
 
   function render() {
     state.route = currentRoute();
+    state.view = localizedData();
     insight.section(state.route);
     updateChrome();
     const views = {
@@ -337,10 +482,18 @@
   }
 
   function updateChrome() {
-    const s = state.data.settings;
+    const s = (state.view || state.data).settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { home: s.tagline || 'Home', chisono: 'Chi sono', programmi: PROGRAM_SECTIONS[0].title, trading: PROGRAM_SECTIONS[1].title, giochi: PROGRAM_SECTIONS[2].title, info: 'Info e contatti', admin: 'Area admin' };
+    const titles = { home: s.tagline || t('navHome'), chisono: t('navAbout'), programmi: t('sec_apprendimento'), trading: t('sec_finanza'), giochi: t('sec_giochi'), admin: 'Area admin' };
+    const navKeys = { home: 'navHome', chisono: 'navAbout', programmi: 'navLearning', trading: 'navTrading', giochi: 'navGames' };
+    document.querySelectorAll('[data-nav]').forEach((a) => { a.querySelector('span').textContent = t(navKeys[a.dataset.nav]); });
+    const pick = document.getElementById('langSelect');
+    if (!pick.options.length) pick.innerHTML = LANGS.map((l) => `<option value="${l.code}">${esc(l.name)}</option>`).join('');
+    pick.value = i18n.lang;
+    pick.setAttribute('aria-label', t('langLabel'));
+    document.querySelector('meta[name="description"]').setAttribute('content', t('metaDescription'));
+    document.querySelectorAll('.modal-x').forEach((b) => b.setAttribute('aria-label', t('close')));
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
     document.getElementById('footerText').textContent = `© ${new Date().getFullYear()} ${s.ownerName || s.siteName || ''}`;
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === state.route));
@@ -482,41 +635,52 @@
      ========================================================= */
 
   function renderPrograms(section) {
-    const s = state.data.settings;
-    const list = state.data.programs.filter((p) => p.category === section.value);
+    const s = state.view.settings;
+    const list = state.view.programs.filter((p) => p.category === section.value);
+    const isGames = section.value === 'giochi';
     return `
       <section class="page-head">
-        <h1>${esc(section.title)}</h1>
+        <h1>${esc(t('sec_' + section.value))}</h1>
         <p>${esc(s[section.introKey])}</p>
       </section>
-      ${list.length ? `<div class="programs">${list.map(section.value === 'giochi' ? renderGame : renderProgram).join('')}</div>`
-        : section.value === 'giochi' ? '<div class="empty"><strong>Nessun gioco pubblicato</strong>A breve troverai qui i miei giochi.</div>'
-          : '<div class="empty"><strong>Nessun programma pubblicato</strong>A breve troverai qui i miei programmi.</div>'}`;
+      ${list.length ? `<div class="programs">${list.map(isGames ? renderGame : renderProgram).join('')}</div>`
+        : `<div class="empty"><strong>${esc(t(isGames ? 'emptyGames' : 'emptyPrograms'))}</strong>${esc(t(isGames ? 'emptyGamesSub' : 'emptyProgramsSub'))}</div>`}`;
+  }
+
+  // Fuori dall'italiano, ogni scheda avvisa che il programma stesso è in italiano.
+  function appLangNote(p) {
+    return i18n.lang === 'it' ? '' : `<span class="badge lang-note">${ICONS.globe} ${esc(p.langNote || t('appLangNote'))}</span>`;
+  }
+
+  function programShot(p, img) {
+    return img ? `
+          <button type="button" class="shot" data-action="zoom-shot" data-id="${esc(p.id)}" aria-label="${esc(t('zoomImage', { name: p.name }))}">
+            <span class="shot-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+            <img src="${img}" alt="${esc(p.name)}" loading="lazy">
+            <span class="shot-zoom" aria-hidden="true">${esc(t('zoom'))}</span>
+          </button>` : `<span class="initial">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`;
   }
 
   // Scheda di un gioco: immagine, breve descrizione a lato e pulsante "Gioca ora".
   function renderGame(p) {
     const img = safeImg(p.image);
-    const features = String(p.features || '').split('\n').map((x) => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+    const features = lines(p.features);
     const playUrl = safeUrl(p.trialUrl);
+    const note = appLangNote(p);
     return `
       <article class="program game" id="prog-${esc(p.id)}">
-        <div class="program-media${img ? ' has-shot' : ''}">${img ? `
-          <button type="button" class="shot" data-action="zoom-shot" data-id="${esc(p.id)}" aria-label="Ingrandisci l'immagine di ${esc(p.name)}">
-            <span class="shot-bar" aria-hidden="true"><i></i><i></i><i></i></span>
-            <img src="${img}" alt="${esc(p.name)}" loading="lazy">
-            <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
-          </button>` : `<span class="initial">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`}</div>
+        <div class="program-media${img ? ' has-shot' : ''}">${programShot(p, img)}</div>
         <div class="program-body">
           <div>
             <h2>${esc(p.name)}</h2>
             ${p.tagline ? `<p class="tagline">${esc(p.tagline)}</p>` : ''}
           </div>
+          ${note ? `<div class="spec">${note}</div>` : ''}
           ${p.description ? `<div class="text">${linkify(p.description)}</div>` : ''}
           ${features.length ? `<ul class="features">${features.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${p.trialInfo ? `<p class="item-meta">${linkify(p.trialInfo)}</p>` : ''}
           <div class="row">
-            ${playUrl ? `<a class="btn play-now" href="${esc(playUrl)}" target="_blank" rel="noopener">${ICONS.play} ${esc(p.trialLabel || 'Gioca ora')}</a>` : ''}
+            ${playUrl ? `<a class="btn play-now" href="${esc(playUrl)}" target="_blank" rel="noopener">${ICONS.play} ${esc(p.trialLabel || t('playNow'))}</a>` : ''}
           </div>
           ${p.requirements ? `<p class="item-meta">${linkify(p.requirements)}</p>` : ''}
         </div>
@@ -525,46 +689,44 @@
 
   function renderProgram(p) {
     const img = safeImg(p.image);
-    const features = String(p.features || '').split('\n').map((x) => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+    const features = lines(p.features);
     const trialUrl = safeUrl(p.trialUrl);
     const hasTrial = p.trialLabel || p.trialInfo || trialUrl;
+    const note = appLangNote(p);
+    const ask = `<a class="btn secondary small" href="#contatti">${esc(t('askInfo'))}</a>`;
     return `
       <article class="program" id="prog-${esc(p.id)}">
-        <div class="program-media${img ? ' has-shot' : ''}">${img ? `
-          <button type="button" class="shot" data-action="zoom-shot" data-id="${esc(p.id)}" aria-label="Ingrandisci l'immagine di ${esc(p.name)}">
-            <span class="shot-bar" aria-hidden="true"><i></i><i></i><i></i></span>
-            <img src="${img}" alt="${esc(p.name)}" loading="lazy">
-            <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
-          </button>` : `<span class="initial">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`}</div>
+        <div class="program-media${img ? ' has-shot' : ''}">${programShot(p, img)}</div>
         <div class="program-body">
           <div>
             <h2>${esc(p.name)}</h2>
             ${p.tagline ? `<p class="tagline">${esc(p.tagline)}</p>` : ''}
           </div>
-          ${p.platform || p.version ? `<div class="spec">
+          ${p.platform || p.version || note ? `<div class="spec">
             ${p.platform ? `<span class="badge">${esc(p.platform)}</span>` : ''}
-            ${p.version ? `<span class="badge">Versione ${esc(p.version)}</span>` : ''}
+            ${p.version ? `<span class="badge">${esc(t('version', { v: p.version }))}</span>` : ''}
+            ${note}
           </div>` : ''}
           ${p.description ? `<div class="text">${linkify(p.description)}</div>` : ''}
           ${features.length ? `<ul class="features">${features.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
           ${hasTrial ? `
             <div class="trial">
-              <h4>${esc(p.trialLabel || 'Modalità di prova')}</h4>
+              <h4>${esc(p.trialLabel || t('trialMode'))}</h4>
               ${p.trialInfo ? `<p>${linkify(p.trialInfo)}</p>` : ''}
               <div class="row">
                 ${trialUrl ? (/\.(exe|msi|zip|rar|7z|dmg|apk)([?#]|$)/i.test(trialUrl)
-                  ? `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.download} Scarica il programma</a>`
-                  : `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.play} Apri il programma</a>`) : ''}
-                <a class="btn secondary small" href="#contatti">Contattami per informazioni</a>
+                  ? `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.download} ${esc(t('download'))}</a>`
+                  : `<a class="btn small" href="${esc(trialUrl)}" target="_blank" rel="noopener">${ICONS.play} ${esc(t('openProgram'))}</a>`) : ''}
+                ${ask}
               </div>
-            </div>` : `<div><a class="btn secondary small" href="#contatti">Contattami per informazioni</a></div>`}
-          ${p.requirements ? `<details><summary class="details-toggle">Requisiti di sistema</summary><div class="req" style="margin-top:6px">${linkify(p.requirements)}</div></details>` : ''}
+            </div>` : `<div>${ask}</div>`}
+          ${p.requirements ? `<details><summary class="details-toggle">${esc(t('requirements'))}</summary><div class="req" style="margin-top:6px">${linkify(p.requirements)}</div></details>` : ''}
         </div>
       </article>`;
   }
 
   /* =========================================================
-     Home (pubblico): chi sono, cosa faccio, il sito e i contatti
+     Home (pubblico): la pubblicità per le aziende, i progetti e i contatti
      ========================================================= */
 
   const HOME_ICONS = {
@@ -597,54 +759,53 @@
 
   // Finto terminale della Home: mostra il genere di lavoro che un'automazione fa da sola.
   function automationDemo() {
-    const steps = ['Lette 248 fatture PDF dalla cartella', 'Estratti importi, date e clienti', 'Aggiornato il foglio Excel "Contabilità"', 'Inviato il riepilogo via email'];
+    const steps = [t('demoStep1'), t('demoStep2'), t('demoStep3'), t('demoStep4')];
     return `
-      <figure class="demo" aria-label="Esempio di automazione: 248 fatture elaborate in 41 secondi invece di circa 3 ore">
+      <figure class="demo" aria-label="${esc(t('demoAria'))}">
         <div class="demo-frame"><div class="demo-win run" aria-hidden="true">
-          <div class="code-bar"><i></i><i></i><i></i><span>automazione_fatture.py</span><b class="demo-live">in esecuzione</b></div>
+          <div class="code-bar"><i></i><i></i><i></i><span>${esc(t('demoFile'))}</span><b class="demo-live">${esc(t('demoRunning'))}</b></div>
           <div class="demo-body">
-            <div class="demo-cmd"><span class="tok-op">$</span> python automazione_fatture.py</div>
-            ${steps.map((t, i) => `<div class="demo-step" style="--i:${i}"><span class="demo-ok">✓</span>${esc(t)}</div>`).join('')}
+            <div class="demo-cmd"><span class="tok-op">$</span> python ${esc(t('demoFile'))}</div>
+            ${steps.map((x, i) => `<div class="demo-step" style="--i:${i}"><span class="demo-ok">✓</span>${esc(x)}</div>`).join('')}
             <div class="demo-bar"><i></i></div>
             <div class="demo-result">
-              <div><small>Con l'automazione</small><strong>41 secondi</strong></div>
-              <div><small>Prima, a mano</small><strong class="demo-old">circa 3 ore</strong></div>
+              <div><small>${esc(t('demoWith'))}</small><strong>${esc(t('demoWithValue'))}</strong></div>
+              <div><small>${esc(t('demoBefore'))}</small><strong class="demo-old">${esc(t('demoBeforeValue'))}</strong></div>
             </div>
           </div>
         </div></div>
-        <figcaption>Un esempio del lavoro che un'automazione può fare al posto tuo.</figcaption>
+        <figcaption>${esc(t('demoCaption'))}</figcaption>
       </figure>`;
   }
 
-  function ctaBand(title, text) {
-    const s = state.data.settings;
+  function ctaBand(title) {
+    const s = state.view.settings;
     return `
       <section class="cta-band">
         <div>
           <h2>${hl(title)}</h2>
-          ${text ? `<p>${esc(text)}</p>` : ''}
+          ${s.ctaText ? `<p>${esc(s.ctaText)}</p>` : ''}
         </div>
         <div class="row">
-          <a class="btn light" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Banner: scrivimi">${ICONS.mail} Scrivimi</a>
+          <a class="btn light" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Banner: scrivimi">${ICONS.mail} ${esc(t('writeMe'))}</a>
           ${s.whatsapp ? `<a class="btn outline-light" href="https://wa.me/${waNumber(s.whatsapp)}" target="_blank" rel="noopener">${ICONS.chat} WhatsApp</a>` : ''}
         </div>
       </section>`;
   }
 
   function renderHome() {
-    const s = state.data.settings;
+    const s = state.view.settings;
     const points = lines(s.homePoints);
     const pains = lines(s.painPoints);
     const services = pairs(s.services);
     const steps = pairs(s.steps);
     const photo = photoOf(s);
-    const bySection = (sec) => state.data.programs.filter((p) => p.category === sec.value);
+    const bySection = (sec) => state.view.programs.filter((p) => p.category === sec.value);
     const areas = PROGRAM_SECTIONS.map((sec) => {
       const list = bySection(sec);
-      const isGame = sec.value === 'giochi';
       return {
-        key: sec.route, href: `#${sec.route}`, title: sec.title, text: s[sec.introKey], names: list.map((p) => p.name),
-        more: list.length ? `${list.length} ${isGame ? (list.length === 1 ? 'gioco' : 'giochi') : (list.length === 1 ? 'programma' : 'programmi')} →` : 'Scopri di più →'
+        key: sec.route, href: `#${sec.route}`, title: t('sec_' + sec.value), label: sec.title, text: s[sec.introKey], names: list.map((p) => p.name),
+        more: list.length ? tn(sec.value === 'giochi' ? 'games' : 'programs', list.length) : t('discoverMore')
       };
     });
 
@@ -655,14 +816,14 @@
           <h1>${hl(s.homeTitle || s.siteName)}</h1>
           ${s.homeIntro ? `<p class="hero-lead">${esc(s.homeIntro)}</p>` : ''}
           <div class="row">
-            <a class="btn big" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Raccontami il tuo problema">Raccontami il tuo problema ${homeIcon('arrow')}</a>
-            ${steps.length ? `<a class="btn secondary big" href="#metodo" data-action="scroll-to" data-target="metodo" data-track="home-link" data-label="Come funziona">Come funziona</a>` : ''}
+            <a class="btn big" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Raccontami il tuo problema">${esc(t('ctaProblem'))} ${homeIcon('arrow')}</a>
+            ${steps.length ? `<a class="btn secondary big" href="#metodo" data-action="scroll-to" data-target="metodo" data-track="home-link" data-label="Come funziona">${esc(t('howItWorks'))}</a>` : ''}
           </div>
           ${points.length ? `<ul class="hero-points">${points.map((p) => `<li>${homeIcon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
           ${s.ownerName ? `
           <a class="hero-me" href="#chisono" data-track="home-link" data-label="Scopri chi sono">
             ${photo ? `<img src="${photo}" alt="">` : ''}
-            <span><strong>${esc(s.ownerName)}</strong><small>Chi c'è dietro queste automazioni? Scopri chi sono →</small></span>
+            <span><strong>${esc(s.ownerName)}</strong><small>${esc(t('whoIsBehind'))}</small></span>
           </a>` : ''}
         </div>
         ${automationDemo()}
@@ -670,18 +831,18 @@
 
       ${pains.length ? `
       <section class="home-section">
-        <h2 class="section-title">Ti riconosci?</h2>
-        <p class="section-sub">Sono le attività che rubano più tempo in ufficio. E quasi sempre si possono automatizzare.</p>
+        <h2 class="section-title">${esc(t('painsTitle'))}</h2>
+        <p class="section-sub">${esc(t('painsSub'))}</p>
         <div class="pains">${pains.map((p) => `
           <div class="pain"><span class="pain-ico">${homeIcon('clock')}</span><p>${esc(p)}</p></div>`).join('')}
         </div>
-        <p class="pains-close">Se hai annuito almeno una volta, <strong>c'è qualcosa che posso automatizzare per te.</strong></p>
+        <p class="pains-close">${esc(t('painsClose'))} <strong>${esc(t('painsCloseStrong'))}</strong></p>
       </section>` : ''}
 
       ${services.length ? `
       <section class="home-section">
-        <h2 class="section-title">Cosa posso fare per te</h2>
-        <p class="section-sub">Ogni soluzione è costruita su misura per il tuo modo di lavorare, con gli strumenti che usi già.</p>
+        <h2 class="section-title">${esc(t('servicesTitle'))}</h2>
+        <p class="section-sub">${esc(t('servicesSub'))}</p>
         <div class="services">${services.map((x, i) => `
           <div class="service">
             <span class="area-ico">${homeIcon(SERVICE_ICONS[i % SERVICE_ICONS.length])}</span>
@@ -693,8 +854,8 @@
 
       ${steps.length ? `
       <section class="home-section" id="metodo">
-        <h2 class="section-title">Come funziona</h2>
-        <p class="section-sub">Semplice e trasparente, dal primo messaggio alla soluzione funzionante.</p>
+        <h2 class="section-title">${esc(t('stepsTitle'))}</h2>
+        <p class="section-sub">${esc(t('stepsSub'))}</p>
         <ol class="steps">${steps.map((x, i) => `
           <li class="step">
             <span class="step-n">${String(i + 1).padStart(2, '0')}</span>
@@ -705,22 +866,22 @@
       </section>` : ''}
 
       <section class="home-section">
-        <h2 class="section-title">Cosa ho già costruito</h2>
-        <p class="section-sub">La prova concreta di quello che so fare: programmi completi che puoi provare subito, direttamente dal browser.</p>
+        <h2 class="section-title">${esc(t('builtTitle'))}</h2>
+        <p class="section-sub">${esc(t('builtSub'))}</p>
         <div class="home-areas">${areas.map((a) => `
-          <a class="area-card" href="${a.href}" data-track="home-link" data-label="${esc(a.title)}">
+          <a class="area-card" href="${a.href}" data-track="home-link" data-label="${esc(a.label)}">
             <span class="area-ico">${homeIcon(a.key)}</span>
             <h3>${esc(a.title)}</h3>
             ${a.text ? `<p>${esc(a.text)}</p>` : ''}
             ${a.names.length ? `<span class="area-tags">${a.names.map((n) => `<span class="badge">${esc(n)}</span>`).join('')}</span>` : ''}
-            <span class="area-more">${a.more}</span>
+            <span class="area-more">${esc(a.more)} →</span>
           </a>`).join('')}
         </div>
       </section>
 
       ${renderCertificates()}
 
-      ${ctaBand(s.ctaTitle || 'Hai un lavoro che ti ruba ore ogni settimana?', s.ctaText)}
+      ${ctaBand(s.ctaTitle || t('ctaDefault'))}
 
       ${renderContacts()}`;
   }
@@ -728,22 +889,23 @@
   /* ---------- Chi sono ---------- */
 
   function renderAbout() {
-    const s = state.data.settings;
+    const s = state.view.settings;
     const photo = photoOf(s);
     const initials = (s.ownerName || s.siteName || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
     const skills = lines(s.skills);
     const values = pairs(s.values);
     const story = String(s.about || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean); // il primo paragrafo fa da attacco
-    const nPrograms = state.data.programs.filter((p) => p.category !== 'giochi').length;
-    const nGames = state.data.programs.filter((p) => p.category === 'giochi').length;
-    const certs = state.data.certificates.filter((c) => c.title);
+    const nPrograms = state.view.programs.filter((p) => p.category !== 'giochi').length;
+    const nGames = state.view.programs.filter((p) => p.category === 'giochi').length;
+    const certs = state.view.certificates.filter((c) => c.title);
     const hours = certs.reduce((a, c) => a + certHours(c), 0);
     const facts = [
-      [nPrograms, nPrograms === 1 ? 'programma pubblicato' : 'programmi pubblicati'],
-      [nGames, nGames === 1 ? 'gioco nel browser' : 'giochi nel browser'],
-      certs.length ? [certs.length, certs.length === 1 ? 'corso certificato' : 'corsi certificati'] : null,
-      hours ? [hours.toLocaleString('it-IT', { maximumFractionDigits: 1 }), 'ore di formazione'] : null
+      [fmtNum(nPrograms), tn('factPrograms', nPrograms)],
+      [fmtNum(nGames), tn('factGames', nGames)],
+      certs.length ? [fmtNum(certs.length), tn('factCourses', certs.length)] : null,
+      hours ? [fmtNum(hours), t('factHours')] : null
     ].filter(Boolean);
+    const skillsVar = t('skillsVar');
 
     return `
       <section class="about-hero">
@@ -751,39 +913,39 @@
           ? `<div class="hero-photo about-photo"><img src="${photo}" alt="${esc(s.ownerName || s.siteName)}"></div>`
           : `<div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>`}
         <div class="hero-text">
-          <span class="hero-eyebrow">Chi sono${s.city ? ` · ${esc(s.city)}` : ''}</span>
-          <h1>${hl(s.aboutTitle || (s.ownerName ? `Ciao, sono ${s.ownerName}` : 'Chi sono'))}</h1>
+          <span class="hero-eyebrow">${esc(t('navAbout'))}${s.city ? ` · ${esc(s.city)}` : ''}</span>
+          <h1>${hl(s.aboutTitle || (s.ownerName ? t('aboutHello', { name: s.ownerName }) : t('navAbout')))}</h1>
           ${s.aboutIntro ? `<p class="hero-lead">${esc(s.aboutIntro)}</p>` : ''}
           <div class="row">
-            <a class="btn big" href="#contatti" data-track="about-link" data-label="Contattami">${ICONS.mail} Contattami</a>
-            <a class="btn secondary big" href="#programmi" data-track="about-link" data-label="Guarda i miei progetti">Guarda i miei progetti</a>
+            <a class="btn big" href="#contatti" data-track="about-link" data-label="Contattami">${ICONS.mail} ${esc(t('contactMe'))}</a>
+            <a class="btn secondary big" href="#programmi" data-track="about-link" data-label="Guarda i miei progetti">${esc(t('seeProjects'))}</a>
           </div>
         </div>
       </section>
 
       <section class="home-section">
-        <h2 class="section-title">La mia storia</h2>
+        <h2 class="section-title">${esc(t('storyTitle'))}</h2>
         <div class="home-two">
           <div class="card about-story">
-            ${story.length ? `<p class="about-lead">${esc(story[0])}</p>${story.slice(1).map((x) => `<p>${esc(x)}</p>`).join('')}` : '<p class="item-meta">Presentazione in arrivo.</p>'}
+            ${story.length ? `<p class="about-lead">${esc(story[0])}</p>${story.slice(1).map((x) => `<p>${esc(x)}</p>`).join('')}` : `<p class="item-meta">${esc(t('storyEmpty'))}</p>`}
           </div>
           <div class="about-side">
             ${facts.length ? `<div class="home-facts about-facts">${facts.map(([n, l]) => `<div><strong>${esc(n)}</strong><span>${esc(l)}</span></div>`).join('')}</div>` : ''}
             ${skills.length ? `
             <div class="code-card">
-              <div class="code-bar" aria-hidden="true"><i></i><i></i><i></i><span>competenze.py</span></div>
-              <pre><code><span class="tok-var">competenze</span> <span class="tok-op">=</span> [
+              <div class="code-bar" aria-hidden="true"><i></i><i></i><i></i><span>${esc(skillsVar)}.py</span></div>
+              <pre><code><span class="tok-var">${esc(skillsVar)}</span> <span class="tok-op">=</span> [
 ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
 ]</code></pre>
             </div>` : ''}
-            ${certs.length ? `<a class="about-certs" href="#attestati" data-track="about-link" data-label="Vedi gli attestati">Vedi gli attestati →</a>` : ''}
+            ${certs.length ? `<a class="about-certs" href="#attestati" data-track="about-link" data-label="Vedi gli attestati">${esc(t('seeCerts'))}</a>` : ''}
           </div>
         </div>
       </section>
 
       ${values.length ? `
       <section class="home-section">
-        <h2 class="section-title">Come lavoro</h2>
+        <h2 class="section-title">${esc(t('valuesTitle'))}</h2>
         <div class="services">${values.map((x) => `
           <div class="service">
             <span class="area-ico">${homeIcon('check')}</span>
@@ -795,11 +957,11 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
 
       ${s.siteAbout ? `
       <section class="home-section">
-        <h2 class="section-title">Questo sito</h2>
+        <h2 class="section-title">${esc(t('siteTitle'))}</h2>
         <div class="card"><div class="text">${esc(s.siteAbout)}</div></div>
       </section>` : ''}
 
-      ${ctaBand(s.aboutCta || 'Hai un problema da risolvere al computer? *Parliamone.*', s.ctaText)}`;
+      ${ctaBand(s.aboutCta || t('aboutCtaDefault'))}`;
   }
 
   /* ---------- Formazione e attestati ---------- */
@@ -809,59 +971,58 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   function certDate(c, opts = { day: 'numeric', month: 'long', year: 'numeric' }) {
     return /^\d{4}-\d{2}-\d{2}$/.test(c.date || '') ? new Date(c.date + 'T12:00:00').toLocaleDateString('it-IT', opts) : '';
   }
-  const hoursLabel = (h) => `${h.toLocaleString('it-IT', { maximumFractionDigits: 1 })} ${h === 1 ? 'ora' : 'ore'}`;
 
   // Nella Home gli attestati si vedono solo come immagini (il titolo è già scritto sull'attestato).
   function renderCertificates() {
-    const s = state.data.settings;
-    const list = state.data.certificates.filter((c) => c.title && safeImg(c.image));
+    const s = state.view.settings;
+    const list = state.view.certificates.filter((c) => c.title && safeImg(c.image));
     if (!list.length) return '';
     const total = list.reduce((a, c) => a + certHours(c), 0);
     return `
       <section class="home-section" id="attestati">
-        <h2 class="section-title">Formazione certificata</h2>
-        <p class="section-sub">${s.certsIntro ? esc(s.certsIntro) + ' ' : ''}<strong>${list.length} ${list.length === 1 ? 'corso completato' : 'corsi completati'}${total ? ` · ${hoursLabel(total)} di formazione` : ''}</strong></p>
+        <h2 class="section-title">${esc(t('certsTitle'))}</h2>
+        <p class="section-sub">${s.certsIntro ? esc(s.certsIntro) + ' ' : ''}<strong>${esc(tn('courses', list.length))}${total ? ` · ${esc(t('trainingHours', { h: tn('hours', total) }))}` : ''}</strong></p>
         <div class="certs">${list.map((c) => `
-          <button type="button" class="cert-shot" data-action="zoom-cert" data-id="${esc(c.id)}" aria-label="Ingrandisci l'attestato ${esc(c.title)}">
-            <img src="${safeImg(c.image)}" alt="Attestato: ${esc(c.title)}" loading="lazy">
-            <span class="shot-zoom" aria-hidden="true">Ingrandisci</span>
+          <button type="button" class="cert-shot" data-action="zoom-cert" data-id="${esc(c.id)}" aria-label="${esc(t('zoomCert', { t: c.title }))}">
+            <img src="${safeImg(c.image)}" alt="${esc(t('certAlt', { t: c.title }))}" loading="lazy">
+            <span class="shot-zoom" aria-hidden="true">${esc(t('zoom'))}</span>
           </button>`).join('')}
         </div>
       </section>`;
   }
 
   function renderContacts() {
-    const s = state.data.settings;
+    const s = state.view.settings;
     const contacts = [];
-    if (s.email) contacts.push({ ico: ICONS.mail, label: 'Email', text: s.email, href: `mailto:${s.email}` });
-    if (s.phone) contacts.push({ ico: ICONS.phone, label: 'Telefono', text: s.phone, href: `tel:${String(s.phone).replace(/[^\d+]/g, '')}` });
+    if (s.email) contacts.push({ ico: ICONS.mail, label: t('cEmail'), text: s.email, href: `mailto:${s.email}` });
+    if (s.phone) contacts.push({ ico: ICONS.phone, label: t('cPhone'), text: s.phone, href: `tel:${String(s.phone).replace(/[^\d+]/g, '')}` });
     if (s.whatsapp) contacts.push({ ico: ICONS.chat, label: 'WhatsApp', text: s.whatsapp, href: `https://wa.me/${waNumber(s.whatsapp)}`, ext: true });
-    if (s.city) contacts.push({ ico: ICONS.pin, label: 'Zona', text: s.city });
-    [['website', 'Sito web', ICONS.globe], ['instagram', 'Instagram', ICONS.link], ['facebook', 'Facebook', ICONS.link], ['linkedin', 'LinkedIn', ICONS.link]].forEach(([k, label, ico]) => {
+    if (s.city) contacts.push({ ico: ICONS.pin, label: t('cArea'), text: s.city });
+    [['website', t('cWebsite'), ICONS.globe], ['instagram', 'Instagram', ICONS.link], ['facebook', 'Facebook', ICONS.link], ['linkedin', 'LinkedIn', ICONS.link]].forEach(([k, label, ico]) => {
       const u = safeUrl(s[k]);
       if (u) contacts.push({ ico, label, text: u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''), href: u, ext: true });
     });
     const list = `
       <div class="card">
-        <h2>Recapiti</h2>
+        <h2>${esc(t('contactsBox'))}</h2>
         ${contacts.length ? `<ul class="contact-list">${contacts.map((c) => `
           <li>
             <span class="ico">${c.ico}</span>
             <div><small>${esc(c.label)}</small>${c.href ? `<a href="${esc(c.href)}" ${c.ext ? 'target="_blank" rel="noopener"' : ''}>${esc(c.text)}</a>` : `<strong>${esc(c.text)}</strong>`}</div>
-          </li>`).join('')}</ul>` : '<p class="item-meta">Contatti in arrivo.</p>'}
+          </li>`).join('')}</ul>` : `<p class="item-meta">${esc(t('contactsEmpty'))}</p>`}
       </div>`;
     return `
       <section class="home-section" id="contatti">
-        <h2 class="section-title">Contatti</h2>
-        <p class="section-sub">Raccontami in poche righe cosa ti fa perdere tempo o quale problema vuoi risolvere: ti rispondo il prima possibile.</p>
+        <h2 class="section-title">${esc(t('contactsTitle'))}</h2>
+        <p class="section-sub">${esc(t('contactsSub'))}</p>
         <div class="${s.email ? 'info-grid' : ''}">
           ${s.email ? `
           <div class="card">
-            <h2>Scrivimi un messaggio</h2>
+            <h2>${esc(t('formTitle'))}</h2>
             <form id="contactForm" class="stack" novalidate>
-              <label class="field"><span>Il tuo nome</span><input name="name" autocomplete="name" required></label>
-              <label class="field"><span>Messaggio</span><textarea name="message" rows="5" required placeholder="Di cosa vuoi parlarmi?"></textarea></label>
-              <div class="row end"><button class="btn" type="submit">${ICONS.mail} Invia messaggio</button></div>
+              <label class="field"><span>${esc(t('formName'))}</span><input name="name" autocomplete="name" required></label>
+              <label class="field"><span>${esc(t('formMessage'))}</span><textarea name="message" rows="5" required placeholder="${esc(t('formPlaceholder'))}"></textarea></label>
+              <div class="row end"><button class="btn" type="submit">${ICONS.mail} ${esc(t('formSend'))}</button></div>
             </form>
           </div>` : ''}
           ${list}
@@ -897,6 +1058,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         </div>
       </div>
       ${state.hasDraft && state.adminTab !== 'pubblica' ? `<div class="notice" style="margin-bottom:16px">Hai modifiche salvate in questo browser ma non ancora pubblicate. <a href="#admin" data-action="tab" data-tab="pubblica">Pubblica ora</a></div>` : ''}
+      ${state.trCheck && state.trCheck.stale.length ? `<div class="notice" style="margin-bottom:16px"><strong>Traduzioni da aggiornare</strong> (${esc(state.trCheck.stale.join(', '))}): alcuni testi italiani sono nuovi o cambiati dopo l'ultima traduzione. Nelle altre lingue si vede ancora la traduzione precedente, o l'italiano per i testi nuovi. Chiedi a Claude: «aggiorna le traduzioni del sito».</div>` : ''}
       <div class="tabs" role="tablist">
         ${tabs.map(([k, label, count]) => `<button role="tab" class="${state.adminTab === k ? 'active' : ''}" data-action="tab" data-tab="${k}">${label}${count != null ? `<span class="count">${count}</span>` : ''}</button>`).join('')}
       </div>
@@ -1658,7 +1820,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
 
   const actions = {
     'zoom-shot': (el) => {
-      const p = state.data.programs.find((x) => x.id === el.dataset.id);
+      const p = state.view.programs.find((x) => x.id === el.dataset.id);
       const src = p && safeImg(p.image);
       if (!src) return;
       openModal(`
@@ -1705,14 +1867,14 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     'remove-program-image': () => { syncEditorFromForm(); state.editing.draft.image = ''; render(); },
 
     'zoom-cert': (el) => {
-      const c = findCert(el.dataset.id);
+      const c = state.view.certificates.find((x) => x.id === el.dataset.id);
       const src = c && safeImg(c.image);
       if (!src) return;
       const url = safeUrl(c.url);
       openModal(`
         <h2 id="modalTitle" class="shot-title">${esc(c.title)}</h2>
-        <img class="shot-full cert-full" src="${src}" alt="Attestato: ${esc(c.title)}">
-        ${url ? `<p class="cert-modal-link"><a href="${esc(url)}" target="_blank" rel="noopener" data-track="cert-verify" data-label="${esc(c.title)}">Verifica l'autenticità sul sito di ${esc(c.issuer || 'chi l\'ha rilasciato')} ↗</a></p>` : ''}`, { wide: true });
+        <img class="shot-full cert-full" src="${src}" alt="${esc(t('certAlt', { t: c.title }))}">
+        ${url ? `<p class="cert-modal-link"><a href="${esc(url)}" target="_blank" rel="noopener" data-track="cert-verify" data-label="${esc((findCert(c.id) || c).title)}">${esc(t('verifyCert', { issuer: c.issuer || t('verifyIssuerFallback') }))}</a></p>` : ''}`, { wide: true });
     },
     'new-cert': () => {
       state.editing = { type: 'cert', isNew: true, draft: newCert() };
@@ -1810,11 +1972,11 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     switch (form.id) {
       case 'contactForm': {
         const v = readForm(form);
-        if (!v.message) { toast('Scrivi un messaggio', true); return; }
+        if (!v.message) { toast(t('formNeedMessage'), true); return; }
         const s = state.data.settings;
-        location.href = `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent('Messaggio dal sito' + (v.name ? ' - ' + v.name : ''))}&body=${encodeURIComponent(v.message + (v.name ? '\n\n' + v.name : ''))}`;
+        location.href = `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent(t('mailSubject') + (v.name ? ' - ' + v.name : ''))}&body=${encodeURIComponent(v.message + (v.name ? '\n\n' + v.name : ''))}`;
         insight.click('contact-form', 'Modulo messaggi');
-        toast('Si sta aprendo il tuo programma di posta');
+        toast(t('mailOpening'));
         break;
       }
       case 'loginForm': {
@@ -1863,6 +2025,31 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     loadSyncStatus();
     watchInsight();
     loopDemo();
+    checkTranslations();
+  }
+
+  // Area admin: avvisa quando un testo italiano è nuovo o cambiato dopo l'ultima traduzione.
+  // Confronta le impronte salvate in lang/<codice>.json ("source"), come fa admin/traduzioni.py.
+  async function checkTranslations() {
+    if (state.route !== 'admin' || !state.isAdmin || !(window.crypto && crypto.subtle)) return;
+    const texts = {};
+    TR_FIELDS.settings.forEach((f) => { if (state.data.settings[f]) texts[`settings.${f}`] = state.data.settings[f]; });
+    ['programs', 'certificates'].forEach((g) => state.data[g].forEach((x) => TR_FIELDS[g].forEach((f) => { if (x[f]) texts[`${g}.${x.id}.${f}`] = x[f]; })));
+    const key = JSON.stringify(texts);
+    if (state.trCheck && state.trCheck.key === key) return;
+    const prints = {};
+    for (const [k, v] of Object.entries(texts)) prints[k] = (await sha256(v)).slice(0, 12);
+    const stale = [];
+    for (const l of LANGS.slice(1)) {
+      let pack = null;
+      try { const res = await fetch(`lang/${l.code}.json`, { cache: 'no-store' }); if (res.ok) pack = await res.json(); } catch (_) {}
+      const src = (pack && pack.source) || {};
+      const n = Object.keys(prints).filter((k) => src[k] !== prints[k]).length;
+      if (n) stale.push(`${l.code.toUpperCase()} ${n}`);
+    }
+    const before = state.trCheck ? state.trCheck.stale.join() : '';
+    state.trCheck = { key, stale };
+    if (before !== stale.join() && state.route === 'admin') render();
   }
 
   // Il finto terminale della Home riparte da capo ogni tanto, per farsi notare.
@@ -1884,9 +2071,11 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
      Avvio
      ========================================================= */
 
+  document.getElementById('langSelect').addEventListener('change', (e) => setLang(e.target.value));
+
   (async () => {
     app.innerHTML = '<div class="empty">Caricamento…</div>';
-    await detectLocalServer();
+    await Promise.all([detectLocalServer(), loadLang(pickLang())]);
     await loadData();
     render();
     if (wantsContacts()) setTimeout(scrollToContacts, 50);
