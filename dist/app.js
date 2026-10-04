@@ -68,7 +68,7 @@
     { code: 'es', name: 'Español', locale: 'es-ES' },
     { code: 'de', name: 'Deutsch', locale: 'de-DE' },
     { code: 'fr', name: 'Français', locale: 'fr-FR' },
-    { code: 'pt', name: 'Português', locale: 'pt-PT' }
+    { code: 'pt', name: 'Português', locale: 'pt-BR' }
   ];
   // Contenuti di data.json che vengono tradotti (gli stessi elenchi sono in admin/traduzioni.py).
   const TR_FIELDS = {
