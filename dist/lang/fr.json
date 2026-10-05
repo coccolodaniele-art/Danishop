@@ -136,7 +136,8 @@
    "features": "Divisé en niveaux, organisés pour que chacun vous prépare au suivant.",
    "trialLabel": "ESSAYEZ-LE GRATUITEMENT !",
    "langNote": "Leçons et interface en italien",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "CODEQUEST"
   },
   "mun8vbdr71vb7": {
    "tagline": "Découvrez la situation actuelle des marchés du monde entier !",
@@ -145,7 +146,8 @@
    "trialInfo": "ATTENTION ! Pour l'utiliser, procurez-vous d'abord une clé API Gemini : ouvrez ce lien, inscrivez-vous et créez votre clé API pour activer le moteur d'IA du programme. Cela ne prend que quelques étapes simples : https://aistudio.google.com/app/apikey\nUne fois votre clé API obtenue, enregistrez-la quelque part sur votre ordinateur. Ouvrez ensuite le programme, saisissez votre clé dans la section API et enregistrez.",
    "requirements": "Fonctionne directement depuis le site, dans le navigateur : aucun téléchargement ni installation, sur téléphone aussi. Une connexion internet est nécessaire. Pour la synthèse rédigée par l'intelligence artificielle, il faut une clé API (celle de Gemini est gratuite : https://aistudio.google.com/app/apikey) ; sans clé, le programme utilise la synthèse locale.",
    "langNote": "Interface en italien",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "SINTESI MERCATI AI"
   },
   "muokmzza3pjsy": {
    "tagline": "Repérez en un coup d'œil quelles actions sélectionnées du S&P 500 valent la peine d'être achetées !",
@@ -154,7 +156,8 @@
    "trialInfo": "N'oubliez pas d'obtenir d'abord gratuitement la précieuse clé API pour profiter de toutes les fonctions du programme ! Voici le lien : https://aistudio.google.com/apikey",
    "requirements": "Fonctionne directement depuis le site, dans le navigateur : aucun téléchargement ni installation, sur téléphone aussi. Une connexion internet est nécessaire. Pour les explications rédigées par l'intelligence artificielle (le point d'interrogation sur chaque thermomètre) et pour améliorer les recherches, il faut une clé API Gemini gratuite : https://aistudio.google.com/apikey",
    "langNote": "Interface en italien",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "SP500 VERTICAL THERMOMETERS"
   },
   "muontpfbbtfq3": {
    "tagline": "Enrichissez votre vocabulaire anglais avec WordQuest !",
@@ -163,7 +166,8 @@
    "trialLabel": "ESSAYEZ-LE GRATUITEMENT !",
    "requirements": "Fonctionne directement depuis le site, dans le navigateur : aucun téléchargement ni installation, sur téléphone aussi. Aucune clé API nécessaire. Vos progrès restent enregistrés dans le navigateur de l'appareil utilisé.",
    "langNote": "Italien ⇄ anglais · interface en italien",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "WORDQUEST"
   },
   "sqlquest01": {
    "tagline": "Apprenez SQL en pratiquant : un simulateur avec une vraie base de données, des exercices et des solutions !",
@@ -173,7 +177,8 @@
    "trialLabel": "Essayez-le gratuitement !",
    "trialInfo": "Gratuit et sans inscription : il s'utilise directement dans le navigateur, sur téléphone aussi.",
    "requirements": "Un navigateur à jour (Chrome, Edge, Firefox ou Safari).",
-   "langNote": "Leçons et interface en italien"
+   "langNote": "Leçons et interface en italien",
+   "name": "SQLQUEST"
   },
   "m76jx4jw5t84m": {
    "tagline": "Défiez l'ordinateur ou jouez en ligne avec les visiteurs présents sur le site !",
@@ -181,7 +186,8 @@
    "description": "Le jeu d'échecs classique, avec toutes ses règles, à jouer directement dans le navigateur. Entraînez-vous contre l'ordinateur en choisissant parmi 6 niveaux de difficulté, de Débutant à Maître, ou entrez dans le salon en ligne et défiez en temps réel les autres visiteurs présents à ce moment-là. Vous pouvez aussi jouer avec un ami sur le même échiquier.",
    "features": "Contre l'ordinateur : 6 niveaux, indices et annulation des coups\nEn ligne : salon avec les joueurs présents, parties chronométrées, nulle et revanche\nDeux joueurs sur le même appareil\nToutes les règles : roque, prise en passant, promotion, nulle par répétition et règle des 50 coups",
    "trialLabel": "Jouer maintenant",
-   "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi."
+   "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi.",
+   "name": "ÉCHECS"
   },
   "muq6m5pp44n40": {
    "tagline": "Le solitaire classique avec des cartes, à jouer quand vous voulez, même sur téléphone !",
@@ -189,7 +195,8 @@
    "description": "Le Solitaire de toujours (Klondike), celui avec sept colonnes et quatre piles à remplir de l'As au Roi. Faites glisser les cartes ou touchez-les et elles iront toutes seules à la bonne place. Choisissez de piocher une carte à la fois (plus facile) ou trois (la version classique), demandez un indice quand vous êtes bloqué et annulez les coups autant de fois que vous le voulez.",
    "features": "Piocher 1 carte ou 3 cartes\nIndices et annulations illimités\nCartes classiques bien dessinées, avec les figures traditionnelles\nBouton pour terminer la partie quand toutes les cartes sont découvertes\nScore, temps et statistiques avec séries de victoires\nPartie du jour : la même donne pour tout le monde\nLa partie reste enregistrée : vous pouvez fermer et reprendre plus tard",
    "trialLabel": "Jouer maintenant",
-   "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi."
+   "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi.",
+   "name": "SOLITAIRE"
   },
   "muq7vciyaosl5": {
    "tagline": "Les dames italiennes : défiez l'ordinateur ou jouez avec un ami !",
@@ -197,7 +204,8 @@
    "description": "Les dames italiennes avec toutes leurs règles, à jouer directement dans le navigateur. Défiez l'ordinateur en choisissant parmi 5 niveaux de difficulté, de Débutant à Champion, ou jouez avec un ami sur le même damier. Touchez ou faites glisser les pions : le jeu vous montre les coups possibles et vous prévient quand la prise est obligatoire.",
    "features": "Contre l'ordinateur : 5 niveaux, indices et annulation des coups\nDeux joueurs sur le même appareil\nRègles italiennes complètes : prise obligatoire, priorités, les pions ne prennent pas les dames\nPartie enregistrée : vous pouvez fermer et reprendre plus tard\nStatistiques des victoires pour chaque niveau",
    "trialLabel": "Jouer maintenant",
-   "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi."
+   "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi.",
+   "name": "DAMES"
   },
   "convertitore01": {
    "tagline": "Chargez un fichier et choisissez le format : images, PDF, documents, Excel et audio, sans rien envoyer sur internet !",
@@ -206,7 +214,18 @@
    "features": "Images → JPG, PNG, WebP, GIF, BMP, ICO, TIFF, SVG ou PDF\nPDF → images (JPG, PNG, WebP, TIFF) ou documents modifiables (DOCX, ODT, RTF, TXT, HTML, Markdown)\nDocuments DOCX, ODT, RTF, HTML, Markdown et TXT → DOCX, ODT, RTF, PDF, HTML, Markdown ou TXT\nTableurs XLSX, XLS, ODS, CSV, JSON et autres → XLSX, XLS, XLSB, ODS, CSV, TSV, JSON, XML, HTML, SQL ou Markdown\nAudio et vidéo → MP3, WAV ou AIFF\nReconnaît tout seul le type de fichier et ne propose que les formats compatibles\nPlusieurs fichiers à la fois, avec « Tout convertir » et téléchargement dans un seul ZIP\nRespecte la virgule décimale européenne et les codes commençant par zéro\nPrivé : vos fichiers ne quittent jamais votre appareil\nDisponible en 6 langues",
    "trialLabel": "Essayez-le gratuitement !",
    "trialInfo": "Gratuit, sans inscription et sans limite : il s'utilise directement dans le navigateur, sur téléphone aussi.",
-   "requirements": "Un navigateur à jour (Chrome, Edge, Firefox ou Safari). Avec des fichiers très volumineux, la puissance de l'appareil compte."
+   "requirements": "Un navigateur à jour (Chrome, Edge, Firefox ou Safari). Avec des fichiers très volumineux, la puissance de l'appareil compte.",
+   "name": "CONVERTISSEUR DE FICHIERS"
+  },
+  "qrcode01": {
+   "tagline": "Créez des QR codes pour vos liens, votre Wi-Fi, vos cartes de visite et WhatsApp, à vos couleurs et avec votre logo !",
+   "platform": "Navigateur, PC et téléphone",
+   "description": "Créez en quelques secondes un QR code à imprimer sur des flyers, des cartes de visite, des menus, des vitrines ou des étiquettes. Choisissez ce qui se passe quand on le scanne : ouvrir votre site, se connecter à votre Wi-Fi sans saisir le mot de passe, enregistrer votre contact dans le répertoire, vous écrire un e-mail, vous appeler ou vous envoyer un SMS ou un message WhatsApp. Personnalisez les couleurs et la forme des points, ajoutez votre logo au centre et téléchargez-le en PNG, SVG ou PDF. Le code est statique : il fonctionne pour toujours, sans abonnement ni date d'expiration.",
+   "features": "8 types de contenu : lien, texte, Wi-Fi, contact (vCard), e-mail, téléphone, SMS et WhatsApp\nAperçu immédiat pendant la saisie\nCouleurs au choix, fond transparent et trois formes de points : carrés, arrondis ou ronds\nLogo au centre, avec la correction d'erreurs maximale pour rester lisible\nTéléchargement en PNG (jusqu'à 4096 pixels), SVG vectoriel pour l'impression et PDF\nAvertissement si les couleurs choisies rendent le code difficile à lire\nCodes statiques : ils fonctionnent pour toujours, sans abonnement ni expiration\nPrivé : les données saisies ne quittent jamais votre appareil\nDisponible en 6 langues",
+   "trialLabel": "Essayez-le gratuitement !",
+   "trialInfo": "Gratuit et sans inscription : il s'utilise directement dans le navigateur, sur téléphone aussi.",
+   "requirements": "Un navigateur à jour (Chrome, Edge, Firefox ou Safari).",
+   "name": "GÉNÉRATEUR DE QR CODES"
   }
  },
  "certificates": {
@@ -247,29 +266,34 @@
   "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
+  "programs.mun4oc3661ldu.name": "375af9724371",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
   "programs.mun4oc3661ldu.platform": "d63149caef80",
   "programs.mun4oc3661ldu.description": "5a2fe9d0649c",
   "programs.mun4oc3661ldu.features": "6bf22bbaee83",
   "programs.mun4oc3661ldu.trialLabel": "134add2cd5c3",
+  "programs.mun8vbdr71vb7.name": "99b943d01d4d",
   "programs.mun8vbdr71vb7.tagline": "6a1980d9dc7b",
   "programs.mun8vbdr71vb7.platform": "d63149caef80",
   "programs.mun8vbdr71vb7.description": "e5fef5aba917",
   "programs.mun8vbdr71vb7.trialLabel": "134add2cd5c3",
   "programs.mun8vbdr71vb7.trialInfo": "c0656341d024",
   "programs.mun8vbdr71vb7.requirements": "fb75b7689792",
+  "programs.muokmzza3pjsy.name": "6f89b9af5140",
   "programs.muokmzza3pjsy.tagline": "164eebb2a7c8",
   "programs.muokmzza3pjsy.platform": "d63149caef80",
   "programs.muokmzza3pjsy.description": "5707429d7a5d",
   "programs.muokmzza3pjsy.trialLabel": "134add2cd5c3",
   "programs.muokmzza3pjsy.trialInfo": "0ad8605ad5ff",
   "programs.muokmzza3pjsy.requirements": "953dfa39de02",
+  "programs.muontpfbbtfq3.name": "4ea2fd66acff",
   "programs.muontpfbbtfq3.tagline": "805c34184fe9",
   "programs.muontpfbbtfq3.platform": "d63149caef80",
   "programs.muontpfbbtfq3.description": "bdda486ca953",
   "programs.muontpfbbtfq3.features": "7f34fde18a7b",
   "programs.muontpfbbtfq3.trialLabel": "134add2cd5c3",
   "programs.muontpfbbtfq3.requirements": "102ea7df3b6a",
+  "programs.sqlquest01.name": "3e20744101bd",
   "programs.sqlquest01.tagline": "3fb2c79e6faf",
   "programs.sqlquest01.platform": "103c74273687",
   "programs.sqlquest01.description": "9ba93e650a02",
@@ -277,24 +301,28 @@
   "programs.sqlquest01.trialLabel": "a61de77fbe80",
   "programs.sqlquest01.trialInfo": "c7de362196df",
   "programs.sqlquest01.requirements": "b0f53f9eb70d",
+  "programs.m76jx4jw5t84m.name": "c629aa153bfe",
   "programs.m76jx4jw5t84m.tagline": "6ed0bf1df19c",
   "programs.m76jx4jw5t84m.platform": "103c74273687",
   "programs.m76jx4jw5t84m.description": "3cf1a3404807",
   "programs.m76jx4jw5t84m.features": "5ff37c48b256",
   "programs.m76jx4jw5t84m.trialLabel": "c84be1b93f37",
   "programs.m76jx4jw5t84m.requirements": "77495f79f663",
+  "programs.muq6m5pp44n40.name": "320f2215f008",
   "programs.muq6m5pp44n40.tagline": "89215128a819",
   "programs.muq6m5pp44n40.platform": "103c74273687",
   "programs.muq6m5pp44n40.description": "97cb9a4c7e7f",
   "programs.muq6m5pp44n40.features": "159289c8c86f",
   "programs.muq6m5pp44n40.trialLabel": "c84be1b93f37",
   "programs.muq6m5pp44n40.requirements": "77495f79f663",
+  "programs.muq7vciyaosl5.name": "35131c39a42d",
   "programs.muq7vciyaosl5.tagline": "33d22ec30bf6",
   "programs.muq7vciyaosl5.platform": "103c74273687",
   "programs.muq7vciyaosl5.description": "de44ba202e18",
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
+  "programs.convertitore01.name": "aa8a8fd85e2a",
   "programs.convertitore01.tagline": "575197e9a55b",
   "programs.convertitore01.platform": "103c74273687",
   "programs.convertitore01.description": "a5b6e61895e4",
@@ -302,6 +330,14 @@
   "programs.convertitore01.trialLabel": "a61de77fbe80",
   "programs.convertitore01.trialInfo": "cf4c9d9d513d",
   "programs.convertitore01.requirements": "2cebca929df6",
+  "programs.qrcode01.name": "8a872ac787b2",
+  "programs.qrcode01.tagline": "c13431765bb2",
+  "programs.qrcode01.platform": "103c74273687",
+  "programs.qrcode01.description": "2cba2e1fc7c0",
+  "programs.qrcode01.features": "0fa21a725c71",
+  "programs.qrcode01.trialLabel": "a61de77fbe80",
+  "programs.qrcode01.trialInfo": "c7de362196df",
+  "programs.qrcode01.requirements": "b0f53f9eb70d",
   "certificates.cert-python.title": "f2371e6336df",
   "certificates.cert-sql.title": "cdf7421b4ea6",
   "certificates.cert-vba.title": "c70bf21af748",

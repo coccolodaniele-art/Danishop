@@ -77,7 +77,7 @@
     settings: ['tagline', 'homeEyebrow', 'homeTitle', 'homeIntro', 'homePoints', 'painPoints', 'services', 'steps', 'certsIntro',
       'ctaTitle', 'ctaText', 'aboutTitle', 'aboutIntro', 'about', 'skills', 'values', 'siteAbout', 'aboutCta',
       'programsIntro', 'tradingIntro', 'toolsIntro', 'gamesIntro', 'city'],
-    programs: ['tagline', 'platform', 'description', 'features', 'trialLabel', 'trialInfo', 'requirements'],
+    programs: ['name', 'tagline', 'platform', 'description', 'features', 'trialLabel', 'trialInfo', 'requirements'],
     certificates: ['title']
   };
 
@@ -607,7 +607,9 @@
     const el = e.target.closest('[data-action], a[href]');
     if (!el) return;
     const card = el.closest('article');
-    const cardName = card && card.querySelector('h2') ? card.querySelector('h2').textContent.trim() : '';
+    // Nelle statistiche il programma compare sempre con il nome italiano, in qualunque lingua sia il sito.
+    const prog = card && card.id.startsWith('prog-') ? state.data.programs.find((p) => `prog-${p.id}` === card.id) : null;
+    const cardName = prog ? prog.name : card && card.querySelector('h2') ? card.querySelector('h2').textContent.trim() : '';
     if (el.dataset.track) {
       insight.click(el.dataset.track, el.dataset.label);
       return;

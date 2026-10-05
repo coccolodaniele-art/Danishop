@@ -136,7 +136,8 @@
    "features": "In Levels unterteilt, die Sie jeweils gezielt auf das nächste vorbereiten.",
    "trialLabel": "KOSTENLOS TESTEN!",
    "langNote": "Lektionen und Benutzeroberfläche auf Italienisch",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "CODEQUEST"
   },
   "mun8vbdr71vb7": {
    "tagline": "Erfahren Sie, wie die Märkte weltweit gerade dastehen!",
@@ -145,7 +146,8 @@
    "trialInfo": "WICHTIG: Für die Nutzung benötigen Sie zuerst einen Gemini-API-Schlüssel. Öffnen Sie diesen Link, registrieren Sie sich und erstellen Sie Ihren API-Schlüssel, um die KI des Programms zu aktivieren – es sind nur wenige einfache Schritte: https://aistudio.google.com/app/apikey\nSpeichern Sie den Schlüssel anschließend an einem sicheren Ort auf Ihrem Computer. Öffnen Sie dann das Programm, geben Sie den Schlüssel im Bereich API ein und speichern Sie.",
    "requirements": "Läuft direkt auf der Website im Browser: kein Download, keine Installation, auch auf dem Smartphone. Eine Internetverbindung ist erforderlich. Für die von der KI geschriebene Zusammenfassung benötigen Sie einen API-Schlüssel (Gemini ist kostenlos: https://aistudio.google.com/app/apikey); ohne Schlüssel verwendet das Programm die lokale Zusammenfassung.",
    "langNote": "Benutzeroberfläche auf Italienisch",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "SINTESI MERCATI AI"
   },
   "muokmzza3pjsy": {
    "tagline": "Erkennen Sie auf einen Blick, welche ausgewählten S&P-500-Aktien einen Kauf wert sind!",
@@ -154,7 +156,8 @@
    "trialInfo": "Denken Sie daran, sich zuerst kostenlos den API-Schlüssel zu besorgen, damit Sie alle Funktionen des Programms nutzen können. Hier ist der Link: https://aistudio.google.com/apikey",
    "requirements": "Läuft direkt auf der Website im Browser: kein Download, keine Installation, auch auf dem Smartphone. Eine Internetverbindung ist erforderlich. Für die von der KI geschriebenen Erklärungen (das Fragezeichen auf jedem Thermometer) und für bessere Suchergebnisse benötigen Sie einen kostenlosen Gemini-API-Schlüssel: https://aistudio.google.com/apikey",
    "langNote": "Benutzeroberfläche auf Italienisch",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "SP500 VERTICAL THERMOMETERS"
   },
   "muontpfbbtfq3": {
    "tagline": "Erweitern Sie Ihren englischen Wortschatz mit WordQuest!",
@@ -163,7 +166,8 @@
    "trialLabel": "KOSTENLOS TESTEN!",
    "requirements": "Läuft direkt auf der Website im Browser: kein Download, keine Installation, auch auf dem Smartphone. Kein API-Schlüssel nötig. Ihr Fortschritt bleibt im Browser des verwendeten Geräts gespeichert.",
    "langNote": "Italienisch ⇄ Englisch · Benutzeroberfläche auf Italienisch",
-   "platform": "Windows 10/11"
+   "platform": "Windows 10/11",
+   "name": "WORDQUEST"
   },
   "sqlquest01": {
    "tagline": "SQL lernen durch Ausprobieren: ein Simulator mit echter Datenbank, Übungen und Lösungen!",
@@ -173,7 +177,8 @@
    "trialLabel": "Kostenlos testen!",
    "trialInfo": "Kostenlos und ohne Anmeldung: direkt im Browser nutzbar, auch auf dem Smartphone.",
    "requirements": "Ein aktueller Browser (Chrome, Edge, Firefox oder Safari).",
-   "langNote": "Lektionen und Benutzeroberfläche auf Italienisch"
+   "langNote": "Lektionen und Benutzeroberfläche auf Italienisch",
+   "name": "SQLQUEST"
   },
   "m76jx4jw5t84m": {
    "tagline": "Fordern Sie den Computer heraus oder spielen Sie online gegen andere Besucher!",
@@ -181,7 +186,8 @@
    "description": "Das klassische Schachspiel mit allen Regeln, direkt im Browser. Trainieren Sie gegen den Computer in 6 Schwierigkeitsstufen, von Anfänger bis Meister, oder betreten Sie den Online-Raum und fordern Sie in Echtzeit die anderen Besucher heraus, die gerade da sind. Sie können auch zu zweit am selben Brett spielen.",
    "features": "Gegen den Computer: 6 Stufen, Tipps und Zugrücknahme\nOnline: Raum mit den anwesenden Spielern, Partien mit Uhr, Remis und Revanche\nZwei Spieler am selben Gerät\nAlle Regeln: Rochade, En passant, Umwandlung, Remis durch Stellungswiederholung und 50-Züge-Regel",
    "trialLabel": "Jetzt spielen",
-   "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone."
+   "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone.",
+   "name": "SCHACH"
   },
   "muq6m5pp44n40": {
    "tagline": "Die klassische Patience mit Karten – jederzeit spielbar, auch auf dem Smartphone!",
@@ -189,7 +195,8 @@
    "description": "Die bekannte Patience (Klondike) mit sieben Spalten und vier Ablagestapeln, die vom Ass bis zum König gefüllt werden. Ziehen Sie die Karten oder tippen Sie sie an – sie wandern dann von selbst an den richtigen Platz. Wählen Sie, ob Sie jeweils eine Karte ziehen (leichter) oder drei (die klassische Variante), holen Sie sich einen Tipp, wenn Sie nicht weiterkommen, und nehmen Sie Züge so oft zurück, wie Sie möchten.",
    "features": "1 oder 3 Karten ziehen\nUnbegrenzte Tipps und Zugrücknahmen\nSchön gestaltete klassische Karten mit traditionellen Bildern\nSchaltfläche zum Beenden der Partie, wenn alle Karten aufgedeckt sind\nPunkte, Zeit und Statistiken mit Siegesserien\nPartie des Tages: dieselbe Verteilung für alle\nDie Partie bleibt gespeichert: Sie können das Spiel schließen und später weiterspielen",
    "trialLabel": "Jetzt spielen",
-   "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone."
+   "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone.",
+   "name": "SOLITÄR"
   },
   "muq7vciyaosl5": {
    "tagline": "Italienisches Damespiel: Fordern Sie den Computer heraus oder spielen Sie zu zweit!",
@@ -197,7 +204,8 @@
    "description": "Das italienische Damespiel mit allen Regeln, direkt im Browser. Fordern Sie den Computer in 5 Schwierigkeitsstufen heraus, von Anfänger bis Champion, oder spielen Sie zu zweit am selben Brett. Tippen Sie die Steine an oder ziehen Sie sie: Das Spiel zeigt Ihnen die möglichen Züge und weist Sie darauf hin, wenn Schlagzwang besteht.",
    "features": "Gegen den Computer: 5 Stufen, Tipps und Zugrücknahme\nZwei Spieler am selben Gerät\nVollständige italienische Regeln: Schlagzwang, Vorrangregeln, einfache Steine schlagen keine Damen\nGespeicherte Partie: Sie können das Spiel schließen und später weiterspielen\nSiegstatistiken für jede Stufe",
    "trialLabel": "Jetzt spielen",
-   "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone."
+   "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone.",
+   "name": "DAME"
   },
   "convertitore01": {
    "tagline": "Datei hochladen und Format wählen: Bilder, PDFs, Dokumente, Excel und Audio – ohne etwas ins Internet hochzuladen!",
@@ -206,7 +214,18 @@
    "features": "Bilder → JPG, PNG, WebP, GIF, BMP, ICO, TIFF, SVG oder PDF\nPDF → Bilder (JPG, PNG, WebP, TIFF) oder bearbeitbare Dokumente (DOCX, ODT, RTF, TXT, HTML, Markdown)\nDokumente in DOCX, ODT, RTF, HTML, Markdown und TXT → DOCX, ODT, RTF, PDF, HTML, Markdown oder TXT\nTabellen in XLSX, XLS, ODS, CSV, JSON und weiteren Formaten → XLSX, XLS, XLSB, ODS, CSV, TSV, JSON, XML, HTML, SQL oder Markdown\nAudio und Video → MP3, WAV oder AIFF\nErkennt den Dateityp selbst und schlägt nur passende Formate vor\nMehrere Dateien gleichzeitig, mit „Alle konvertieren“ und Download als eine ZIP-Datei\nBerücksichtigt das europäische Dezimalkomma und Codes mit führenden Nullen\nPrivat: Ihre Dateien verlassen nie Ihr Gerät\nIn 6 Sprachen verfügbar",
    "trialLabel": "Kostenlos testen!",
    "trialInfo": "Kostenlos, ohne Anmeldung und ohne Begrenzung: direkt im Browser nutzbar, auch auf dem Smartphone.",
-   "requirements": "Ein aktueller Browser (Chrome, Edge, Firefox oder Safari). Bei sehr großen Dateien kommt es auf die Leistung des Geräts an."
+   "requirements": "Ein aktueller Browser (Chrome, Edge, Firefox oder Safari). Bei sehr großen Dateien kommt es auf die Leistung des Geräts an.",
+   "name": "DATEIKONVERTER"
+  },
+  "qrcode01": {
+   "tagline": "Erstellen Sie QR-Codes für Links, WLAN, Visitenkarten und WhatsApp – mit Ihren Farben und Ihrem Logo!",
+   "platform": "Browser, PC und Smartphone",
+   "description": "Erstellen Sie in Sekunden einen QR-Code für Flyer, Visitenkarten, Speisekarten, Schaufenster oder Etiketten. Legen Sie fest, was beim Scannen passiert: Ihre Website öffnen, sich ohne Passworteingabe mit Ihrem WLAN verbinden, Ihren Kontakt im Adressbuch speichern, Ihnen eine E-Mail schreiben, Sie anrufen oder Ihnen eine SMS oder WhatsApp-Nachricht senden. Passen Sie Farben und Punktform an, fügen Sie Ihr Logo in der Mitte ein und laden Sie den Code als PNG, SVG oder PDF herunter. Der Code ist statisch: Er funktioniert dauerhaft – ohne Abo und ohne Ablaufdatum.",
+   "features": "8 Inhaltstypen: Link, Text, WLAN, Kontakt (vCard), E-Mail, Telefon, SMS und WhatsApp\nSofortige Vorschau während der Eingabe\nFarben nach Wahl, transparenter Hintergrund und drei Punktformen: eckig, abgerundet oder rund\nLogo in der Mitte, mit höchster Fehlerkorrektur für gute Lesbarkeit\nDownload als PNG (bis 4096 Pixel), Vektor-SVG für den Druck und PDF\nHinweis, wenn die gewählten Farben die Lesbarkeit beeinträchtigen\nStatische Codes: dauerhaft gültig, ohne Abo und ohne Ablaufdatum\nPrivat: Ihre Eingaben verlassen nie Ihr Gerät\nIn 6 Sprachen verfügbar",
+   "trialLabel": "Kostenlos testen!",
+   "trialInfo": "Kostenlos und ohne Anmeldung: direkt im Browser nutzbar, auch auf dem Smartphone.",
+   "requirements": "Ein aktueller Browser (Chrome, Edge, Firefox oder Safari).",
+   "name": "QR-CODE-GENERATOR"
   }
  },
  "certificates": {
@@ -247,29 +266,34 @@
   "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
+  "programs.mun4oc3661ldu.name": "375af9724371",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
   "programs.mun4oc3661ldu.platform": "d63149caef80",
   "programs.mun4oc3661ldu.description": "5a2fe9d0649c",
   "programs.mun4oc3661ldu.features": "6bf22bbaee83",
   "programs.mun4oc3661ldu.trialLabel": "134add2cd5c3",
+  "programs.mun8vbdr71vb7.name": "99b943d01d4d",
   "programs.mun8vbdr71vb7.tagline": "6a1980d9dc7b",
   "programs.mun8vbdr71vb7.platform": "d63149caef80",
   "programs.mun8vbdr71vb7.description": "e5fef5aba917",
   "programs.mun8vbdr71vb7.trialLabel": "134add2cd5c3",
   "programs.mun8vbdr71vb7.trialInfo": "c0656341d024",
   "programs.mun8vbdr71vb7.requirements": "fb75b7689792",
+  "programs.muokmzza3pjsy.name": "6f89b9af5140",
   "programs.muokmzza3pjsy.tagline": "164eebb2a7c8",
   "programs.muokmzza3pjsy.platform": "d63149caef80",
   "programs.muokmzza3pjsy.description": "5707429d7a5d",
   "programs.muokmzza3pjsy.trialLabel": "134add2cd5c3",
   "programs.muokmzza3pjsy.trialInfo": "0ad8605ad5ff",
   "programs.muokmzza3pjsy.requirements": "953dfa39de02",
+  "programs.muontpfbbtfq3.name": "4ea2fd66acff",
   "programs.muontpfbbtfq3.tagline": "805c34184fe9",
   "programs.muontpfbbtfq3.platform": "d63149caef80",
   "programs.muontpfbbtfq3.description": "bdda486ca953",
   "programs.muontpfbbtfq3.features": "7f34fde18a7b",
   "programs.muontpfbbtfq3.trialLabel": "134add2cd5c3",
   "programs.muontpfbbtfq3.requirements": "102ea7df3b6a",
+  "programs.sqlquest01.name": "3e20744101bd",
   "programs.sqlquest01.tagline": "3fb2c79e6faf",
   "programs.sqlquest01.platform": "103c74273687",
   "programs.sqlquest01.description": "9ba93e650a02",
@@ -277,24 +301,28 @@
   "programs.sqlquest01.trialLabel": "a61de77fbe80",
   "programs.sqlquest01.trialInfo": "c7de362196df",
   "programs.sqlquest01.requirements": "b0f53f9eb70d",
+  "programs.m76jx4jw5t84m.name": "c629aa153bfe",
   "programs.m76jx4jw5t84m.tagline": "6ed0bf1df19c",
   "programs.m76jx4jw5t84m.platform": "103c74273687",
   "programs.m76jx4jw5t84m.description": "3cf1a3404807",
   "programs.m76jx4jw5t84m.features": "5ff37c48b256",
   "programs.m76jx4jw5t84m.trialLabel": "c84be1b93f37",
   "programs.m76jx4jw5t84m.requirements": "77495f79f663",
+  "programs.muq6m5pp44n40.name": "320f2215f008",
   "programs.muq6m5pp44n40.tagline": "89215128a819",
   "programs.muq6m5pp44n40.platform": "103c74273687",
   "programs.muq6m5pp44n40.description": "97cb9a4c7e7f",
   "programs.muq6m5pp44n40.features": "159289c8c86f",
   "programs.muq6m5pp44n40.trialLabel": "c84be1b93f37",
   "programs.muq6m5pp44n40.requirements": "77495f79f663",
+  "programs.muq7vciyaosl5.name": "35131c39a42d",
   "programs.muq7vciyaosl5.tagline": "33d22ec30bf6",
   "programs.muq7vciyaosl5.platform": "103c74273687",
   "programs.muq7vciyaosl5.description": "de44ba202e18",
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
+  "programs.convertitore01.name": "aa8a8fd85e2a",
   "programs.convertitore01.tagline": "575197e9a55b",
   "programs.convertitore01.platform": "103c74273687",
   "programs.convertitore01.description": "a5b6e61895e4",
@@ -302,6 +330,14 @@
   "programs.convertitore01.trialLabel": "a61de77fbe80",
   "programs.convertitore01.trialInfo": "cf4c9d9d513d",
   "programs.convertitore01.requirements": "2cebca929df6",
+  "programs.qrcode01.name": "8a872ac787b2",
+  "programs.qrcode01.tagline": "c13431765bb2",
+  "programs.qrcode01.platform": "103c74273687",
+  "programs.qrcode01.description": "2cba2e1fc7c0",
+  "programs.qrcode01.features": "0fa21a725c71",
+  "programs.qrcode01.trialLabel": "a61de77fbe80",
+  "programs.qrcode01.trialInfo": "c7de362196df",
+  "programs.qrcode01.requirements": "b0f53f9eb70d",
   "certificates.cert-python.title": "f2371e6336df",
   "certificates.cert-sql.title": "cdf7421b4ea6",
   "certificates.cert-vba.title": "c70bf21af748",

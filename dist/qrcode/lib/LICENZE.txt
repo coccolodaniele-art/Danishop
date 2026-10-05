@@ -1,0 +1,5 @@
+Libreria usata dal Generatore di codici QR (copia originale, non modificata):
+
+- qrcode-generator 1.4.4 (Kazuhiko Arase) - MIT License - https://github.com/kazuhikoarase/qrcode-generator
+
+Rimossa solo la riga "sourceMappingURL". Il PDF usa pdf-lib dalla cartella del Convertitore (../convertitore/lib).

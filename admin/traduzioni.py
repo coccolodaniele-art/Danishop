@@ -28,7 +28,7 @@ FIELDS = {
     "settings": ["tagline", "homeEyebrow", "homeTitle", "homeIntro", "homePoints", "painPoints", "services", "steps",
                  "certsIntro", "ctaTitle", "ctaText", "aboutTitle", "aboutIntro", "about", "skills", "values",
                  "siteAbout", "aboutCta", "programsIntro", "tradingIntro", "toolsIntro", "gamesIntro", "city"],
-    "programs": ["tagline", "platform", "description", "features", "trialLabel", "trialInfo", "requirements"],
+    "programs": ["name", "tagline", "platform", "description", "features", "trialLabel", "trialInfo", "requirements"],
     "certificates": ["title"],
 }
 
