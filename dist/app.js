@@ -467,7 +467,8 @@
 
   function currentRoute() {
     const r = location.hash.replace(/^#\/?/, '').split('/')[0];
-    if (HOME_ANCHORS.includes(r) || r === 'info') return 'home';
+    if (ANCHORS[r]) return ANCHORS[r];
+    if (r === 'info') return 'home';
     if (r === 'chi-sono') return 'chisono';
     return ['home', 'chisono', 'admin'].concat(PROGRAM_SECTIONS.map((x) => x.route)).includes(r) ? r : 'home';
   }
@@ -508,19 +509,19 @@
     if (!modal.hidden) closeModal();
     const prev = state.route;
     render();
-    if (wantsContacts()) scrollToContacts();
+    if (pageAnchor()) scrollToAnchor();
     else if (prev !== state.route) window.scrollTo(0, 0);
   });
 
-  // #contatti e #attestati aprono la Home direttamente su quella parte (anche i vecchi link #info portano alla Home).
-  const HOME_ANCHORS = ['contatti', 'attestati'];
-  function homeAnchor() { const r = location.hash.replace(/^#\/?/, '').split('/')[0]; return HOME_ANCHORS.includes(r) ? r : ''; }
-  function wantsContacts() { return !!homeAnchor(); }
+  // Indirizzi che aprono una pagina direttamente su una sua parte: #contatti (Home) e #attestati (Chi sono).
+  // I vecchi link #info portano alla Home.
+  const ANCHORS = { contatti: 'home', attestati: 'chisono' };
+  function pageAnchor() { const r = location.hash.replace(/^#\/?/, '').split('/')[0]; return ANCHORS[r] ? r : ''; }
   function scrollToId(id) {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ block: 'start' }); // morbido grazie a scroll-behavior nel CSS
   }
-  function scrollToContacts() { scrollToId(homeAnchor() || 'contatti'); }
+  function scrollToAnchor() { scrollToId(pageAnchor() || 'contatti'); }
 
   /* =========================================================
      Statistiche: raccolta anonima di visite e click
@@ -900,8 +901,6 @@
         </div>
       </section>
 
-      ${renderCertificates()}
-
       ${ctaBand(s.ctaTitle || t('ctaDefault'))}
 
       ${renderContacts()}`;
@@ -955,10 +954,12 @@
 ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
 ]</code></pre>
             </div>` : ''}
-            ${certs.length ? `<a class="about-certs" href="#attestati" data-track="about-link" data-label="Vedi gli attestati">${esc(t('seeCerts'))}</a>` : ''}
+            ${certs.length ? `<a class="about-certs" href="#attestati" data-action="scroll-to" data-target="attestati" data-track="about-link" data-label="Vedi gli attestati">${esc(t('seeCerts'))}</a>` : ''}
           </div>
         </div>
       </section>
+
+      ${renderCertificates()}
 
       ${values.length ? `
       <section class="home-section">
@@ -989,7 +990,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     return /^\d{4}-\d{2}-\d{2}$/.test(c.date || '') ? new Date(c.date + 'T12:00:00').toLocaleDateString('it-IT', opts) : '';
   }
 
-  // Nella Home gli attestati si vedono solo come immagini (il titolo è già scritto sull'attestato).
+  // Nella pagina Chi sono gli attestati si vedono solo come immagini (il titolo è già scritto sull'attestato).
   function renderCertificates() {
     const s = state.view.settings;
     const list = state.view.certificates.filter((c) => c.title && safeImg(c.image));
@@ -1304,7 +1305,6 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         ${field('painPoints', 'Ti riconosci? (i problemi del cliente)', s.painPoints, { textarea: true, rows: 5, hint: 'Uno per riga. Se lasci vuoto, la sezione non compare.' })}
         ${field('services', 'Cosa posso fare per te', s.services, { textarea: true, rows: 6, hint: 'Uno per riga, nella forma "Titolo: descrizione". Se lasci vuoto, la sezione non compare.' })}
         ${field('steps', 'Come funziona', s.steps, { textarea: true, rows: 3, hint: 'Un passaggio per riga, nella forma "Titolo: descrizione".' })}
-        ${field('certsIntro', 'Formazione certificata', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati (si gestiscono nella scheda Attestati).' })}
         ${field('ctaTitle', 'Banner finale: titolo', s.ctaTitle, { placeholder: 'Hai un lavoro che ti ruba ore ogni settimana?', hint: 'Il riquadro scuro prima dei contatti. Le parole tra *asterischi* vengono evidenziate.' })}
         ${field('ctaText', 'Banner finale: testo', s.ctaText, { textarea: true, rows: 2 })}
 
@@ -1325,6 +1325,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         ${field('skills', 'Competenze', s.skills, { textarea: true, rows: 4, hint: 'Una per riga: compaiono scritte come un piccolo file di codice.' })}
         ${field('values', 'Come lavoro', s.values, { textarea: true, rows: 3, hint: 'Uno per riga, nella forma "Titolo: descrizione". Se lasci vuoto, la sezione non compare.' })}
         ${field('siteAbout', 'Questo sito', s.siteAbout, { textarea: true, rows: 3, hint: 'Cosa si trova nel sito e come si usa.' })}
+        ${field('certsIntro', 'Formazione certificata', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati, nella pagina Chi sono (si gestiscono nella scheda Attestati).' })}
         ${field('aboutCta', 'Banner finale: titolo', s.aboutCta, { placeholder: 'Hai un problema da risolvere al computer? *Parliamone.*' })}
 
         <div class="form-section">Testi delle schede</div>
@@ -2097,6 +2098,6 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     await Promise.all([detectLocalServer(), loadLang(pickLang())]);
     await loadData();
     render();
-    if (wantsContacts()) setTimeout(scrollToContacts, 50);
+    if (pageAnchor()) setTimeout(scrollToAnchor, 50);
   })();
 })();
