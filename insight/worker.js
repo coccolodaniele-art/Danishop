@@ -13,7 +13,7 @@
 //   GET  /stats?days=30     riepilogo per l'area Insight (serve la chiave)
 //   GET  /export?days=30    tutti gli eventi in CSV (serve la chiave)
 
-const ALLOWED_ORIGINS = ["https://coccolodaniele-art.github.io"];
+const ALLOWED_ORIGINS = ["https://coccolodigital.com", "https://www.coccolodigital.com", "https://coccolodaniele-art.github.io"];
 const LOCAL_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 const SECTIONS = ["home", "chisono", "programmi", "trading", "strumenti", "giochi", "info"];
 const BOTS = /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|preview|facebookexternalhit|embedly|curl|wget|python|java\/|monitor|uptime/i;

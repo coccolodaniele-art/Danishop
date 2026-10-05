@@ -29,6 +29,8 @@ const ALLOWED_HOSTS = [
 ];
 
 const ALLOWED_ORIGINS = [
+  "https://coccolodigital.com",
+  "https://www.coccolodigital.com",
   "https://coccolodaniele-art.github.io",
   "http://localhost:5501",
   "http://localhost:5500",
