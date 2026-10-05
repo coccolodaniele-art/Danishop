@@ -90,7 +90,7 @@
     emptyPrograms: 'Nessun programma pubblicato', emptyProgramsSub: 'A breve troverai qui i miei programmi.',
     zoom: 'Ingrandisci', zoomImage: "Ingrandisci l'immagine di {name}",
     playNow: 'Gioca ora', version: 'Versione {v}', trialMode: 'Modalità di prova',
-    download: 'Scarica il programma', openProgram: 'Apri il programma', askInfo: 'Contattami per informazioni', requirements: 'Requisiti di sistema',
+    download: 'Scarica il programma', openProgram: 'Apri il programma', askInfo: 'Chiedi informazioni senza impegno', requirements: 'Requisiti di sistema',
     appLangNote: 'Interfaccia in italiano',
     demoAria: 'Esempio di automazione: 248 fatture elaborate in 41 secondi invece di circa 3 ore',
     demoFile: 'automazione_fatture.py', demoRunning: 'in esecuzione',
@@ -99,7 +99,11 @@
     demoWith: "Con l'automazione", demoWithValue: '41 secondi', demoBefore: 'Prima, a mano', demoBeforeValue: 'circa 3 ore',
     demoCaption: "Un esempio del lavoro che un'automazione può fare al posto tuo.",
     ctaProblem: 'Raccontami il tuo problema', howItWorks: 'Come funziona',
-    whoIsBehind: "Chi c'è dietro queste automazioni? Scopri chi sono →",
+    heroReassure: 'Contattami gratuitamente e senza impegno: una prima chiacchierata non ti vincola a nulla.',
+    heroBadge: 'Prima consulenza gratuita', aboutLink: 'Scopri chi sono →',
+    exampleTitle: 'Un esempio concreto',
+    exampleText: "Immagina di ricevere ogni mese centinaia di fatture in PDF e di doverle ricopiare a mano in Excel: ore di lavoro ripetitivo e il rischio continuo di sbagliare un numero. Un'automazione può leggerle, estrarre i dati e aggiornare il foglio da sola, in meno di un minuto. Ogni azienda ha il suo «lavoro delle fatture»: raccontami il tuo.",
+    exampleCta: 'Parliamone, senza impegno',
     painsTitle: 'Ti riconosci?', painsSub: 'Sono le attività che rubano più tempo in ufficio. E quasi sempre si possono automatizzare.',
     painsClose: 'Se hai annuito almeno una volta,', painsCloseStrong: "c'è qualcosa che posso automatizzare per te.",
     servicesTitle: 'Cosa posso fare per te', servicesSub: 'Ogni soluzione è costruita su misura per il tuo modo di lavorare, con gli strumenti che usi già.',
@@ -111,15 +115,15 @@
     zoomCert: "Ingrandisci l'attestato {t}", certAlt: 'Attestato: {t}',
     verifyCert: "Verifica l'autenticità sul sito di {issuer} ↗", verifyIssuerFallback: "chi l'ha rilasciato",
     ctaDefault: 'Hai un lavoro che ti ruba ore ogni settimana?', writeMe: 'Scrivimi',
-    aboutHello: 'Ciao, sono {name}', contactMe: 'Contattami', seeProjects: 'Guarda i miei progetti',
+    aboutHello: 'Ciao, sono {name}', contactMe: 'Contattami senza impegno', seeProjects: 'Guarda i miei progetti',
     storyTitle: 'La mia storia', storyEmpty: 'Presentazione in arrivo.',
     factPrograms_one: 'programma pubblicato', factPrograms_other: 'programmi pubblicati',
     factGames_one: 'gioco nel browser', factGames_other: 'giochi nel browser',
     factCourses_one: 'corso certificato', factCourses_other: 'corsi certificati', factHours: 'ore di formazione',
     skillsVar: 'competenze', seeCerts: 'Vedi gli attestati →', valuesTitle: 'Come lavoro', siteTitle: 'Questo sito',
-    aboutCtaDefault: 'Hai un problema da risolvere al computer? *Parliamone.*',
-    contactsTitle: 'Contatti', contactsSub: 'Raccontami in poche righe cosa ti fa perdere tempo o quale problema vuoi risolvere: ti rispondo il prima possibile.',
-    formTitle: 'Scrivimi un messaggio', formName: 'Il tuo nome', formMessage: 'Messaggio', formPlaceholder: 'Di cosa vuoi parlarmi?', formSend: 'Invia messaggio',
+    aboutCtaDefault: 'Hai un problema da risolvere al computer? *Parliamone, senza impegno.*',
+    contactsTitle: 'Contatti', contactsSub: 'Scrivimi in tutta libertà: il primo contatto è gratuito e non ti impegna a nulla. Raccontami in poche righe cosa ti fa perdere tempo o quale problema vuoi risolvere, e ti rispondo il prima possibile.',
+    formTitle: 'Scrivimi senza impegno', formName: 'Il tuo nome', formMessage: 'Messaggio', formPlaceholder: 'Di cosa vuoi parlarmi?', formSend: 'Invia messaggio',
     contactsBox: 'Recapiti', cEmail: 'Email', cPhone: 'Telefono', cArea: 'Zona', cWebsite: 'Sito web', contactsEmpty: 'Contatti in arrivo.',
     formNeedMessage: 'Scrivi un messaggio', mailSubject: 'Messaggio dal sito', mailOpening: 'Si sta aprendo il tuo programma di posta'
   };
@@ -743,6 +747,7 @@
     ai: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
     tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    shield: '<path d="M12 3 4 6v6c0 5 3.4 8.6 8 9 4.6-.4 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
     arrow: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>'
   };
@@ -822,14 +827,15 @@
             <a class="btn big" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Raccontami il tuo problema">${esc(t('ctaProblem'))} ${homeIcon('arrow')}</a>
             ${steps.length ? `<a class="btn secondary big" href="#metodo" data-action="scroll-to" data-target="metodo" data-track="home-link" data-label="Come funziona">${esc(t('howItWorks'))}</a>` : ''}
           </div>
+          <p class="hero-reassure">${homeIcon('shield')}<span>${esc(t('heroReassure'))}</span></p>
           ${points.length ? `<ul class="hero-points">${points.map((p) => `<li>${homeIcon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
-          ${s.ownerName ? `
-          <a class="hero-me" href="#chisono" data-track="home-link" data-label="Scopri chi sono">
-            ${photo ? `<img src="${photo}" alt="">` : ''}
-            <span><strong>${esc(s.ownerName)}</strong><small>${esc(t('whoIsBehind'))}</small></span>
-          </a>` : ''}
         </div>
-        ${automationDemo()}
+        ${photo ? `
+        <figure class="hero-photo home-photo">
+          <img src="${photo}" alt="${esc(s.ownerName || s.siteName)}">
+          <span class="hero-badge">${homeIcon('check')}${esc(t('heroBadge'))}</span>
+          ${s.ownerName ? `<a class="hero-name" href="#chisono" data-track="home-link" data-label="Scopri chi sono"><strong>${esc(s.ownerName)}</strong><span>${esc(s.tagline || '')}</span><em>${esc(t('aboutLink'))}</em></a>` : ''}
+        </figure>` : automationDemo()}
       </section>
 
       ${pains.length ? `
@@ -840,6 +846,18 @@
           <div class="pain"><span class="pain-ico">${homeIcon('clock')}</span><p>${esc(p)}</p></div>`).join('')}
         </div>
         <p class="pains-close">${esc(t('painsClose'))} <strong>${esc(t('painsCloseStrong'))}</strong></p>
+      </section>` : ''}
+
+      ${photo ? `
+      <section class="home-section">
+        <h2 class="section-title">${esc(t('exampleTitle'))}</h2>
+        <div class="example">
+          <div class="example-text">
+            <p>${esc(t('exampleText'))}</p>
+            <a class="btn secondary" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Esempio: parliamone">${esc(t('exampleCta'))} ${homeIcon('arrow')}</a>
+          </div>
+          ${automationDemo()}
+        </div>
       </section>` : ''}
 
       ${services.length ? `
@@ -893,8 +911,6 @@
 
   function renderAbout() {
     const s = state.view.settings;
-    const photo = photoOf(s);
-    const initials = (s.ownerName || s.siteName || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
     const skills = lines(s.skills);
     const values = pairs(s.values);
     const story = String(s.about || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean); // il primo paragrafo fa da attacco
@@ -910,11 +926,9 @@
     ].filter(Boolean);
     const skillsVar = t('skillsVar');
 
+    // La foto grande sta nella Home; qui resta la presentazione.
     return `
-      <section class="about-hero">
-        ${photo
-          ? `<div class="hero-photo about-photo"><img src="${photo}" alt="${esc(s.ownerName || s.siteName)}"></div>`
-          : `<div class="hero-mark" aria-hidden="true"><span>${esc(initials)}</span></div>`}
+      <section class="about-hero solo">
         <div class="hero-text">
           <span class="hero-eyebrow">${esc(t('navAbout'))}${s.city ? ` · ${esc(s.city)}` : ''}</span>
           <h1>${hl(s.aboutTitle || (s.ownerName ? t('aboutHello', { name: s.ownerName }) : t('navAbout')))}</h1>
@@ -1302,7 +1316,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
             <button type="button" class="btn secondary small" data-action="pick-home-photo">${safeImg(s.photo) ? 'Cambia foto' : 'Carica foto'}</button>
             ${safeImg(s.photo) ? '<button type="button" class="btn ghost small" data-action="remove-home-photo">Rimuovi</button>' : ''}
           </div>
-          <small>Compare grande nella pagina Chi sono e piccola nella Home; senza foto si vedono le tue iniziali. Meglio una foto verticale. Si salva subito.</small>
+          <small>Compare grande in cima alla Home, con il tuo nome e il bollino della consulenza gratuita; senza foto, al suo posto si vede l'esempio di automazione. Meglio una foto verticale. Si salva subito.</small>
           <input type="file" id="homePhotoInput" accept="image/*" hidden>
         </div>
         ${field('aboutTitle', 'Titolo', s.aboutTitle, { placeholder: 'Ciao, sono…', hint: 'Le parole tra *asterischi* vengono evidenziate in colore.' })}
