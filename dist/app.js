@@ -98,8 +98,7 @@
     demoStep3: 'Aggiornato il foglio Excel "Contabilità"', demoStep4: 'Inviato il riepilogo via email',
     demoWith: "Con l'automazione", demoWithValue: '41 secondi', demoBefore: 'Prima, a mano', demoBeforeValue: 'circa 3 ore',
     demoCaption: "Un esempio del lavoro che un'automazione può fare al posto tuo.",
-    ctaProblem: 'Raccontami il tuo problema', howItWorks: 'Come funziona',
-    heroReassure: 'Contattami gratuitamente e senza impegno: una prima chiacchierata non ti vincola a nulla.',
+    heroCta: 'Contattami gratuitamente e senza impegno',
     heroBadge: 'Prima consulenza gratuita', aboutLink: 'Scopri chi sono →',
     exampleTitle: 'Un esempio concreto',
     exampleText: "Immagina di ricevere ogni mese centinaia di fatture in PDF e di doverle ricopiare a mano in Excel: ore di lavoro ripetitivo e il rischio continuo di sbagliare un numero. Un'automazione può leggerle, estrarre i dati e aggiornare il foglio da sola, in meno di un minuto. Ogni azienda ha il suo «lavoro delle fatture»: raccontami il tuo.",
@@ -823,11 +822,7 @@
           <span class="hero-eyebrow">${esc(s.homeEyebrow || s.tagline || s.siteName)}</span>
           <h1>${hl(s.homeTitle || s.siteName)}</h1>
           ${s.homeIntro ? `<p class="hero-lead">${esc(s.homeIntro)}</p>` : ''}
-          <div class="row">
-            <a class="btn big" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Raccontami il tuo problema">${esc(t('ctaProblem'))} ${homeIcon('arrow')}</a>
-            ${steps.length ? `<a class="btn secondary big" href="#metodo" data-action="scroll-to" data-target="metodo" data-track="home-link" data-label="Come funziona">${esc(t('howItWorks'))}</a>` : ''}
-          </div>
-          <p class="hero-reassure">${homeIcon('shield')}<span>${esc(t('heroReassure'))}</span></p>
+          <a class="btn hero-cta" href="#contatti" data-action="go-contacts" data-track="home-link" data-label="Contattami gratuitamente e senza impegno">${ICONS.mail}<span>${esc(t('heroCta'))}</span>${homeIcon('arrow')}</a>
           ${points.length ? `<ul class="hero-points">${points.map((p) => `<li>${homeIcon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
         </div>
         ${photo ? `

@@ -38,8 +38,6 @@
   "demoBefore": "Before, by hand",
   "demoBeforeValue": "about 3 hours",
   "demoCaption": "An example of the work an automation can do for you.",
-  "ctaProblem": "Tell me about your problem",
-  "howItWorks": "How it works",
   "painsTitle": "Sound familiar?",
   "painsSub": "These are the tasks that eat up the most time in an office. And almost all of them can be automated.",
   "painsClose": "If you nodded even once,",
@@ -102,12 +100,12 @@
   "mailOpening": "Opening your email app",
   "navTools": "Tools",
   "sec_strumenti": "Useful tools",
-  "heroReassure": "Contact me free of charge and with no obligation: a first chat doesn't commit you to anything.",
   "heroBadge": "Free first consultation",
   "aboutLink": "Meet me →",
   "exampleTitle": "A concrete example",
   "exampleText": "Imagine receiving hundreds of PDF invoices every month and having to copy them into Excel by hand: hours of repetitive work and a constant risk of typing a wrong number. An automation can read them, extract the data and update the sheet by itself in under a minute. Every business has its own \"invoice job\": tell me about yours.",
-  "exampleCta": "Let's talk, no obligation"
+  "exampleCta": "Let's talk, no obligation",
+  "heroCta": "Contact me free of charge, with no obligation"
  },
  "settings": {
   "tagline": "Custom automations and software",

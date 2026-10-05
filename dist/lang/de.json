@@ -38,8 +38,6 @@
   "demoBefore": "Bisher, von Hand",
   "demoBeforeValue": "rund 3 Stunden",
   "demoCaption": "Ein Beispiel dafür, was eine Automatisierung für Sie erledigen kann.",
-  "ctaProblem": "Schildern Sie mir Ihr Problem",
-  "howItWorks": "So funktioniert es",
   "painsTitle": "Kommt Ihnen das bekannt vor?",
   "painsSub": "Diese Aufgaben kosten im Büro am meisten Zeit – und fast alle lassen sich automatisieren.",
   "painsClose": "Wenn Sie auch nur einmal genickt haben,",
@@ -102,12 +100,12 @@
   "mailOpening": "Ihr E-Mail-Programm wird geöffnet",
   "navTools": "Werkzeuge",
   "sec_strumenti": "Nützliche Werkzeuge",
-  "heroReassure": "Kontaktieren Sie mich kostenlos und unverbindlich: Ein erstes Gespräch verpflichtet Sie zu nichts.",
   "heroBadge": "Kostenlose Erstberatung",
   "aboutLink": "Lernen Sie mich kennen →",
   "exampleTitle": "Ein konkretes Beispiel",
   "exampleText": "Stellen Sie sich vor, Sie erhalten jeden Monat Hunderte PDF-Rechnungen und müssen sie von Hand in Excel übertragen: stundenlange Routinearbeit und das ständige Risiko eines Tippfehlers. Eine Automatisierung kann sie einlesen, die Daten extrahieren und die Tabelle selbstständig aktualisieren – in weniger als einer Minute. Jedes Unternehmen hat seine eigene „Rechnungsarbeit“: Erzählen Sie mir von Ihrer.",
-  "exampleCta": "Unverbindlich darüber sprechen"
+  "exampleCta": "Unverbindlich darüber sprechen",
+  "heroCta": "Kontaktieren Sie mich – kostenlos und unverbindlich"
  },
  "settings": {
   "tagline": "Maßgeschneiderte Automatisierungen und Software",

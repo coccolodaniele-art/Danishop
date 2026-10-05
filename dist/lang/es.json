@@ -38,8 +38,6 @@
   "demoBefore": "Antes, a mano",
   "demoBeforeValue": "unas 3 horas",
   "demoCaption": "Un ejemplo del trabajo que una automatización puede hacer por ti.",
-  "ctaProblem": "Cuéntame tu problema",
-  "howItWorks": "Cómo funciona",
   "painsTitle": "¿Te suena?",
   "painsSub": "Son las tareas que más tiempo roban en una oficina. Y casi siempre se pueden automatizar.",
   "painsClose": "Si has asentido aunque sea una vez,",
@@ -102,12 +100,12 @@
   "mailOpening": "Se está abriendo tu programa de correo",
   "navTools": "Herramientas",
   "sec_strumenti": "Herramientas útiles",
-  "heroReassure": "Contáctame gratis y sin compromiso: una primera charla no te ata a nada.",
   "heroBadge": "Primera consulta gratuita",
   "aboutLink": "Descubre quién soy →",
   "exampleTitle": "Un ejemplo concreto",
   "exampleText": "Imagina recibir cada mes cientos de facturas en PDF y tener que copiarlas a mano en Excel: horas de trabajo repetitivo y el riesgo constante de equivocarte en una cifra. Una automatización puede leerlas, extraer los datos y actualizar la hoja sola, en menos de un minuto. Cada empresa tiene su propio «trabajo de las facturas»: cuéntame el tuyo.",
-  "exampleCta": "Hablemos, sin compromiso"
+  "exampleCta": "Hablemos, sin compromiso",
+  "heroCta": "Contáctame gratis y sin compromiso"
  },
  "settings": {
   "tagline": "Automatizaciones y software a medida",
