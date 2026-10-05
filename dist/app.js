@@ -1525,7 +1525,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
       <p class="item-meta ins-note">
         Dati anonimi, senza cookie né indirizzi IP. Nel database: ${fmt(d.database.events)} eventi${d.database.since ? ` dal ${esc(dayLabel(d.database.since))}` : ''} (si conservano circa 13 mesi).
         Per non contare le tue visite, apri una volta il sito online da ogni tuo dispositivo con
-        <a href="https://coccolodaniele-art.github.io/Danishop/?noinsight" target="_blank" rel="noopener">questo indirizzo</a>.
+        <a href="https://coccolodigital.com/?noinsight" target="_blank" rel="noopener">questo indirizzo</a>.
       </p>`;
   }
 

@@ -8,7 +8,7 @@ nella scheda **Insight** dell'area admin, con la possibilità di scaricare tutti
 
 - Niente cookie e niente indirizzi IP salvati: il visitatore è un codice che cambia ogni giorno.
 - Le visite dal PC (localhost) non vengono contate. Per escludere anche i propri telefoni/PC
-  online: aprire una volta `https://coccolodaniele-art.github.io/Danishop/?noinsight`
+  online: aprire una volta `https://coccolodigital.com/?noinsight`
   (per riattivare: `?insight=on`).
 - I dati si conservano circa 13 mesi.
 
