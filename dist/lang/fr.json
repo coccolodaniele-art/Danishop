@@ -200,10 +200,10 @@
    "requirements": "Gratuit, sans inscription et sans rien télécharger : il fonctionne dans le navigateur, sur téléphone aussi."
   },
   "convertitore01": {
-   "tagline": "Convertissez images, PDF, Excel et audio en un clic, sans rien envoyer sur internet !",
+   "tagline": "Chargez un fichier et choisissez le format : images, PDF, documents, Excel et audio, sans rien envoyer sur internet !",
    "platform": "Navigateur, PC et téléphone",
-   "description": "Un convertisseur de fichiers complet qui fonctionne directement dans le navigateur. Déposez vos fichiers et choisissez le format : les images deviennent JPG, PNG, WebP ou un seul PDF ; les PDF se transforment en images ou en texte, se fusionnent ou se divisent page par page ; les feuilles Excel passent en CSV, JSON ou ODS et inversement ; l'audio devient MP3 ou WAV, même extrait d'une vidéo. Tout se passe sur votre appareil : les fichiers ne sont jamais envoyés à un serveur, vous pouvez donc l'utiliser aussi pour des documents confidentiels.",
-   "features": "Images JPG, PNG, WebP, GIF, BMP, SVG et AVIF → JPG, PNG, WebP ou PDF\nPlusieurs images dans un seul PDF, dans l'ordre de votre choix\nPDF → images JPG ou PNG ou texte ; fusionnez plusieurs PDF ou divisez-les en une page par fichier\nExcel, ODS, CSV et JSON dans tous les sens, en respectant la virgule décimale européenne\nAudio et vidéo → MP3 ou WAV, en stéréo ou mono\nQualité, dimensions et résolution réglables\nPlusieurs fichiers à la fois et tout télécharger dans un seul ZIP\nPrivé : vos fichiers ne quittent jamais votre appareil\nDisponible en 6 langues",
+   "description": "Le convertisseur le plus simple qui soit : vous déposez le fichier, le programme reconnaît tout seul son type et vous montre tous les formats dans lesquels il peut être converti. Vous choisissez celui qu'il vous faut et téléchargez le résultat. Il fonctionne avec les images (y compris les photos HEIC de l'iPhone), les PDF, les documents Word, les feuilles Excel, l'audio et la vidéo. Tout se passe sur votre appareil : les fichiers ne sont jamais envoyés à un serveur, vous pouvez donc l'utiliser aussi pour des documents confidentiels.",
+   "features": "Images → JPG, PNG, WebP, GIF, BMP, ICO, TIFF, SVG ou PDF\nPDF → images (JPG, PNG, WebP, TIFF) ou documents modifiables (DOCX, ODT, RTF, TXT, HTML, Markdown)\nDocuments DOCX, ODT, RTF, HTML, Markdown et TXT → DOCX, ODT, RTF, PDF, HTML, Markdown ou TXT\nTableurs XLSX, XLS, ODS, CSV, JSON et autres → XLSX, XLS, XLSB, ODS, CSV, TSV, JSON, XML, HTML, SQL ou Markdown\nAudio et vidéo → MP3, WAV ou AIFF\nReconnaît tout seul le type de fichier et ne propose que les formats compatibles\nPlusieurs fichiers à la fois, avec « Tout convertir » et téléchargement dans un seul ZIP\nRespecte la virgule décimale européenne et les codes commençant par zéro\nPrivé : vos fichiers ne quittent jamais votre appareil\nDisponible en 6 langues",
    "trialLabel": "Essayez-le gratuitement !",
    "trialInfo": "Gratuit, sans inscription et sans limite : il s'utilise directement dans le navigateur, sur téléphone aussi.",
    "requirements": "Un navigateur à jour (Chrome, Edge, Firefox ou Safari). Avec des fichiers très volumineux, la puissance de l'appareil compte."
@@ -295,10 +295,10 @@
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
-  "programs.convertitore01.tagline": "9ea979731580",
+  "programs.convertitore01.tagline": "575197e9a55b",
   "programs.convertitore01.platform": "103c74273687",
-  "programs.convertitore01.description": "288cb5a775b0",
-  "programs.convertitore01.features": "a766b9e0f0a5",
+  "programs.convertitore01.description": "a5b6e61895e4",
+  "programs.convertitore01.features": "d54478b65b8b",
   "programs.convertitore01.trialLabel": "a61de77fbe80",
   "programs.convertitore01.trialInfo": "cf4c9d9d513d",
   "programs.convertitore01.requirements": "2cebca929df6",

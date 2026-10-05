@@ -200,10 +200,10 @@
    "requirements": "Kostenlos, ohne Anmeldung und ohne Download: läuft im Browser, auch auf dem Smartphone."
   },
   "convertitore01": {
-   "tagline": "Bilder, PDFs, Excel und Audio mit einem Klick konvertieren – ohne etwas hochzuladen!",
+   "tagline": "Datei hochladen und Format wählen: Bilder, PDFs, Dokumente, Excel und Audio – ohne etwas ins Internet hochzuladen!",
    "platform": "Browser, PC und Smartphone",
-   "description": "Ein vollständiger Dateikonverter, der direkt im Browser läuft. Ziehen Sie Ihre Dateien hinein und wählen Sie das Format: Bilder werden zu JPG, PNG, WebP oder zu einer einzigen PDF; PDFs werden zu Bildern oder Text, lassen sich zusammenführen oder Seite für Seite aufteilen; Excel-Tabellen werden zu CSV, JSON oder ODS und umgekehrt; Audio wird zu MP3 oder WAV – auch direkt aus einem Video extrahiert. Alles geschieht auf Ihrem Gerät: Die Dateien werden nie auf einen Server hochgeladen, sodass Sie den Konverter auch für vertrauliche Dokumente nutzen können.",
-   "features": "Bilder in JPG, PNG, WebP, GIF, BMP, SVG und AVIF → JPG, PNG, WebP oder PDF\nMehrere Bilder in einer PDF, in der von Ihnen gewählten Reihenfolge\nPDF → JPG- oder PNG-Bilder oder Text; mehrere PDFs zusammenführen oder in Einzelseiten aufteilen\nExcel, ODS, CSV und JSON in alle Richtungen, mit korrektem europäischem Dezimalkomma\nAudio und Video → MP3 oder WAV, in Stereo oder Mono\nQualität, Größe und Auflösung einstellbar\nMehrere Dateien gleichzeitig und alles in einer ZIP-Datei herunterladen\nPrivat: Ihre Dateien verlassen nie Ihr Gerät\nIn 6 Sprachen verfügbar",
+   "description": "Der einfachste Konverter überhaupt: Sie ziehen die Datei hinein, das Programm erkennt den Dateityp selbst und zeigt Ihnen alle Formate, in die sie sich umwandeln lässt. Sie wählen das passende und laden das Ergebnis herunter. Er funktioniert mit Bildern (auch HEIC-Fotos vom iPhone), PDFs, Word-Dokumenten, Excel-Tabellen, Audio und Video. Alles geschieht auf Ihrem Gerät: Die Dateien werden nie auf einen Server hochgeladen, sodass Sie den Konverter auch für vertrauliche Dokumente nutzen können.",
+   "features": "Bilder → JPG, PNG, WebP, GIF, BMP, ICO, TIFF, SVG oder PDF\nPDF → Bilder (JPG, PNG, WebP, TIFF) oder bearbeitbare Dokumente (DOCX, ODT, RTF, TXT, HTML, Markdown)\nDokumente in DOCX, ODT, RTF, HTML, Markdown und TXT → DOCX, ODT, RTF, PDF, HTML, Markdown oder TXT\nTabellen in XLSX, XLS, ODS, CSV, JSON und weiteren Formaten → XLSX, XLS, XLSB, ODS, CSV, TSV, JSON, XML, HTML, SQL oder Markdown\nAudio und Video → MP3, WAV oder AIFF\nErkennt den Dateityp selbst und schlägt nur passende Formate vor\nMehrere Dateien gleichzeitig, mit „Alle konvertieren“ und Download als eine ZIP-Datei\nBerücksichtigt das europäische Dezimalkomma und Codes mit führenden Nullen\nPrivat: Ihre Dateien verlassen nie Ihr Gerät\nIn 6 Sprachen verfügbar",
    "trialLabel": "Kostenlos testen!",
    "trialInfo": "Kostenlos, ohne Anmeldung und ohne Begrenzung: direkt im Browser nutzbar, auch auf dem Smartphone.",
    "requirements": "Ein aktueller Browser (Chrome, Edge, Firefox oder Safari). Bei sehr großen Dateien kommt es auf die Leistung des Geräts an."
@@ -295,10 +295,10 @@
   "programs.muq7vciyaosl5.features": "e4279403cade",
   "programs.muq7vciyaosl5.trialLabel": "c84be1b93f37",
   "programs.muq7vciyaosl5.requirements": "77495f79f663",
-  "programs.convertitore01.tagline": "9ea979731580",
+  "programs.convertitore01.tagline": "575197e9a55b",
   "programs.convertitore01.platform": "103c74273687",
-  "programs.convertitore01.description": "288cb5a775b0",
-  "programs.convertitore01.features": "a766b9e0f0a5",
+  "programs.convertitore01.description": "a5b6e61895e4",
+  "programs.convertitore01.features": "d54478b65b8b",
   "programs.convertitore01.trialLabel": "a61de77fbe80",
   "programs.convertitore01.trialInfo": "cf4c9d9d513d",
   "programs.convertitore01.requirements": "2cebca929df6",

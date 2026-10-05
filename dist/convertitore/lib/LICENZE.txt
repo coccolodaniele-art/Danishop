@@ -3,6 +3,9 @@ Librerie usate dal Convertitore di file (copie originali, non modificate):
 - pdf.js 4.4.168 (Mozilla) - Apache License 2.0 - https://github.com/mozilla/pdf.js
 - pdf-lib 1.17.1 - MIT License - https://github.com/Hopding/pdf-lib
 - SheetJS Community Edition 0.20.3 - Apache License 2.0 - https://sheetjs.com
+- heic2any 0.0.4 (libheif) - MIT License / LGPL 3.0 per libheif - https://github.com/alexcorvi/heic2any
+- UTIF.js 3.1.0 (Photopea) - MIT License - https://github.com/photopea/UTIF.js
+- mammoth.js 1.8.0 - BSD 2-Clause License - https://github.com/mwilliamson/mammoth.js
 - lamejs 1.2.1 - LGPL 3.0 - https://github.com/zhuker/lamejs
   (usata come file separato e sostituibile, come richiesto dalla licenza LGPL)
 
