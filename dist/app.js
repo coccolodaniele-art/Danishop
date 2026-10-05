@@ -831,10 +831,15 @@
           ${points.length ? `<ul class="hero-points">${points.map((p) => `<li>${homeIcon('check')}${esc(p)}</li>`).join('')}</ul>` : ''}
         </div>
         ${photo ? `
-        <figure class="hero-photo home-photo">
-          <img src="${photo}" alt="${esc(s.ownerName || s.siteName)}">
-          <span class="hero-badge">${homeIcon('check')}${esc(t('heroBadge'))}</span>
-          ${s.ownerName ? `<a class="hero-name" href="#chisono" data-track="home-link" data-label="Scopri chi sono"><strong>${esc(s.ownerName)}</strong><span>${esc(s.tagline || '')}</span><em>${esc(t('aboutLink'))}</em></a>` : ''}
+        <figure class="home-side">
+          <div class="hero-photo home-photo"><img src="${photo}" alt="${esc(s.ownerName || s.siteName)}"></div>
+          <figcaption class="hero-caption">
+            ${s.ownerName ? `<div class="hero-who"><strong>${esc(s.ownerName)}</strong><span>${esc(s.tagline || '')}</span></div>` : ''}
+            <div class="hero-caption-row">
+              <span class="hero-badge">${homeIcon('check')}${esc(t('heroBadge'))}</span>
+              <a href="#chisono" data-track="home-link" data-label="Scopri chi sono">${esc(t('aboutLink'))}</a>
+            </div>
+          </figcaption>
         </figure>` : automationDemo()}
       </section>
 
