@@ -927,14 +927,10 @@
     const story = String(s.about || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean); // il primo paragrafo fa da attacco
     const nPrograms = state.view.programs.filter((p) => p.category !== 'giochi').length;
     const nGames = state.view.programs.filter((p) => p.category === 'giochi').length;
-    const certs = state.view.certificates.filter((c) => c.title);
-    const hours = certs.reduce((a, c) => a + certHours(c), 0);
     const facts = [
       [fmtNum(nPrograms), tn('factPrograms', nPrograms)],
-      [fmtNum(nGames), tn('factGames', nGames)],
-      certs.length ? [fmtNum(certs.length), tn('factCourses', certs.length)] : null,
-      hours ? [fmtNum(hours), t('factHours')] : null
-    ].filter(Boolean);
+      [fmtNum(nGames), tn('factGames', nGames)]
+    ];
     const skillsVar = t('skillsVar');
 
     // La foto grande sta nella Home; qui resta la presentazione.
