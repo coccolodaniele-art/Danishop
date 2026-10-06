@@ -106,7 +106,15 @@
   "exampleText": "Imagine receiving hundreds of PDF invoices every month and having to copy them into Excel by hand: hours of repetitive work and a constant risk of typing a wrong number. An automation can read them, extract the data and update the sheet by itself in under a minute. Every business has its own \"invoice job\": tell me about yours.",
   "exampleCta": "Let's talk, no obligation",
   "heroCta": "Contact me free of charge, with no obligation",
-  "menuLabel": "Menu"
+  "menuLabel": "Menu",
+  "formEmail": "Your email",
+  "formNeedEmail": "Please enter a valid email address so I can reply to you",
+  "formSending": "Sending…",
+  "formSentTitle": "Message sent!",
+  "formSentText": "Thank you, I'll get back to you as soon as possible. If you don't see my reply, please check your spam folder too.",
+  "formSendAnother": "Write another message",
+  "formError": "Sending failed. Please try again shortly or email me directly at {email}",
+  "formPrivacy": "I only use your details to reply to you – you won't be added to any mailing list."
  },
  "settings": {
   "tagline": "Custom automations and software",

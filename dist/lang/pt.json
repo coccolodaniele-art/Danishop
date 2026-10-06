@@ -106,7 +106,15 @@
   "exampleText": "Imagine receber todo mês centenas de faturas em PDF e ter que copiá-las à mão no Excel: horas de trabalho repetitivo e o risco constante de errar um número. Uma automação pode lê-las, extrair os dados e atualizar a planilha sozinha, em menos de um minuto. Toda empresa tem o seu próprio «trabalho das faturas»: me conte o seu.",
   "exampleCta": "Vamos conversar, sem compromisso",
   "heroCta": "Fale comigo de graça e sem compromisso",
-  "menuLabel": "Menu"
+  "menuLabel": "Menu",
+  "formEmail": "Seu e-mail",
+  "formNeedEmail": "Digite um endereço de e-mail válido para que eu possa responder",
+  "formSending": "Enviando…",
+  "formSentTitle": "Mensagem enviada!",
+  "formSentText": "Obrigado, vou responder o mais rápido possível. Se você não encontrar minha resposta, confira também a pasta de spam.",
+  "formSendAnother": "Escrever outra mensagem",
+  "formError": "Não foi possível enviar. Tente novamente daqui a pouco ou me escreva diretamente para {email}",
+  "formPrivacy": "Uso seus dados apenas para responder, sem inscrever você em nenhuma lista."
  },
  "settings": {
   "tagline": "Automações e software sob medida",

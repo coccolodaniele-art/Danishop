@@ -124,7 +124,11 @@
     contactsTitle: 'Contatti', contactsSub: 'Scrivimi in tutta libertà: il primo contatto è gratuito e non ti impegna a nulla. Raccontami in poche righe cosa ti fa perdere tempo o quale problema vuoi risolvere, e ti rispondo il prima possibile.',
     formTitle: 'Scrivimi senza impegno', formName: 'Il tuo nome', formMessage: 'Messaggio', formPlaceholder: 'Di cosa vuoi parlarmi?', formSend: 'Invia messaggio',
     contactsBox: 'Recapiti', cEmail: 'Email', cPhone: 'Telefono', cArea: 'Zona', cWebsite: 'Sito web', contactsEmpty: 'Contatti in arrivo.',
-    formNeedMessage: 'Scrivi un messaggio', mailSubject: 'Messaggio dal sito', mailOpening: 'Si sta aprendo il tuo programma di posta'
+    formNeedMessage: 'Scrivi un messaggio', mailSubject: 'Messaggio dal sito', mailOpening: 'Si sta aprendo il tuo programma di posta',
+    formEmail: 'La tua email', formNeedEmail: 'Scrivi un indirizzo email valido, così posso risponderti',
+    formSending: 'Invio in corso…', formSentTitle: 'Messaggio inviato!', formSentText: 'Grazie, ti rispondo al più presto. Se non vedi la mia risposta, controlla anche nella cartella spam.',
+    formSendAnother: 'Scrivi un altro messaggio', formError: 'Invio non riuscito. Riprova tra poco oppure scrivimi direttamente a {email}',
+    formPrivacy: 'Uso i tuoi dati solo per risponderti, senza iscriverti a nessuna lista.'
   };
 
   const i18n = { lang: 'it', pack: null };
@@ -202,6 +206,8 @@
     render();
   }
   // L'area admin esiste solo sulla copia del sito in questo PC, mai su quella online.
+  // Chiave pubblica di Web3Forms: i messaggi del modulo arrivano all'email del sito. Vuota = si apre il programma di posta.
+  const FORM_KEY = '4cc051d1-1a14-4721-bff6-bacdb53fd6a3';
   const IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
   // Servizio che raccoglie le statistiche del sito (cartella insight/). Online è sempre attivo;
@@ -1025,9 +1031,18 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
             <h2>${esc(t('formTitle'))}</h2>
             <form id="contactForm" class="stack" novalidate>
               <label class="field"><span>${esc(t('formName'))}</span><input name="name" autocomplete="name" required></label>
+              ${FORM_KEY ? `<label class="field"><span>${esc(t('formEmail'))}</span><input name="email" type="email" autocomplete="email" required></label>` : ''}
               <label class="field"><span>${esc(t('formMessage'))}</span><textarea name="message" rows="5" required placeholder="${esc(t('formPlaceholder'))}"></textarea></label>
-              <div class="row end"><button class="btn" type="submit">${ICONS.mail} ${esc(t('formSend'))}</button></div>
+              <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <div class="row end"><button class="btn" type="submit">${ICONS.mail} <span>${esc(t('formSend'))}</span></button></div>
+              ${FORM_KEY ? `<p class="form-note">${esc(t('formPrivacy'))}</p>` : ''}
             </form>
+            <div class="form-sent" hidden>
+              <div class="form-sent-ico">✓</div>
+              <h3>${esc(t('formSentTitle'))}</h3>
+              <p>${esc(t('formSentText'))}</p>
+              <button class="btn secondary" type="button" data-action="form-again">${esc(t('formSendAnother'))}</button>
+            </div>
           </div>` : ''}
           ${list}
         </div>
@@ -1924,6 +1939,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     'sync-now': (el) => syncNow(el),
     'insight-days': (el) => { state.insight.days = Number(el.dataset.days); state.insight.data = null; state.insight.error = ''; render(); },
     'insight-reload': () => loadInsight(true),
+    'form-again': (el) => { const box = el.closest('.form-sent'); box.hidden = true; box.previousElementSibling.hidden = false; },
     'go-contacts': (el, e) => { e.preventDefault(); if (state.route === 'home') scrollToId('contatti'); else location.hash = '#contatti'; },
     'scroll-to': (el, e) => { e.preventDefault(); scrollToId(el.dataset.target); },
     'import': () => document.getElementById('importInput').click(),
@@ -1978,8 +1994,39 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     switch (form.id) {
       case 'contactForm': {
         const v = readForm(form);
+        if (form.elements['botcheck'].checked) return;
         if (!v.message) { toast(t('formNeedMessage'), true); return; }
         const s = state.data.settings;
+        if (FORM_KEY) {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email || '')) { toast(t('formNeedEmail'), true); form.elements['email'].focus(); return; }
+          const btn = form.querySelector('button[type=submit]');
+          const label = btn.querySelector('span');
+          btn.disabled = true; label.textContent = t('formSending');
+          try {
+            const res = await fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({
+                access_key: FORM_KEY,
+                subject: 'Messaggio dal sito' + (v.name ? ' - ' + v.name : ''),
+                from_name: 'Coccolo Digital',
+                name: v.name || '-', email: v.email, message: v.message,
+                lingua: i18n.lang, botcheck: false
+              })
+            });
+            const out = await res.json().catch(() => ({}));
+            if (!res.ok || !out.success) throw new Error(out.message || res.status);
+            insight.click('contact-form', 'Modulo messaggi');
+            form.reset();
+            form.hidden = true;
+            form.nextElementSibling.hidden = false;
+          } catch (err) {
+            toast(t('formError').replace('{email}', s.email), true);
+          } finally {
+            btn.disabled = false; label.textContent = t('formSend');
+          }
+          break;
+        }
         location.href = `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent(t('mailSubject') + (v.name ? ' - ' + v.name : ''))}&body=${encodeURIComponent(v.message + (v.name ? '\n\n' + v.name : ''))}`;
         insight.click('contact-form', 'Modulo messaggi');
         toast(t('mailOpening'));

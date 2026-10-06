@@ -234,6 +234,13 @@ img { max-width: 100%; display: block; }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field > span { font-size: .84rem; font-weight: 600; color: var(--text-2); }
 .field > small { color: var(--muted); font-size: .8rem; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.form-note { margin: 0; color: var(--muted); font-size: .8rem; text-align: right; }
+.form-sent { text-align: center; padding: 18px 6px 6px; }
+.form-sent[hidden], #contactForm[hidden] { display: none; }
+.form-sent-ico { width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-size: 1.6rem; font-weight: 700; }
+.form-sent h3 { margin: 0 0 6px; }
+.form-sent p { margin: 0 0 16px; color: var(--muted); }
 .field input, .field select, .field textarea {
   width: 100%;
   padding: 11px 13px;

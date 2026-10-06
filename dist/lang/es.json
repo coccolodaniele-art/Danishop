@@ -106,7 +106,15 @@
   "exampleText": "Imagina recibir cada mes cientos de facturas en PDF y tener que copiarlas a mano en Excel: horas de trabajo repetitivo y el riesgo constante de equivocarte en una cifra. Una automatización puede leerlas, extraer los datos y actualizar la hoja sola, en menos de un minuto. Cada empresa tiene su propio «trabajo de las facturas»: cuéntame el tuyo.",
   "exampleCta": "Hablemos, sin compromiso",
   "heroCta": "Contáctame gratis y sin compromiso",
-  "menuLabel": "Menú"
+  "menuLabel": "Menú",
+  "formEmail": "Tu correo electrónico",
+  "formNeedEmail": "Escribe una dirección de correo válida para que pueda responderte",
+  "formSending": "Enviando…",
+  "formSentTitle": "¡Mensaje enviado!",
+  "formSentText": "Gracias, te responderé lo antes posible. Si no ves mi respuesta, revisa también la carpeta de spam.",
+  "formSendAnother": "Escribir otro mensaje",
+  "formError": "No se ha podido enviar. Inténtalo de nuevo en un momento o escríbeme directamente a {email}",
+  "formPrivacy": "Solo uso tus datos para responderte, sin suscribirte a ninguna lista."
  },
  "settings": {
   "tagline": "Automatizaciones y software a medida",

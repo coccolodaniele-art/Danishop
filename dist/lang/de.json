@@ -106,7 +106,15 @@
   "exampleText": "Stellen Sie sich vor, Sie erhalten jeden Monat Hunderte PDF-Rechnungen und müssen sie von Hand in Excel übertragen: stundenlange Routinearbeit und das ständige Risiko eines Tippfehlers. Eine Automatisierung kann sie einlesen, die Daten extrahieren und die Tabelle selbstständig aktualisieren – in weniger als einer Minute. Jedes Unternehmen hat seine eigene „Rechnungsarbeit“: Erzählen Sie mir von Ihrer.",
   "exampleCta": "Unverbindlich darüber sprechen",
   "heroCta": "Kontaktieren Sie mich – kostenlos und unverbindlich",
-  "menuLabel": "Menü"
+  "menuLabel": "Menü",
+  "formEmail": "Ihre E-Mail-Adresse",
+  "formNeedEmail": "Bitte geben Sie eine gültige E-Mail-Adresse an, damit ich Ihnen antworten kann",
+  "formSending": "Wird gesendet …",
+  "formSentTitle": "Nachricht gesendet!",
+  "formSentText": "Vielen Dank, ich melde mich so schnell wie möglich bei Ihnen. Falls Sie meine Antwort nicht finden, schauen Sie bitte auch im Spam-Ordner nach.",
+  "formSendAnother": "Weitere Nachricht schreiben",
+  "formError": "Senden fehlgeschlagen. Bitte versuchen Sie es gleich noch einmal oder schreiben Sie mir direkt an {email}",
+  "formPrivacy": "Ich verwende Ihre Daten ausschließlich für meine Antwort – keine Aufnahme in Verteilerlisten."
  },
  "settings": {
   "tagline": "Maßgeschneiderte Automatisierungen und Software",
