@@ -84,7 +84,7 @@
   const UI_IT = {
     navHome: 'Home', navAbout: 'Chi sono', navLearning: 'Apprendimento', navTrading: 'Trading e finanza', navTools: 'Strumenti', navGames: 'Giochi',
     sec_apprendimento: "Programmi per l'apprendimento", sec_finanza: 'Programmi per trading e finanza', sec_strumenti: 'Strumenti utili', sec_giochi: 'Giochi',
-    langLabel: 'Lingua', close: 'Chiudi',
+    langLabel: 'Lingua', close: 'Chiudi', menuLabel: 'Menu',
     metaDescription: 'Daniele Coccolo crea automazioni su misura per aziende e professionisti: meno lavoro ripetitivo al computer, con Python, Excel, SQL e intelligenza artificiale.',
     emptyGames: 'Nessun gioco pubblicato', emptyGamesSub: 'A breve troverai qui i miei giochi.',
     emptyPrograms: 'Nessun programma pubblicato', emptyProgramsSub: 'A breve troverai qui i miei programmi.',
@@ -496,6 +496,7 @@
     if (!pick.options.length) pick.innerHTML = LANGS.map((l) => `<option value="${l.code}">${esc(l.name)}</option>`).join('');
     pick.value = i18n.lang;
     pick.setAttribute('aria-label', t('langLabel'));
+    document.getElementById('menuToggle').setAttribute('aria-label', t('menuLabel'));
     document.querySelector('meta[name="description"]').setAttribute('content', t('metaDescription'));
     document.querySelectorAll('.modal-x').forEach((b) => b.setAttribute('aria-label', t('close')));
     document.title = `${titles[state.route]} · ${s.siteName || 'Il mio sito'}`;
@@ -505,7 +506,18 @@
     document.getElementById('draftBanner').hidden = !(state.hasDraft && state.isAdmin && state.route !== 'admin');
   }
 
+  // Sul telefono le schede stanno in un menu che si apre con il pulsante ☰.
+  const topbar = document.querySelector('.topbar');
+  function setMenu(open) {
+    topbar.classList.toggle('nav-open', open);
+    document.getElementById('menuToggle').setAttribute('aria-expanded', String(open));
+  }
+  document.getElementById('menuToggle').addEventListener('click', () => setMenu(!topbar.classList.contains('nav-open')));
+  document.getElementById('mainNav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.topbar')) setMenu(false); });
+
   window.addEventListener('hashchange', () => {
+    setMenu(false);
     if (!modal.hidden) closeModal();
     const prev = state.route;
     render();

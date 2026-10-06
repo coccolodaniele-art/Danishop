@@ -105,7 +105,8 @@
   "exampleTitle": "Um exemplo concreto",
   "exampleText": "Imagine receber todo mês centenas de faturas em PDF e ter que copiá-las à mão no Excel: horas de trabalho repetitivo e o risco constante de errar um número. Uma automação pode lê-las, extrair os dados e atualizar a planilha sozinha, em menos de um minuto. Toda empresa tem o seu próprio «trabalho das faturas»: me conte o seu.",
   "exampleCta": "Vamos conversar, sem compromisso",
-  "heroCta": "Fale comigo de graça e sem compromisso"
+  "heroCta": "Fale comigo de graça e sem compromisso",
+  "menuLabel": "Menu"
  },
  "settings": {
   "tagline": "Automações e software sob medida",

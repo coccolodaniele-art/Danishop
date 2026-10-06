@@ -105,7 +105,8 @@
   "exampleTitle": "Un exemple concret",
   "exampleText": "Imaginez recevoir chaque mois des centaines de factures en PDF et devoir les recopier à la main dans Excel : des heures de travail répétitif et le risque permanent de se tromper de chiffre. Une automatisation peut les lire, extraire les données et mettre à jour la feuille toute seule, en moins d'une minute. Chaque entreprise a son propre « travail des factures » : parlez-moi du vôtre.",
   "exampleCta": "Parlons-en, sans engagement",
-  "heroCta": "Contactez-moi gratuitement et sans engagement"
+  "heroCta": "Contactez-moi gratuitement et sans engagement",
+  "menuLabel": "Menu"
  },
  "settings": {
   "tagline": "Automatisations et logiciels sur mesure",

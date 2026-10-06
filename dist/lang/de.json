@@ -105,7 +105,8 @@
   "exampleTitle": "Ein konkretes Beispiel",
   "exampleText": "Stellen Sie sich vor, Sie erhalten jeden Monat Hunderte PDF-Rechnungen und müssen sie von Hand in Excel übertragen: stundenlange Routinearbeit und das ständige Risiko eines Tippfehlers. Eine Automatisierung kann sie einlesen, die Daten extrahieren und die Tabelle selbstständig aktualisieren – in weniger als einer Minute. Jedes Unternehmen hat seine eigene „Rechnungsarbeit“: Erzählen Sie mir von Ihrer.",
   "exampleCta": "Unverbindlich darüber sprechen",
-  "heroCta": "Kontaktieren Sie mich – kostenlos und unverbindlich"
+  "heroCta": "Kontaktieren Sie mich – kostenlos und unverbindlich",
+  "menuLabel": "Menü"
  },
  "settings": {
   "tagline": "Maßgeschneiderte Automatisierungen und Software",

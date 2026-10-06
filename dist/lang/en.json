@@ -105,7 +105,8 @@
   "exampleTitle": "A concrete example",
   "exampleText": "Imagine receiving hundreds of PDF invoices every month and having to copy them into Excel by hand: hours of repetitive work and a constant risk of typing a wrong number. An automation can read them, extract the data and update the sheet by itself in under a minute. Every business has its own \"invoice job\": tell me about yours.",
   "exampleCta": "Let's talk, no obligation",
-  "heroCta": "Contact me free of charge, with no obligation"
+  "heroCta": "Contact me free of charge, with no obligation",
+  "menuLabel": "Menu"
  },
  "settings": {
   "tagline": "Custom automations and software",
