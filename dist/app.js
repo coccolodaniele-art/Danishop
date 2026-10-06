@@ -966,12 +966,9 @@
 ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
 ]</code></pre>
             </div>` : ''}
-            ${certs.length ? `<a class="about-certs" href="#attestati" data-action="scroll-to" data-target="attestati" data-track="about-link" data-label="Vedi gli attestati">${esc(t('seeCerts'))}</a>` : ''}
           </div>
         </div>
       </section>
-
-      ${renderCertificates()}
 
       ${values.length ? `
       <section class="home-section">
@@ -1000,25 +997,6 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   function certHours(c) { const n = parseFloat(String(c.hours || '').replace(',', '.')); return isFinite(n) && n > 0 ? n : 0; }
   function certDate(c, opts = { day: 'numeric', month: 'long', year: 'numeric' }) {
     return /^\d{4}-\d{2}-\d{2}$/.test(c.date || '') ? new Date(c.date + 'T12:00:00').toLocaleDateString('it-IT', opts) : '';
-  }
-
-  // Nella pagina Chi sono gli attestati si vedono solo come immagini (il titolo è già scritto sull'attestato).
-  function renderCertificates() {
-    const s = state.view.settings;
-    const list = state.view.certificates.filter((c) => c.title && safeImg(c.image));
-    if (!list.length) return '';
-    const total = list.reduce((a, c) => a + certHours(c), 0);
-    return `
-      <section class="home-section" id="attestati">
-        <h2 class="section-title">${esc(t('certsTitle'))}</h2>
-        <p class="section-sub">${s.certsIntro ? esc(s.certsIntro) + ' ' : ''}<strong>${esc(tn('courses', list.length))}${total ? ` · ${esc(t('trainingHours', { h: tn('hours', total) }))}` : ''}</strong></p>
-        <div class="certs">${list.map((c) => `
-          <button type="button" class="cert-shot" data-action="zoom-cert" data-id="${esc(c.id)}" aria-label="${esc(t('zoomCert', { t: c.title }))}">
-            <img src="${safeImg(c.image)}" alt="${esc(t('certAlt', { t: c.title }))}" loading="lazy">
-            <span class="shot-zoom" aria-hidden="true">${esc(t('zoom'))}</span>
-          </button>`).join('')}
-        </div>
-      </section>`;
   }
 
   function renderContacts() {
