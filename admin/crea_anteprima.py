@@ -5,7 +5,7 @@ Per ogni lingua del sito:
   - dist/og/og-<lingua>-<versione>.jpg   immagine 1200x630 (foto, titolo della Home, bollino)
   - dist/<lingua>/index.html             pagina con l'anteprima in quella lingua, che apre
                                           subito il sito in quella lingua (es. coccolodigital.com/it)
-La Home (dist/index.html) usa l'immagine inglese.
+La Home (dist/index.html, il semplice coccolodigital.com) usa l'anteprima nella lingua HOME_LANG.
 
 La parte centrale quadrata dell'immagine contiene da sola foto, titolo e bollino: quando
 WhatsApp mostra l'anteprima piccola ritaglia proprio quel quadrato.
@@ -35,6 +35,7 @@ DIST = os.path.join(ROOT, "dist")
 SITE = "https://coccolodigital.com"
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 LANGS = ["it", "en", "es", "de", "fr", "pt"]
+HOME_LANG = "it"  # lingua dell'anteprima del semplice coccolodigital.com (scelta dell'utente)
 LOCALES = {"it": "it_IT", "en": "en_GB", "es": "es_ES", "de": "de_DE", "fr": "fr_FR", "pt": "pt_BR"}
 
 TEMPLATE = r"""<!doctype html><html lang="{{LANG}}"><head><meta charset="utf-8">
@@ -138,7 +139,7 @@ def main():
     old = glob.glob(os.path.join(DIST, "og", "og-*.jpg"))
     fonts = "file:///" + os.path.join(DIST, "fonts", "fonts.css").replace(os.sep, "/")
     tmp = tempfile.mkdtemp()
-    made = {}
+    made, info = {}, {}
     try:
         for lang in LANGS:
             tx = texts(lang, data)
@@ -155,6 +156,8 @@ def main():
             Image.open(png).convert("RGB").save(os.path.join(DIST, name), quality=86, optimize=True, progressive=True)
             made[lang] = name
             plain = tx["title"].replace("*", "")
+            info[lang] = {"title": f"Coccolo Digital · {tx['tagline']}", "description": tx["description"],
+                          "alt": f"Coccolo Digital — {plain} Daniele Coccolo"}
             os.makedirs(os.path.join(DIST, lang), exist_ok=True)
             open(os.path.join(DIST, lang, "index.html"), "w", encoding="utf-8").write(SHARE_PAGE.format(
                 lang=lang, site=SITE, image=name, locale=LOCALES[lang],
@@ -165,17 +168,30 @@ def main():
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
-    # La Home usa l'immagine inglese (il sito si rivolge anche all'estero).
+    # Anteprima della Home (il semplice coccolodigital.com) nella lingua HOME_LANG.
     idx = os.path.join(DIST, "index.html")
     s = open(idx, encoding="utf-8").read()
-    s = re.sub(r'(<meta (?:property="og:image"|name="twitter:image") content=")[^"]*(")', r"\g<1>" + SITE + "/" + made["en"] + r"\2", s)
+    home = info[HOME_LANG]
+    values = {
+        'property="og:image"': SITE + "/" + made[HOME_LANG],
+        'name="twitter:image"': SITE + "/" + made[HOME_LANG],
+        'property="og:title"': home["title"],
+        'property="og:description"': home["description"],
+        'property="og:image:alt"': home["alt"],
+        'property="og:locale"': LOCALES[HOME_LANG],
+    }
+    for attr, value in values.items():
+        s = re.sub(r'(<meta ' + re.escape(attr) + r' content=")[^"]*(")',
+                   lambda m, v=value: m.group(1) + html.escape(v, quote=True) + m.group(2), s)
+    alternates = "".join(f'  <meta property="og:locale:alternate" content="{LOCALES[l]}">\n' for l in LANGS if l != HOME_LANG)
+    s = re.sub(r'(  <meta property="og:locale:alternate" content="[^"]*">\n)+', lambda m: alternates, s)
     open(idx, "w", encoding="utf-8").write(s)
     for f in old:
         if os.path.relpath(f, DIST).replace(os.sep, "/") not in made.values():
             os.remove(f)
     # Il vecchio indirizzo dell'immagine resta valido, con l'immagine nuova.
-    shutil.copyfile(os.path.join(DIST, made["en"]), os.path.join(DIST, "og-image.jpg"))
-    print("Home:", made["en"])
+    shutil.copyfile(os.path.join(DIST, made[HOME_LANG]), os.path.join(DIST, "og-image.jpg"))
+    print("Home:", made[HOME_LANG])
 
 
 if __name__ == "__main__":
