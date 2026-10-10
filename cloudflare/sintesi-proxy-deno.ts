@@ -97,9 +97,9 @@ function slimFacts(facts: any, tags: string[]): unknown {
 }
 
 // Risposte compresse (gzip) quando il browser le accetta: JSON, feed e pagine si riducono di 3-10 volte.
-async function gzip(data: Uint8Array): Promise<Uint8Array> {
+async function gzip(data: BlobPart): Promise<ArrayBuffer> {
   const stream = new Blob([data]).stream().pipeThrough(new CompressionStream("gzip"));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
+  return await new Response(stream).arrayBuffer();
 }
 
 function hostAllowed(hostname: string): boolean {
@@ -171,7 +171,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
     "Cache-Control": "public, max-age=300",
   };
   if (/\bgzip\b/i.test(request.headers.get("Accept-Encoding") || "") && body.byteLength > 1024) {
-    body = await gzip(body);
+    body = new Uint8Array(await gzip(body));
     headers["Content-Encoding"] = "gzip";
     headers["Vary"] = "Origin, Accept-Encoding";
   }
