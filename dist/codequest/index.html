@@ -1276,6 +1276,16 @@ print(g.nome, g.verso())</code></pre>
           <li><code>__eq__</code>: confronto con ==</li>
           <li><code>__len__</code>, <code>__add__</code>, <code>__lt__</code>, ...</li>
         </ul>
+        <pre><code>class Moneta:
+    def __init__(self, valore):
+        self.valore = valore
+    def __str__(self):
+        return f"{self.valore} euro"
+    def __eq__(self, altra):
+        return self.valore == altra.valore
+
+print(Moneta(2))                # 2 euro
+print(Moneta(2) == Moneta(2))   # True (senza __eq__ sarebbe False)</code></pre>
         <div class="task-box"><h3>🎯 Esercizio</h3>
           <p>Crea <code>Punto(x, y)</code> con <code>__str__</code> che restituisce <code>"Punto(x, y)"</code>. Stampa <code>Punto(3, 4)</code>.</p>
           <p>Output atteso: <code>Punto(3, 4)</code></p>
@@ -1363,9 +1373,9 @@ with open("data.txt") as f:
 # qui il file è già chiuso
 
 # Crea il tuo:
+import time
 class Cronometro:
     def __enter__(self):
-        import time
         self.t = time.time()
         return self
     def __exit__(self, *a):
@@ -1535,7 +1545,7 @@ print(descrivi((0, 5)))</code></pre>
           <pre><code>vado verso nord
 vado a (3,7)</code></pre>
         </div>`,
-      starter:`def classifica(c):\n    match c:\n        # case ...\n        pass\n\nprint(classifica(["go", "nord"]))\nprint(classifica(["go", 3, 7]))\n`,
+      starter:`def classifica(c):\n    match c:\n        case ["quit"]:\n            return "esci"\n        # aggiungi gli altri case\n\nprint(classifica(["go", "nord"]))\nprint(classifica(["go", 3, 7]))\n`,
       tests:[{name:'2 righe', check:o=>o.trim()==='vado verso nord\nvado a (3,7)'}],
       hint:'case ["go", direz]: return f"vado verso {direz}"',
       solution:`def classifica(c):\n  match c:\n    case ["quit"]: return "esci"\n    case ["go", d]: return f"vado verso {d}"\n    case ["go", x, y]: return f"vado a ({x},{y})"\n    case _: return "sconosciuto"\nprint(classifica(["go","nord"])); print(classifica(["go",3,7]))`
@@ -1597,7 +1607,7 @@ vado a (3,7)</code></pre>
         <p>F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2). Sequenza: 0, 1, 1, 2, 3, 5, 8, 13, 21, ...</p>
         <p>L'approccio iterativo è O(n) ed è il più efficiente per casi standard.</p>
         <div class="task-box"><h3>🎯 Esercizio</h3>
-          <p>Stampa il 30° numero di Fibonacci (output: <code>832040</code>).</p>
+          <p>Stampa <code>F(30)</code>, il numero di Fibonacci di indice 30 (output: <code>832040</code>).</p>
         </div>`,
       starter:`# calcola fib(30) in modo iterativo\n`,
       tests:[{name:'832040', check:o=>o.trim()==='832040'}],
@@ -1680,7 +1690,7 @@ vado a (3,7)</code></pre>
       theory:`<h2>🧮 Test di primalità efficiente</h2>
         <p>Per testare se n è primo, basta verificare i divisori da 2 a √n.</p>
         <div class="task-box"><h3>🎯 Esercizio</h3>
-          <p>Trova e stampa il <b>1000°</b> numero primo. (Sapevi che si chiama Bertrand-style? Comunque...)</p>
+          <p>Trova e stampa il <b>1000°</b> numero primo (2 è il primo, 3 il secondo, 5 il terzo...).</p>
           <p>Output atteso: <code>7919</code></p>
         </div>`,
       starter:`def is_prime(n):\n    # ...\n    pass\n\ncount = 0\nn = 1\n# trova il 1000° primo\n`,
@@ -1785,6 +1795,7 @@ function isoDate(d){
 }
 
 function renderAll(){
+  S.streak = computeStreak();
   renderTopStats();
   renderSidebar();
   pickDailyLessonIfNeeded();
@@ -1805,7 +1816,8 @@ function initEditor(){
     extraKeys: {
       "Ctrl-Enter": ()=> runCode(),
       "Cmd-Enter": ()=> runCode(),
-      "Tab": cm => cm.replaceSelection("    ", "end"),
+      "Tab": cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.replaceSelection("    ", "end"),
+      "Shift-Tab": cm => cm.indentSelection('subtract'),
     }
   });
 }
@@ -1967,7 +1979,7 @@ function loadLesson(id){
     : `<p class="tiny">Modalità libera (nessun test).</p>`;
   document.getElementById('lesson-panel').innerHTML = `
     ${l.theory}
-    ${doneBefore ? `<div class="hint" style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46;">✅ Hai già completato questa lezione. Ripassala quanto vuoi: guadagni un piccolo bonus XP ogni volta.</div>` : ''}
+    ${doneBefore ? `<div class="hint" style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46;">✅ Hai già completato questa lezione. Ripassala quanto vuoi: guadagni un piccolo bonus XP una volta al giorno.</div>` : ''}
     <div class="lesson-help">
       <button class="btn btn-warn" id="btn-toggle-hint">💡 Mostra suggerimento</button>
       <button class="btn btn-ghost" id="btn-toggle-solution">🔓 Mostra soluzione</button>
@@ -2138,6 +2150,7 @@ async function checkCode(){
   logTo('tres','▶ Esecuzione test...','log-trace');
   const res = await runPython(code, false);
   if(!res.ok){
+    countFailedAttempt(currentLesson);
     logTo('tres', `❌ Errore durante l'esecuzione:`, 'log-err');
     logTo('tres', htmlEscape(res.error||''), 'log-err');
     toast('Errore nel codice. Controlla la console.', 'bad');
@@ -2155,9 +2168,20 @@ async function checkCode(){
   if(passed === total){
     onLessonSolved(currentLesson, code);
   } else {
+    countFailedAttempt(currentLesson);
     toast(`Test falliti: ${total-passed}/${total}`, 'bad');
     Sfx.fail();
   }
+}
+
+// Le stelle dipendono dai tentativi: anche una verifica fallita e' un tentativo
+// (prima contavano solo quelle riuscite, quindi ogni lezione prendeva sempre 3 stelle).
+function countFailedAttempt(lesson){
+  if(!lesson || !LESSONS.includes(lesson)) return;
+  const prev = S.progress[lesson.id];
+  if(prev && prev.done) return;
+  S.progress[lesson.id] = Object.assign({done:false, stars:0, attempts:0, bestCode:''}, prev, {attempts: ((prev && prev.attempts) || 0) + 1});
+  saveState();
 }
 
 function resetCode(){
@@ -2178,15 +2202,18 @@ function onLessonSolved(lesson, code){
   if(attempts === 1) stars = 3;
   else if(attempts <= 3) stars = 2;
   stars = Math.max(prev.stars||0, stars);
-  S.progress[lesson.id] = { done:true, stars, attempts, bestCode: code };
+  const today = isoDate(new Date());
+  // il bonus del ripasso vale una volta al giorno per lezione (prima bastava premere
+  // Verifica a ripetizione per accumulare XP all'infinito)
+  const alreadyToday = !isFirst && prev.reviewed === today;
+  S.progress[lesson.id] = { done:true, stars, attempts, bestCode: code, reviewed: today };
   let xpGain = lesson.xp;
-  if(!isFirst) xpGain = Math.round(xpGain * 0.2);
+  if(!isFirst) xpGain = alreadyToday ? 0 : Math.round(xpGain * 0.2);
   addXP(xpGain);
   if(isFirst){ S.totalDone++; }
   const deltaStars = (stars - (prev.stars||0));
   if(deltaStars>0) S.stars += deltaStars;
 
-  const today = isoDate(new Date());
   if(S.dailyLesson === lesson.id && S.dailyDone !== today){
     S.dailyDone = today;
     addXP(50);
@@ -2201,8 +2228,10 @@ function onLessonSolved(lesson, code){
   Sfx.success();
   if(isFirst){
     toast(`✅ Lezione completata! +${xpGain} XP · ${'⭐'.repeat(stars)}`, 'good');
-  } else {
+  } else if(xpGain){
     toast(`✨ Test ripassato! +${xpGain} XP`, 'good');
+  } else {
+    toast('✨ Test ripassato! (il bonus XP del ripasso vale una volta al giorno)', 'good');
   }
 }
 
@@ -2232,15 +2261,17 @@ function checkBadges(){
 function updateStreak(){
   const today = isoDate(new Date());
   if(!S.activeDays.includes(today)) S.activeDays.push(today);
-  let streak = 0;
-  const d = new Date();
-  while(true){
-    const ds = isoDate(d);
-    if(S.activeDays.includes(ds)) { streak++; d.setDate(d.getDate()-1); }
-    else break;
-  }
-  S.streak = streak;
+  S.streak = computeStreak();
   S.lastActive = today;
+}
+// Giorni consecutivi fino a oggi; se oggi non hai ancora completato nulla la serie
+// resta valida fino a ieri. Senza questo calcolo all'apertura restava il valore vecchio.
+function computeStreak(){
+  const d = new Date();
+  if(!S.activeDays.includes(isoDate(d))) d.setDate(d.getDate()-1);
+  let streak = 0;
+  while(S.activeDays.includes(isoDate(d))){ streak++; d.setDate(d.getDate()-1); }
+  return streak;
 }
 
 /* ============ DAILY ============ */
@@ -2426,7 +2457,7 @@ function openDashboard(){
     </div>` : '';
 
   const html = `
-    <h2>📊 Dashboard di ${S.name}</h2>
+    <h2>📊 Dashboard di ${htmlEscape(S.name)}</h2>
     <p class="tiny">Membro da ${new Date(S.createdAt).toLocaleDateString('it-IT')}</p>
     <div class="dash-stats">
       <div class="stat-card"><div class="big">${S.level}</div><div class="lbl">Livello</div></div>
@@ -2464,7 +2495,7 @@ function exportProgress(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = 'codequest-python-progress.json'; a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
   toast('Progressi esportati!','good');
 }
 function importProgress(file){
@@ -2486,9 +2517,9 @@ function openSettings(){
   const soundOn = Sfx.isEnabled();
   openModal(`
     <h2>⚙️ Impostazioni</h2>
-    <p><b>Nome attuale:</b> ${S.name}</p>
+    <p><b>Nome attuale:</b> ${htmlEscape(S.name)}</p>
     <p>Cambia nome:</p>
-    <input id="set-name" type="text" value="${S.name}" style="background:var(--bg-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;width:100%;font-size:14px;outline:none;">
+    <input id="set-name" type="text" value="${htmlEscape(S.name)}" style="background:var(--bg-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;width:100%;font-size:14px;outline:none;">
     <p style="margin-top:16px;"><b>🔊 Suoni</b></p>
     <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:14px;">
       <input type="checkbox" id="set-sound" ${soundOn ? 'checked' : ''} style="width:18px; height:18px;">
@@ -2515,6 +2546,9 @@ function openSettings(){
       S.createdAt = Date.now();
       saveState(); renderAll(); closeModal();
       currentLesson = null;
+      document.getElementById('lb-title').textContent = 'Progressi azzerati';
+      document.getElementById('lb-meta').textContent = 'Seleziona una lezione per ricominciare';
+      document.getElementById('lb-xp').textContent = '+0 XP';
       document.getElementById('lesson-panel').innerHTML = `<h2>🔄 Progressi azzerati</h2><p>Riparti dalla prima lezione!</p>`;
       editor.setValue('');
       toast('Tutto azzerato','good');
@@ -2545,10 +2579,13 @@ print(random.choice(["alpha","beta","gamma"]))</code></pre>
   document.getElementById('lb-diff').textContent = 'LIBERO';
   document.getElementById('lb-diff').className = 'diff-pill diff-2';
   document.getElementById('lb-meta').textContent = 'Modalità sperimentazione';
-  document.getElementById('lb-xp').textContent = '';
+  document.getElementById('lb-xp').textContent = 'nessuno';
   document.getElementById('lesson-panel').innerHTML = currentLesson.theory;
   editor.setValue('# Sperimenta liberamente!\nprint("Hello Playground")\n');
   clearConsole();
+  renderSidebar();
+  saveState();
+  showView('code');
 }
 
 function pickRandomUnlocked(){
@@ -2595,6 +2632,9 @@ function doRipasso(){
   }
   toast(`🔄 Ripasso: ${r.title}`, 'gold');
   loadLesson(r.id);
+  // si riparte dal codice iniziale: con la soluzione gia' nell'editor non sarebbe un ripasso
+  editor.setValue(r.starter || '');
+  showView('code');
 }
 
 /* ============ EVENTI ============ */
@@ -2630,8 +2670,8 @@ function startApp(){
   // FIX: previene doppia esecuzione (click + Enter)
   if(_appStarted) return;
   _appStarted = true;
-  const name = document.getElementById('welcome-name').value.trim() || 'Player';
-  if(S.name === 'Player' || !S.lastActive) S.name = name;
+  const name = document.getElementById('welcome-name').value.trim();
+  if(name) S.name = name.slice(0,20);
   document.getElementById('welcome').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
   initEditor();
