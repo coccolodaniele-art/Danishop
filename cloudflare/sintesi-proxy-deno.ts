@@ -58,6 +58,50 @@ function upstreamHeaders(target: URL): Record<string, string> {
   return { "User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" };
 }
 
+// Bilanci SEC (company facts, 4-8 MB): SP500 Vertical Thermometers ne legge solo poche voci
+// (valori in USD dei 10-Q/10-K, campi start/end/val/form). Se la pagina le elenca in &tags=...,
+// l'intermediario manda solo quelle: pochi KB. Il traffico da Deno verso i visitatori e' a
+// consumo, quello dalle fonti verso Deno no. Stessa regola di slimFacts in termometri-web/logica.js.
+const FACT_FORMS = ["10-Q", "10-Q/A", "10-K", "10-K/A"];
+
+function isCompanyFacts(target: URL): boolean {
+  return target.hostname.toLowerCase() === "data.sec.gov" && target.pathname.startsWith("/api/xbrl/companyfacts/");
+}
+
+// deno-lint-ignore no-explicit-any
+function slimFacts(facts: any, tags: string[]): unknown {
+  // deno-lint-ignore no-explicit-any
+  const gaap: Record<string, any> = {};
+  let source;
+  try { source = facts.facts["us-gaap"]; } catch (_) { source = null; }
+  for (const tag of tags) {
+    let units;
+    try { units = source[tag].units.USD; } catch (_) { continue; }
+    if (!Array.isArray(units)) continue;
+    // Solo le righe utili; dello stesso periodo (start, end) ripetuto nei bilanci, solo l'ultima.
+    // deno-lint-ignore no-explicit-any
+    const kept: Record<string, any>[] = [];
+    const last = new Map<string, number>();
+    for (const item of units) {
+      if (!item || !FACT_FORMS.includes(item.form)) continue;
+      if (item.end === null || item.end === undefined || item.val === null || item.val === undefined) continue;
+      // deno-lint-ignore no-explicit-any
+      const x: Record<string, any> = { form: item.form, end: item.end, val: item.val };
+      if (item.start !== undefined) x.start = item.start;
+      last.set(x.start + "|" + x.end, kept.length);
+      kept.push(x);
+    }
+    gaap[tag] = { units: { USD: kept.filter((x, i) => last.get(x.start + "|" + x.end) === i) } };
+  }
+  return { facts: { "us-gaap": gaap } };
+}
+
+// Risposte compresse (gzip) quando il browser le accetta: JSON, feed e pagine si riducono di 3-10 volte.
+async function gzip(data: Uint8Array): Promise<Uint8Array> {
+  const stream = new Blob([data]).stream().pipeThrough(new CompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
 function hostAllowed(hostname: string): boolean {
   const host = hostname.toLowerCase();
   return ALLOWED_HOSTS.some((allowed) => host === allowed || host.endsWith("." + allowed));
@@ -84,8 +128,11 @@ Deno.serve(async (request: Request): Promise<Response> => {
   if (!ALLOWED_ORIGINS.includes(origin)) return reply("Origine non consentita", 403, origin);
 
   let target: URL;
+  let tags: string[] = [];
   try {
-    target = new URL(new URL(request.url).searchParams.get("url") || "");
+    const params = new URL(request.url).searchParams;
+    target = new URL(params.get("url") || "");
+    tags = (params.get("tags") || "").split(",").filter(Boolean);
   } catch (_) {
     return reply("Indirizzo non valido", 400, origin);
   }
@@ -107,16 +154,26 @@ Deno.serve(async (request: Request): Promise<Response> => {
   const finalUrl = upstream.url || target.toString();
   if (!hostAllowed(new URL(finalUrl).hostname)) return reply("Fonte non consentita", 403, origin);
 
-  const body = await upstream.arrayBuffer();
+  let body = new Uint8Array(await upstream.arrayBuffer());
   if (body.byteLength > MAX_BYTES) return reply("Pagina troppo grande", 413, origin);
 
-  return new Response(body, {
-    status: upstream.status,
-    headers: {
-      ...corsHeaders(origin),
-      "Content-Type": upstream.headers.get("Content-Type") || "text/plain; charset=utf-8",
-      "X-Final-Url": finalUrl,
-      "Cache-Control": "public, max-age=300",
-    },
-  });
+  if (tags.length && upstream.ok && isCompanyFacts(new URL(finalUrl))) {
+    try {
+      const facts = JSON.parse(new TextDecoder().decode(body));
+      body = new TextEncoder().encode(JSON.stringify(slimFacts(facts, tags)));
+    } catch (_) { /* non e' JSON valido: si manda com'e' */ }
+  }
+
+  const headers: Record<string, string> = {
+    ...corsHeaders(origin),
+    "Content-Type": upstream.headers.get("Content-Type") || "text/plain; charset=utf-8",
+    "X-Final-Url": finalUrl,
+    "Cache-Control": "public, max-age=300",
+  };
+  if (/\bgzip\b/i.test(request.headers.get("Accept-Encoding") || "") && body.byteLength > 1024) {
+    body = await gzip(body);
+    headers["Content-Encoding"] = "gzip";
+    headers["Vary"] = "Origin, Accept-Encoding";
+  }
+  return new Response(body, { status: upstream.status, headers });
 });

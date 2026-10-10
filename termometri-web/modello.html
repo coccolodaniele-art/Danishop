@@ -186,7 +186,42 @@
 <script>
 'use strict';
 (function () {
-  T.init(__DATA__, { proxy: '__PROXY_URL__', storage: (() => { try { return window.localStorage; } catch (_) { return null; } })() });
+  // Bilanci SEC gia' scaricati (solo le voci usate, pochi KB per societa'): restano nel
+  // browser per T.FACTS_MAX_AGE e poi si cancellano. Se IndexedDB non c'e' o e' pieno,
+  // si scaricano ogni volta come prima.
+  function secFactsStore() {
+    if (typeof indexedDB === 'undefined') return null;
+    let opening = null;
+    const open = () => opening || (opening = new Promise((resolve, reject) => {
+      const req = indexedDB.open('sp500-thermometers', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('sec');
+      req.onsuccess = () => { purge(req.result); resolve(req.result); };
+      req.onerror = () => reject(req.error);
+    }));
+    function purge(db) {
+      try {
+        const cursor = db.transaction('sec', 'readwrite').objectStore('sec').openCursor();
+        cursor.onsuccess = () => {
+          const c = cursor.result;
+          if (!c) return;
+          if (!c.value || !(Date.now() - c.value.t < T.FACTS_MAX_AGE)) c.delete();
+          c.continue();
+        };
+      } catch (_) { }
+    }
+    const run = (mode, action) => open().then((db) => new Promise((resolve, reject) => {
+      const tx = db.transaction('sec', mode);
+      const req = action(tx.objectStore('sec'));
+      tx.oncomplete = () => resolve(req.result);
+      tx.onerror = tx.onabort = () => reject(tx.error);
+    }));
+    return { get: (key) => run('readonly', (s) => s.get(key)), set: (key, value) => run('readwrite', (s) => s.put(value, key)) };
+  }
+  T.init(__DATA__, {
+    proxy: '__PROXY_URL__',
+    storage: (() => { try { return window.localStorage; } catch (_) { return null; } })(),
+    factsStore: (() => { try { return secFactsStore(); } catch (_) { return null; } })(),
+  });
   const D = T.D;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

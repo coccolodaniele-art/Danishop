@@ -21,6 +21,7 @@ const T = {};  // spazio dei nomi esportato (anche per i test in Node)
   let PROXY_URL = '';
   let SEC_SNAPSHOT_URL = 'sec_tickers.json';
   let storage = null;     // localStorage (o finto nei test)
+  let factsStore = null;  // copia dei bilanci SEC gia' scaricati (IndexedDB, o finta nei test)
   let fetchImpl = (...a) => fetch(...a);
 
   T.init = function (data, opts = {}) {
@@ -28,6 +29,7 @@ const T = {};  // spazio dei nomi esportato (anche per i test in Node)
     PROXY_URL = (opts.proxy || '').replace(/\/+$/, '');
     if (opts.secSnapshotUrl) SEC_SNAPSHOT_URL = opts.secSnapshotUrl;
     storage = opts.storage || null;
+    factsStore = opts.factsStore || null;
     if (opts.fetch) fetchImpl = opts.fetch;
     T.D = D;
   };
@@ -101,13 +103,16 @@ const T = {};  // spazio dei nomi esportato (anche per i test in Node)
     }
   }
   // Come http_get_json del desktop, ma passando dall'intermediario.
-  async function httpGetText(url, timeout = 25000) {
+  // extra: parametri per l'intermediario (es. { tags: ... } per ridurre i bilanci SEC).
+  async function httpGetText(url, timeout = 25000, extra = null) {
     if (!PROXY_URL) throw new Error('Il servizio per leggere le fonti non e\' configurato.');
-    const res = await timedFetch(PROXY_URL + '/?url=' + encodeURIComponent(url), {}, timeout);
+    let address = PROXY_URL + '/?url=' + encodeURIComponent(url);
+    if (extra) for (const [k, v] of Object.entries(extra)) address += '&' + k + '=' + encodeURIComponent(v);
+    const res = await timedFetch(address, {}, timeout);
     if (!res.ok) throw new HTTPError(res.status);
     return await res.text();
   }
-  async function httpGetJson(url, timeout = 25000) { return JSON.parse(await httpGetText(url, timeout)); }
+  async function httpGetJson(url, timeout = 25000, extra = null) { return JSON.parse(await httpGetText(url, timeout, extra)); }
 
   // Elenchi ufficiali dei ticker SEC: prima dal vivo, poi dalla copia pubblicata con la pagina.
   let secSnapshot = null;
@@ -406,11 +411,65 @@ const T = {};  // spazio dei nomi esportato (anche per i test in Node)
     if (!byEnd.size) return [];
     return [...byEnd.entries()].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).slice(-limit);
   }
+  /* Differenza obbligata dal browser (i risultati non cambiano): dei bilanci SEC (4-8 MB
+     ciascuno) il programma legge solo le voci di EDGAR_FUNDAMENTAL_TAGS, valori in USD dei
+     10-Q/10-K, campi start/end/val/form. L'intermediario manda solo quelle (&tags=...), e
+     solo quelle si tengono in memoria e nel browser per FACTS_MAX_AGE: pochi KB per societa'. */
+  const FACT_FORMS = ['10-Q', '10-Q/A', '10-K', '10-K/A'];  // = forms di periodSeries
+  const FACTS_MAX_AGE = 24 * 3600 * 1000;
+  function factTags() {
+    const out = [];
+    for (const list of Object.values(TAGS())) for (const tag of list) if (!out.includes(tag)) out.push(tag);
+    return out;
+  }
+  function slimFacts(facts, tags) {
+    const gaap = {};
+    let source;
+    try { source = facts.facts['us-gaap']; } catch (_) { source = null; }
+    for (const tag of tags) {
+      let units;
+      try { units = source[tag].units.USD; } catch (_) { continue; }
+      if (!Array.isArray(units)) continue;
+      // Solo le righe che periodSeries puo' usare; di quelle con lo stesso periodo (start, end),
+      // ripetute da un bilancio all'altro, solo l'ultima: e' quella che periodSeries tiene.
+      const kept = [], last = new Map();
+      for (const item of units) {
+        if (!item || !FACT_FORMS.includes(item.form)) continue;
+        if (item.end === null || item.end === undefined || item.val === null || item.val === undefined) continue;
+        const x = { form: item.form, end: item.end, val: item.val };
+        if (item.start !== undefined) x.start = item.start;
+        last.set(x.start + '|' + x.end, kept.length);
+        kept.push(x);
+      }
+      gaap[tag] = { units: { USD: kept.filter((x, i) => last.get(x.start + '|' + x.end) === i) } };
+    }
+    return { facts: { 'us-gaap': gaap } };
+  }
+  async function savedFacts(key) {
+    if (!factsStore) return null;
+    try {
+      const rec = await factsStore.get(key);
+      return rec && Date.now() - rec.t < FACTS_MAX_AGE ? rec.facts : null;
+    } catch (_) { return null; }
+  }
+  function saveFacts(key, facts) {
+    if (!factsStore) return;
+    try { Promise.resolve(factsStore.set(key, { t: Date.now(), facts })).catch(() => { }); } catch (_) { }
+  }
   async function edgarFacts(cik) {
     const cik10 = cik.padStart(10, '0');
     let facts = edgarFactsCache.get(cik10);
     if (facts === undefined || facts === null) {
-      try { facts = await httpGetJson(D.EDGAR_COMPANYFACTS_URL.replace('{cik10}', cik10), 60000); } catch (_) { return null; }
+      const tags = factTags();
+      const key = cik10 + '|' + tags.join(',');
+      facts = await savedFacts(key);
+      if (!facts) {
+        try {
+          const full = await httpGetJson(D.EDGAR_COMPANYFACTS_URL.replace('{cik10}', cik10), 60000, { tags: tags.join(',') });
+          facts = slimFacts(full, tags);  // gia' ridotto dall'intermediario; serve se risponde col bilancio intero
+        } catch (_) { return null; }
+        saveFacts(key, facts);
+      }
       edgarFactsCache.set(cik10, facts);
     }
     return facts;
@@ -542,7 +601,7 @@ const T = {};  // spazio dei nomi esportato (anche per i test in Node)
     const sectorTxt = sector ? ` (settore: ${sector})` : '';
     return [rating, `Valutazione rapida locale${sectorTxt}, senza IA - voto ${rating}/10: ` + facts.join('; ') + `. ${verdict}.`];
   }
-  Object.assign(T, { periodSeries, edgarFactsCache, fetchEdgarFundamentalsSummary, fetchEdgarFundamentalsData, computeLocalRating });
+  Object.assign(T, { periodSeries, edgarFactsCache, FACTS_MAX_AGE, factTags, slimFacts, fetchEdgarFundamentalsSummary, fetchEdgarFundamentalsData, computeLocalRating });
 
   /* ---------- Gemini ---------- */
   class GeminiAuthError extends Error { }
