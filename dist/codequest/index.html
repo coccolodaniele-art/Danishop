@@ -283,6 +283,7 @@
   .py-status.ready{background:var(--good); box-shadow:0 0 0 3px rgba(5,150,105,.15);}
 
   #editor-area{flex:1; position:relative; min-height:0;}
+  .lesson-panel pre, .lesson-panel code, .CodeMirror, .console-body{font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0;}
   .CodeMirror{height:100% !important; font-size:13.5px; font-family:var(--mono); background:var(--code-bg) !important;}
   .CodeMirror-gutters{background:var(--code-bg-2) !important; border-right:1px solid var(--code-line) !important;}
   .CodeMirror-linenumber{color:#475569 !important;}
@@ -563,6 +564,8 @@
     .lesson-panel h2{font-size:19px;}
     .lesson-panel p, .lesson-panel ul, .lesson-panel ol{font-size:15px;}
     .lesson-help .btn{flex:1 1 auto; justify-content:center; padding:10px 12px; font-size:13.5px;}
+    .lesson-panel pre{font-size:11.5px; padding:10px; white-space:pre-wrap; overflow-wrap:anywhere;}
+    .help-box{padding:12px 10px;}
 
     .editor-toolbar{flex-wrap:wrap; gap:6px; padding:8px;}
     .editor-toolbar .btn{flex:1 1 28%; min-width:0; justify-content:center; padding:8px 4px; font-size:12.5px; white-space:nowrap;}
@@ -759,6 +762,18 @@ const LESSONS = buildLessons();
 
 /* ============ LEZIONI ============ */
 function buildLessons(){
+  // Verifiche: OUT = output esatto; USA = come e' scritto il codice (i = analisi di CODE_INFO);
+  // PROVA = la funzione provata con altri valori; VARIANTE = il programma con altri dati.
+  const OUT = (expect) => ({name:'Output corretto', expect});
+  const USA = (name, cond, fail) => ({name, check:(o, c, i) => !!i && !!cond(i), fail});
+  const PROVA = (probe, expect) => ({name:`Prova con altri valori: ${probe.split('\n').pop()}`, probe, expect});
+  const VARIANTE = (from, to, expect) => ({name:`Prova con altri dati: ${to}`, variant:[from, to], expect});
+  // nessun numero scritto a mano tra quelli indicati
+  const senzaNumeri = (i, ...nums) => !i.consts.some(c => typeof c === 'number' && nums.includes(c));
+  // nessun testo che contenga uno di questi pezzi
+  const senzaTesto = (i, ...parti) => !i.consts.some(c => typeof c === 'string' && parti.some(x => c.includes(x)));
+  // quante volte compare esattamente questo testo
+  const conta = (i, v) => i.consts.filter(c => c === v).length;
   const fond = [
     {
       id:'fond-1', track:'fond', title:'Hello, Python!', diff:1, xp:20,
@@ -769,9 +784,14 @@ function buildLessons(){
         <p>Le stringhe vanno tra virgolette doppie <code>"..."</code> o singole <code>'...'</code>.</p>
         <div class="task-box"><h3>🎯 Esercizio</h3><p>Stampa esattamente la frase: <code>Ciao, Python!</code></p></div>`,
       starter:`# Scrivi qui il tuo print\n`,
-      tests:[{name:'Output esatto', check:o=>o.trim()==='Ciao, Python!'}],
-      hint:'print("Ciao, Python!") — attenzione alla virgola e al punto esclamativo.',
-      solution:`print("Ciao, Python!")`
+      tests:[OUT('Ciao, Python!'),
+        USA('Usa print', i=>i.calls.print, 'Per stampare un testo serve la funzione print("...").')],
+      hint:`print("Ciao, Python!") — attenzione alla virgola e al punto esclamativo.`,
+      solution:`# print() scrive nella console quello
+# che sta tra le parentesi.
+# Il testo va tra virgolette, scritto
+# esattamente come richiesto.
+print("Ciao, Python!")`
     },
     {
       id:'fond-2', track:'fond', title:'Variabili e tipi', diff:1, xp:25,
@@ -787,9 +807,19 @@ attivo = True      # booleano (bool)</code></pre>
           <p>Stampa esattamente: <code>Roma 2873000</code></p>
         </div>`,
       starter:`# Crea le variabili e stampale\n`,
-      tests:[{name:'Output corretto', check:o=>o.trim()==='Roma 2873000'}],
-      hint:'print(citta, abitanti)',
-      solution:`citta = "Roma"\nabitanti = 2873000\nprint(citta, abitanti)`
+      tests:[OUT('Roma 2873000'),
+        USA('Crea le variabili citta e abitanti', i=>i.assigned.includes('citta') && i.assigned.includes('abitanti'), 'Crea le due variabili con il segno =: citta = "Roma" e abitanti = 2873000 (citta senza accento).'),
+        USA('Stampa le variabili, non il testo', i=>i.used.includes('citta') && i.used.includes('abitanti'), 'Nel print usa i nomi delle variabili, senza virgolette: print(citta, abitanti).')],
+      hint:`print(citta, abitanti) — i nomi delle variabili vanno senza virgolette.`,
+      solution:`# Una variabile con un testo (str) e
+# una con un numero intero (int)
+citta = "Roma"
+abitanti = 2873000
+
+# print con più valori separati da
+# virgola li stampa con uno spazio in
+# mezzo
+print(citta, abitanti)`
     },
     {
       id:'fond-3', track:'fond', title:'Operatori matematici', diff:1, xp:30,
@@ -809,10 +839,19 @@ print(2 ** 10) # 1024</code></pre>
         </div>`,
       starter:`r = 5\npi = 3.14159\n# stampa l'area\n`,
       tests:[{name:'Area circa 78.54', check:o=>{
-        const n=parseFloat(o.trim()); return !isNaN(n) && Math.abs(n - 3.14159*25) < 0.01;
-      }}],
-      hint:'Area = π × r²  →  pi * r ** 2',
-      solution:`r=5; pi=3.14159\nprint(pi * r ** 2)`
+          const n=parseFloat(o.trim()); return !isNaN(n) && Math.abs(n - 3.14159*25) < 0.01;
+        }, fail:'Il risultato deve essere circa 78.54: l\'area del cerchio è pi greco per raggio al quadrato (pi * r ** 2).'},
+        USA('Calcola con r e pi', i=>i.used.includes('r') && i.used.includes('pi') && senzaNumeri(i, 78.53975, 78.54) && senzaTesto(i, '78.5'), 'Calcola l\'area con le variabili r e pi (pi * r ** 2): il risultato non va scritto a mano.')],
+      hint:`Area = π × r²  →  pi * r ** 2`,
+      solution:`r = 5
+pi = 3.14159
+
+# Area del cerchio = pi greco per il
+# raggio al quadrato.
+# ** è l'operatore "elevato a": r ** 2
+# vale 25.
+area = pi * r ** 2
+print(area)`
     },
     {
       id:'fond-4', track:'fond', title:'Stringhe e f-string', diff:1, xp:35,
@@ -827,9 +866,19 @@ print(f"{nome} ha {eta} anni")
           <p>Dati <code>nome="Mario"</code>, <code>anni=42</code>, stampa: <code>Salve Mario, hai 42 anni e fra 10 anni ne avrai 52.</code></p>
         </div>`,
       starter:`nome = "Mario"\nanni = 42\n# stampa la frase con f-string\n`,
-      tests:[{name:'Output esatto', check:o=>o.trim()==='Salve Mario, hai 42 anni e fra 10 anni ne avrai 52.'}],
+      tests:[OUT('Salve Mario, hai 42 anni e fra 10 anni ne avrai 52.'),
+        USA('Usa una f-string', i=>i.nodes.includes('JoinedStr'), 'Scrivi la frase con una f-string: una f prima delle virgolette e le variabili tra graffe, f"Salve {nome}, ...".'),
+        USA('Calcola anni + 10', i=>i.used.includes('anni') && senzaNumeri(i, 52) && senzaTesto(i, '52'), 'Il 52 non va scritto a mano: dentro le graffe metti {anni + 10}, così il conto lo fa Python.')],
       hint:`f"Salve {nome}, hai {anni} anni e fra 10 anni ne avrai {anni+10}."`,
-      solution:`nome="Mario"; anni=42\nprint(f"Salve {nome}, hai {anni} anni e fra 10 anni ne avrai {anni+10}.")`
+      solution:`nome = "Mario"
+anni = 42
+
+# Con la f davanti alle virgolette,
+# quello che sta tra { } viene
+# calcolato:
+# {nome} diventa Mario, {anni + 10}
+# diventa 52.
+print(f"Salve {nome}, hai {anni} anni e fra 10 anni ne avrai {anni + 10}.")`
     },
     {
       id:'fond-5', track:'fond', title:'Booleani e confronti', diff:2, xp:35,
@@ -845,9 +894,15 @@ print(not False)         # True</code></pre>
           <p>Output atteso: <code>False</code></p>
         </div>`,
       starter:`# stampa True/False dell'espressione richiesta\n`,
-      tests:[{name:'Output False', check:o=>o.trim()==='False'}],
-      hint:'print(10 > 5 and 7 < 3)',
-      solution:`print(10 > 5 and 7 < 3)`
+      tests:[OUT('False'),
+        USA('Usa i confronti e and', i=>i.ops.includes('And') && i.nodes.includes('Compare'), 'Scrivi l\'espressione per intero, 10 > 5 and 7 < 3: il risultato deve calcolarlo Python, non va stampato False direttamente.')],
+      hint:`print(10 > 5 and 7 < 3)`,
+      solution:`# 10 > 5 è vero (True), 7 < 3 è falso
+# (False).
+# and dà True solo se TUTTE e due le
+# condizioni sono vere, quindi qui dà
+# False.
+print(10 > 5 and 7 < 3)`
     },
     {
       id:'fond-6', track:'fond', title:'Condizioni if/elif/else', diff:2, xp:45,
@@ -869,9 +924,26 @@ else:
           </ul>
         </div>`,
       starter:`temperatura = 28\n# if/elif/else\n`,
-      tests:[{name:'caldo', check:o=>o.trim()==='caldo'}],
-      hint:'if temperatura > 25: print("caldo")',
-      solution:`temperatura = 28\nif temperatura < 15: print("freddo")\nelif temperatura <= 25: print("mite")\nelse: print("caldo")`
+      tests:[OUT('caldo'),
+        USA('Usa if, elif ed else', i=>i.nodes.includes('Elif'), 'Servono tre casi in fila: if temperatura < 15: ... elif temperatura <= 25: ... else: ...'),
+        VARIANTE(/temperatura\s*=\s*28/, 'temperatura = 10', 'freddo'),
+        VARIANTE(/temperatura\s*=\s*28/, 'temperatura = 25', 'mite'),
+        VARIANTE(/temperatura\s*=\s*28/, 'temperatura = 15', 'mite')],
+      hint:`if temperatura < 15: ... elif temperatura <= 25: ... else: ...`,
+      solution:`temperatura = 28
+
+# Python controlla le condizioni
+# dall'alto in basso e si ferma alla
+# prima vera.
+if temperatura < 15:
+    print("freddo")
+# qui arriva solo se è almeno 15:
+# quindi da 15 a 25
+elif temperatura <= 25:
+    print("mite")
+# tutti gli altri casi: più di 25
+else:
+    print("caldo")`
     },
     {
       id:'fond-7', track:'fond', title:'Cicli for e range', diff:2, xp:50,
@@ -884,9 +956,21 @@ else:
           <p>Stampa la somma dei numeri da 1 a 100 inclusi (output: <code>5050</code>).</p>
         </div>`,
       starter:`somma = 0\n# cicla e somma\nprint(somma)\n`,
-      tests:[{name:'5050', check:o=>o.trim()==='5050'}],
-      hint:'for i in range(1, 101): somma += i',
-      solution:`somma = 0\nfor i in range(1, 101):\n    somma += i\nprint(somma)`
+      tests:[OUT('5050'),
+        USA('Usa un ciclo for con range', i=>i.nodes.includes('For') && i.calls.range, 'Somma i numeri con un ciclo: for i in range(1, 101): e dentro somma += i.'),
+        USA('Niente risultato scritto a mano', i=>senzaNumeri(i, 5050) && senzaTesto(i, '5050'), 'Il 5050 non va scritto nel codice: deve calcolarlo il ciclo.')],
+      hint:`for i in range(1, 101): somma += i`,
+      solution:`somma = 0
+
+# range(1, 101) produce 1, 2, ...,
+# 100: il secondo numero è escluso
+for i in range(1, 101):
+    # come scrivere: somma = somma + i
+    somma += i
+
+# fuori dal ciclo (senza rientro): si
+# stampa una volta sola
+print(somma)`
     },
     {
       id:'fond-8', track:'fond', title:'Cicli while', diff:2, xp:50,
@@ -901,9 +985,23 @@ while n &gt; 0:
           <p>Partendo da <code>n = 64</code>, dividi per 2 finché diventa minore di 1. Conta quante divisioni servono e stampa il numero (output: <code>7</code>).</p>
         </div>`,
       starter:`n = 64\ncount = 0\n# while ...\nprint(count)\n`,
-      tests:[{name:'7 divisioni', check:o=>o.trim()==='7'}],
-      hint:'while n >= 1: n /= 2; count += 1',
-      solution:`n = 64\ncount = 0\nwhile n >= 1:\n    n /= 2\n    count += 1\nprint(count)`
+      tests:[OUT('7'),
+        USA('Usa un ciclo while', i=>i.nodes.includes('While'), 'Ripeti la divisione con un ciclo: while n >= 1: e dentro n = n / 2 e count += 1.'),
+        USA('Niente risultato scritto a mano', i=>senzaNumeri(i, 7), 'Il 7 non va scritto nel codice: lo deve contare il ciclo con count += 1.')],
+      hint:`while n >= 1: n /= 2; count += 1`,
+      solution:`n = 64
+count = 0
+
+# Il ciclo continua finché n vale
+# almeno 1: 64, 32, 16, 8, 4, 2, 1 →
+# poi 0.5 e si ferma
+while n >= 1:
+    # dimezza n
+    n = n / 2
+    # conta la divisione appena fatta
+    count += 1
+
+print(count)`
     },
     {
       id:'fond-9', track:'fond', title:'Liste base', diff:2, xp:50,
@@ -915,14 +1013,29 @@ print(len(frutti))       # 3
 frutti.append("uva")     # aggiunge in fondo
 frutti.remove("pera")    # rimuove
 print("kiwi" in frutti)  # True</code></pre>
+        <p>Funzioni utili sulle liste: <code>len()</code> (quanti elementi), <code>min()</code> e <code>max()</code> (il più piccolo e il più grande), <code>sum()</code> (la somma).</p>
         <div class="task-box"><h3>🎯 Esercizio</h3>
           <p>Data <code>nums = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]</code>, stampa la sua lunghezza, il valore minimo, il valore massimo e la somma, separati da virgola.</p>
           <p>Output atteso: <code>10,1,9,39</code></p>
         </div>`,
       starter:`nums = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]\n# stampa "len,min,max,sum"\n`,
-      tests:[{name:'10,1,9,39', check:o=>o.trim()==='10,1,9,39'}],
+      tests:[OUT('10,1,9,39'),
+        USA('Usa len, min, max e sum', i=>['len','min','max','sum'].every(f=>i.calls[f]), 'Calcola i quattro valori con len(nums), min(nums), max(nums) e sum(nums).'),
+        USA('Niente risultati scritti a mano', i=>senzaNumeri(i, 39) && senzaTesto(i, '39'), 'Non scrivere i risultati a mano: devono uscire dalle funzioni applicate a nums.')],
       hint:`print(f"{len(nums)},{min(nums)},{max(nums)},{sum(nums)}")`,
-      solution:`nums=[3,1,4,1,5,9,2,6,5,3]\nprint(f"{len(nums)},{min(nums)},{max(nums)},{sum(nums)}")`
+      solution:`nums = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+
+# len = quanti elementi, min/max = il
+# più piccolo e il più grande, sum =
+# la somma
+lunghezza = len(nums)
+minimo = min(nums)
+massimo = max(nums)
+totale = sum(nums)
+
+# una f-string con le virgole in
+# mezzo, senza spazi
+print(f"{lunghezza},{minimo},{massimo},{totale}")`
     },
     {
       id:'fond-10', track:'fond', title:'Input e conversioni', diff:2, xp:45,
@@ -931,15 +1044,31 @@ print("kiwi" in frutti)  # True</code></pre>
         <pre><code>s = "42"
 n = int(s) + 1  # 43
 x = float("3.14")</code></pre>
+        <p>Per dividere un testo in pezzi si usa <code>.split()</code>: <code>"1 2 3".split()</code> → <code>['1', '2', '3']</code> (sono ancora testi).</p>
         <p class="tiny">(Nota: in questo ambiente <code>input()</code> non è disponibile, usiamo variabili predefinite.)</p>
         <div class="task-box"><h3>🎯 Esercizio</h3>
           <p>Data la stringa <code>cifre = "12 34 56 78"</code>, converti in lista di interi e stampa la somma.</p>
           <p>Output atteso: <code>180</code></p>
         </div>`,
       starter:`cifre = "12 34 56 78"\n# split, converti, somma\n`,
-      tests:[{name:'180', check:o=>o.trim()==='180'}],
-      hint:'sum(int(x) for x in cifre.split())',
-      solution:`cifre="12 34 56 78"\nprint(sum(int(x) for x in cifre.split()))`
+      tests:[OUT('180'),
+        USA('Dividi il testo e converti con int', i=>i.calls.split && i.calls.int, 'Dividi il testo con cifre.split() e trasforma ogni pezzo in numero con int(...).'),
+        USA('Niente risultato scritto a mano', i=>senzaNumeri(i, 180), 'Il 180 non va scritto nel codice: è la somma dei numeri ricavati dal testo.')],
+      hint:`Dividi con cifre.split(), poi somma int(pezzo) per ogni pezzo.`,
+      solution:`cifre = "12 34 56 78"
+
+# split() divide il testo dove ci sono
+# spazi: ["12", "34", "56", "78"]
+# (sono ancora testi: "12" + "34"
+# darebbe "1234")
+pezzi = cifre.split()
+
+totale = 0
+for pezzo in pezzi:
+    # int("12") diventa il numero 12
+    totale += int(pezzo)
+
+print(totale)`
     },
   ];
 
@@ -959,9 +1088,20 @@ a[::-1]    # invertita</code></pre>
           <p>Output atteso: <code>[19, 17, 15, 13, 11, 9, 7, 5, 3, 1]</code></p>
         </div>`,
       starter:`a = list(range(20))\n# slicing\n`,
-      tests:[{name:'Lista dispari inversa', check:o=>o.trim()==='[19, 17, 15, 13, 11, 9, 7, 5, 3, 1]'}],
-      hint:'a[1::2] sono i dispari. Poi [::-1] li inverte. Oppure a[-1::-2]',
-      solution:`a=list(range(20))\nprint(a[-1::-2])`
+      tests:[OUT('[19, 17, 15, 13, 11, 9, 7, 5, 3, 1]'),
+        USA('Usa lo slicing', i=>i.nodes.includes('Slice'), 'Ricava i numeri da a con lo slicing [inizio:fine:passo], per esempio a[-1::-2].'),
+        USA('Niente lista scritta a mano', i=>i.bigLiterals === 0, 'Non scrivere la lista a mano: deve uscire da a con lo slicing.')],
+      hint:`a[1::2] sono i dispari. Poi [::-1] li inverte. Oppure a[-1::-2]`,
+      solution:`# [0, 1, 2, ..., 19]
+a = list(range(20))
+
+# a[inizio:fine:passo]
+# inizio -1 = l'ultimo elemento (19),
+# fine vuota = fino in fondo,
+# passo -2 = all'indietro saltando di
+# due: 19, 17, 15, ..., 1
+dispari_al_contrario = a[-1::-2]
+print(dispari_al_contrario)`
     },
     {
       id:'dati-2', track:'dati', title:'Tuple e unpacking', diff:2, xp:45,
@@ -978,9 +1118,20 @@ a, b = b, a         # swap elegante</code></pre>
           <p>Output atteso: <code>(20, 10)</code></p>
         </div>`,
       starter:`coppia = (10, 20)\n# fai lo swap e stampa la nuova tupla\n`,
-      tests:[{name:'(20, 10)', check:o=>o.trim()==='(20, 10)'}],
-      hint:'a, b = coppia; print((b, a))',
-      solution:`coppia = (10, 20)\na, b = coppia\nprint((b, a))`
+      tests:[OUT('(20, 10)'),
+        USA('Usa l\'unpacking', i=>i.nodes.includes('Unpack'), 'Estrai i due valori con a, b = coppia e poi crea la nuova tupla (b, a).')],
+      hint:`a, b = coppia; print((b, a))`,
+      solution:`coppia = (10, 20)
+
+# unpacking: il primo valore va in a,
+# il secondo in b
+a, b = coppia
+
+# le tuple non si possono modificare:
+# se ne crea una nuova con i valori
+# scambiati
+coppia = (b, a)
+print(coppia)`
     },
     {
       id:'dati-3', track:'dati', title:'Set: insiemi', diff:3, xp:55,
@@ -998,9 +1149,19 @@ l2 = ["arancia","uva","mela","limone","kiwi"]</code></pre>
           <p>Output atteso: <code>3</code></p>
         </div>`,
       starter:`l1 = ["mela","pera","kiwi","uva","banana"]\nl2 = ["arancia","uva","mela","limone","kiwi"]\n# stampa il numero di parole comuni\n`,
-      tests:[{name:'3', check:o=>o.trim()==='3'}],
-      hint:'len(set(l1) & set(l2))',
-      solution:`l1=["mela","pera","kiwi","uva","banana"]; l2=["arancia","uva","mela","limone","kiwi"]\nprint(len(set(l1) & set(l2)))`
+      tests:[OUT('3'),
+        USA('Usa i set', i=>i.calls.set && (i.ops.includes('BitAnd') || i.calls.intersection) && senzaNumeri(i, 3), 'Trasforma le liste in insiemi con set(...), trova le parole comuni con & (intersezione) e contale con len(...).')],
+      hint:`len(set(l1) & set(l2))`,
+      solution:`l1 = ["mela", "pera", "kiwi", "uva", "banana"]
+l2 = ["arancia", "uva", "mela", "limone", "kiwi"]
+
+# set() trasforma la lista in un
+# insieme; & è l'intersezione:
+# restano solo gli elementi presenti
+# in entrambi → {"mela", "kiwi",
+# "uva"}
+comuni = set(l1) & set(l2)
+print(len(comuni))`
     },
     {
       id:'dati-4', track:'dati', title:'Dizionari', diff:3, xp:60,
@@ -1017,9 +1178,18 @@ for k, v in p.items():
           <p>Output atteso: <code>Lara</code></p>
         </div>`,
       starter:`scores = {"Anna":85, "Marco":72, "Lara":91, "Tom":66}\n# stampa il nome con punteggio massimo\n`,
-      tests:[{name:'Lara', check:o=>o.trim()==='Lara'}],
-      hint:'max(scores, key=scores.get)',
-      solution:`scores={"Anna":85,"Marco":72,"Lara":91,"Tom":66}\nprint(max(scores, key=scores.get))`
+      tests:[OUT('Lara'),
+        USA('Ricava il nome dal dizionario', i=>(i.calls.max || i.nodes.includes('For')) && conta(i, 'Lara') <= 1, 'Non scrivere "Lara" a mano: trovalo con max(scores, key=scores.get) oppure con un ciclo sul dizionario.')],
+      hint:`max(scores, key=scores.get)`,
+      solution:`scores = {"Anna": 85, "Marco": 72, "Lara": 91, "Tom": 66}
+
+# max su un dizionario scorre le
+# chiavi (i nomi).
+# key=scores.get dice di confrontarle
+# in base al loro valore (il
+# punteggio).
+migliore = max(scores, key=scores.get)
+print(migliore)`
     },
     {
       id:'dati-5', track:'dati', title:'List comprehension', diff:3, xp:65,
@@ -1035,9 +1205,17 @@ pari = [x for x in range(20) if x%2==0]
           <p>Output atteso: <code>[8, 64, 216, 512, 1000]</code></p>
         </div>`,
       starter:`# usa una list comprehension\n`,
-      tests:[{name:'[8, 64, 216, 512, 1000]', check:o=>o.trim()==='[8, 64, 216, 512, 1000]'}],
-      hint:'[x**3 for x in range(2,11,2)]',
-      solution:`print([x**3 for x in range(2,11,2)])`
+      tests:[OUT('[8, 64, 216, 512, 1000]'),
+        USA('Usa una list comprehension', i=>i.nodes.includes('ListComp'), 'Costruisci la lista in una riga: [x ** 3 for x in range(2, 11, 2)].'),
+        USA('Niente lista scritta a mano', i=>i.bigLiterals === 0 && senzaNumeri(i, 1000, 512, 216), 'Non scrivere i cubi a mano: li deve calcolare la comprehension.')],
+      hint:`[x**3 for x in range(2,11,2)]`,
+      solution:`# range(2, 11, 2) produce 2, 4, 6, 8,
+# 10 (parte da 2, si ferma prima di
+# 11, salta di 2)
+# per ogni x si mette nella lista x **
+# 3, cioè il cubo
+cubi = [x ** 3 for x in range(2, 11, 2)]
+print(cubi)`
     },
     {
       id:'dati-6', track:'dati', title:'Dict comprehension', diff:3, xp:70,
@@ -1049,9 +1227,15 @@ pari = [x for x in range(20) if x%2==0]
           <p>Output atteso: <code>{'python': 6, 'è': 1, 'facile': 6, 'e': 1, 'potente': 7}</code></p>
         </div>`,
       starter:`parole = ["python","è","facile","e","potente"]\n# dict comprehension\n`,
-      tests:[{name:'Dict lunghezze', check:o=>o.trim()==="{'python': 6, 'è': 1, 'facile': 6, 'e': 1, 'potente': 7}"}],
-      hint:'{p: len(p) for p in parole}',
-      solution:`parole=["python","è","facile","e","potente"]\nprint({p: len(p) for p in parole})`
+      tests:[OUT("{'python': 6, 'è': 1, 'facile': 6, 'e': 1, 'potente': 7}"),
+        USA('Usa una dict comprehension', i=>i.nodes.includes('DictComp'), 'Costruisci il dizionario in una riga: {p: len(p) for p in parole}.')],
+      hint:`{p: len(p) for p in parole}`,
+      solution:`parole = ["python", "è", "facile", "e", "potente"]
+
+# per ogni parola p: la chiave è la
+# parola, il valore è la sua lunghezza
+lunghezze = {p: len(p) for p in parole}
+print(lunghezze)`
     },
     {
       id:'dati-7', track:'dati', title:'Stringhe avanzate', diff:3, xp:60,
@@ -1067,9 +1251,15 @@ pari = [x for x in range(20) if x%2==0]
           <p>Data <code>s = "il rapido lupo bruno salta sul cane"</code>, stampa la frase con ogni parola che inizia con maiuscola (output: <code>Il Rapido Lupo Bruno Salta Sul Cane</code>).</p>
         </div>`,
       starter:`s = "il rapido lupo bruno salta sul cane"\n# capitalizza ogni parola\n`,
-      tests:[{name:'Title case', check:o=>o.trim()==='Il Rapido Lupo Bruno Salta Sul Cane'}],
-      hint:'s.title()',
-      solution:`print("il rapido lupo bruno salta sul cane".title())`
+      tests:[OUT('Il Rapido Lupo Bruno Salta Sul Cane'),
+        USA('Usa un metodo delle stringhe', i=>(i.calls.title || i.calls.capitalize) && senzaTesto(i, 'Rapido'), 'Trasforma s con il metodo s.title(), senza riscrivere la frase a mano.')],
+      hint:`s.title()`,
+      solution:`s = "il rapido lupo bruno salta sul cane"
+
+# title() restituisce una copia del
+# testo con l'iniziale maiuscola in
+# ogni parola
+print(s.title())`
     },
     {
       id:'dati-8', track:'dati', title:'enumerate e zip', diff:3, xp:65,
@@ -1085,11 +1275,18 @@ for n, e in zip(nomi, eta):
           <p>Date <code>citta = ["Roma","Milano","Napoli"]</code> e <code>popolazione = [2873000, 1379000, 967000]</code>, stampa una riga per coppia nel formato <code>Roma:2873000</code>, ecc.</p>
         </div>`,
       starter:`citta = ["Roma","Milano","Napoli"]\npopolazione = [2873000, 1379000, 967000]\n# stampa coppie con zip\n`,
-      tests:[{name:'3 righe formattate', check:o=>{
-        return o.trim()==='Roma:2873000\nMilano:1379000\nNapoli:967000';
-      }}],
-      hint:'for c, p in zip(citta, popolazione): print(f"{c}:{p}")',
-      solution:`citta=["Roma","Milano","Napoli"]; pop=[2873000,1379000,967000]\nfor c,p in zip(citta,pop): print(f"{c}:{p}")`
+      tests:[OUT('Roma:2873000\nMilano:1379000\nNapoli:967000'),
+        USA('Usa zip in un ciclo', i=>i.calls.zip && i.nodes.includes('For'), 'Abbina le due liste con un ciclo: for c, p in zip(citta, popolazione):'),
+        USA('Niente righe scritte a mano', i=>senzaTesto(i, 'Roma:', 'Milano:'), 'Non scrivere le righe a mano: componile con una f-string, per esempio f"{c}:{p}".')],
+      hint:`for c, p in zip(citta, popolazione): print(f"{c}:{p}")`,
+      solution:`citta = ["Roma", "Milano", "Napoli"]
+popolazione = [2873000, 1379000, 967000]
+
+# zip abbina gli elementi nella stessa
+# posizione: ("Roma", 2873000),
+# ("Milano", 1379000), ...
+for c, p in zip(citta, popolazione):
+    print(f"{c}:{p}")`
     },
     {
       id:'dati-9', track:'dati', title:'Sorting personalizzato', diff:3, xp:70,
@@ -1103,9 +1300,18 @@ sorted(nomi, key=str.lower)
           <p>Output atteso: <code>[('Lara', 91), ('Anna', 85), ('Marco', 72), ('Tom', 66)]</code></p>
         </div>`,
       starter:`punti = [("Anna",85),("Marco",72),("Lara",91),("Tom",66)]\n# ordina per punteggio decrescente\n`,
-      tests:[{name:'Sort descending', check:o=>o.trim()==="[('Lara', 91), ('Anna', 85), ('Marco', 72), ('Tom', 66)]"}],
-      hint:'sorted(punti, key=lambda t: t[1], reverse=True)',
-      solution:`p=[("Anna",85),("Marco",72),("Lara",91),("Tom",66)]\nprint(sorted(p, key=lambda t:t[1], reverse=True))`
+      tests:[OUT("[('Lara', 91), ('Anna', 85), ('Marco', 72), ('Tom', 66)]"),
+        USA('Ordina con key e reverse', i=>(i.calls.sorted || i.calls.sort) && i.kw.includes('key') && i.kw.includes('reverse'), 'Usa sorted(punti, key=lambda t: t[1], reverse=True): key sceglie il punteggio, reverse mette l\'ordine decrescente.')],
+      hint:`sorted(punti, key=lambda t: t[1], reverse=True)`,
+      solution:`punti = [("Anna", 85), ("Marco", 72), ("Lara", 91), ("Tom", 66)]
+
+# key dice su cosa ordinare: per ogni
+# tupla t = (nome, punteggio) si usa
+# t[1], il punteggio.
+# reverse=True ordina dal più grande
+# al più piccolo.
+classifica = sorted(punti, key=lambda t: t[1], reverse=True)
+print(classifica)`
     },
     {
       id:'dati-10', track:'dati', title:'collections.Counter', diff:4, xp:80,
@@ -1120,9 +1326,22 @@ print(c.most_common(2))
           <p>Output atteso: <code>il</code></p>
         </div>`,
       starter:`from collections import Counter\nfrase = "il sole splende e il mare brilla e il vento soffia"\n# stampa la parola più frequente\n`,
-      tests:[{name:'il', check:o=>o.trim()==='il'}],
-      hint:'Counter(frase.split()).most_common(1)[0][0]',
-      solution:`from collections import Counter\nfrase="il sole splende e il mare brilla e il vento soffia"\nprint(Counter(frase.split()).most_common(1)[0][0])`
+      tests:[OUT('il'),
+        USA('Usa Counter', i=>i.calls.Counter && conta(i, 'il') === 0, 'Conta le parole con Counter(frase.split()) e prendi la più frequente con most_common(1); non scrivere "il" a mano.')],
+      hint:`Counter(frase.split()).most_common(1)[0][0]`,
+      solution:`from collections import Counter
+
+frase = "il sole splende e il mare brilla e il vento soffia"
+
+# split() divide la frase in parole;
+# Counter conta quante volte compare
+# ognuna
+conteggi = Counter(frase.split())
+
+# most_common(1) restituisce [('il',
+# 3)]: la prima coppia (parola, volte)
+parola, volte = conteggi.most_common(1)[0]
+print(parola)`
     },
   ];
 
@@ -1140,9 +1359,18 @@ print(saluta("Anna"))</code></pre>
           <p>Output atteso: <code>40.0</code></p>
         </div>`,
       starter:`def area_triangolo(base, altezza):\n    # ...\n    pass\n\nprint(area_triangolo(10, 8))\n`,
-      tests:[{name:'40.0', check:o=>o.trim()==='40.0'}],
-      hint:'return base * altezza / 2',
-      solution:`def area_triangolo(b,h): return b*h/2\nprint(area_triangolo(10,8))`
+      tests:[OUT('40.0'),
+        USA('La funzione restituisce l\'area', i=>i.funcs.area_triangolo && i.funcs.area_triangolo.returns, 'Dentro area_triangolo, al posto di pass, serve return base * altezza / 2.'),
+        PROVA('print(area_triangolo(3, 4))', '6.0')],
+      hint:`return base * altezza / 2`,
+      solution:`def area_triangolo(base, altezza):
+    # return restituisce il risultato
+    # a chi ha chiamato la funzione
+    return base * altezza / 2
+
+# 10 * 8 / 2 = 40.0 (la divisione / dà
+# sempre un decimale)
+print(area_triangolo(10, 8))`
     },
     {
       id:'func-2', track:'func', title:'Parametri default e keyword', diff:3, xp:60,
@@ -1157,9 +1385,21 @@ saluta(nome="Anna", formula="Salve")  # keyword</code></pre>
           <p>Scrivi <code>potenza(base, esp=2)</code>. Stampa <code>potenza(5)</code> e <code>potenza(2, esp=10)</code> su due righe.</p>
         </div>`,
       starter:`def potenza(base, esp=2):\n    # ...\n    pass\n\nprint(potenza(5))\nprint(potenza(2, esp=10))\n`,
-      tests:[{name:'25 e 1024', check:o=>o.trim()==='25\n1024'}],
-      hint:'return base ** esp',
-      solution:`def potenza(b, esp=2): return b**esp\nprint(potenza(5)); print(potenza(2, esp=10))`
+      tests:[OUT('25\n1024'),
+        USA('esp ha un valore di default', i=>i.funcs.potenza && i.funcs.potenza.defaults >= 1 && i.funcs.potenza.returns, 'Definisci def potenza(base, esp=2): e restituisci return base ** esp.'),
+        PROVA('print(potenza(3))', '9'),
+        PROVA('print(potenza(2, esp=3))', '8')],
+      hint:`return base ** esp`,
+      solution:`def potenza(base, esp=2):
+    # se chi chiama non passa esp,
+    # vale 2 (valore di default)
+    return base ** esp
+
+# esp non passato → 5 ** 2 = 25
+print(potenza(5))
+# esp passato per nome → 2 ** 10 =
+# 1024
+print(potenza(2, esp=10))`
     },
     {
       id:'func-3', track:'func', title:'*args e **kwargs', diff:4, xp:75,
@@ -1178,9 +1418,18 @@ descrivi(nome="Anna", eta=30)</code></pre>
           <p>Output atteso: <code>6.0</code></p>
         </div>`,
       starter:`def media(*nums):\n    # ...\n    pass\n\nprint(media(2, 4, 6, 8, 10))\n`,
-      tests:[{name:'6.0', check:o=>o.trim()==='6.0'}],
-      hint:'sum(nums) / len(nums)',
-      solution:`def media(*n): return sum(n)/len(n)\nprint(media(2,4,6,8,10))`
+      tests:[OUT('6.0'),
+        USA('Usa *args', i=>i.funcs.media && i.funcs.media.vararg, 'La funzione deve accettare quanti valori vuoi: def media(*nums):'),
+        PROVA('print(media(1, 2))', '1.5')],
+      hint:`sum(nums) / len(nums)`,
+      solution:`def media(*nums):
+    # *nums raccoglie tutti gli
+    # argomenti in una tupla: (2, 4,
+    # 6, 8, 10)
+    return sum(nums) / len(nums)
+
+# 30 / 5 = 6.0
+print(media(2, 4, 6, 8, 10))`
     },
     {
       id:'func-4', track:'func', title:'Lambda', diff:3, xp:65,
@@ -1196,9 +1445,18 @@ sorted([1,-3,2,-5], key=lambda x: abs(x))
           <p>Output atteso: <code>['linguaggio', 'fantastico', 'python', 'è']</code></p>
         </div>`,
       starter:`parole = ["python","è","linguaggio","fantastico"]\n# usa sorted con lambda\n`,
-      tests:[{name:'Sort by length desc', check:o=>o.trim()==="['linguaggio', 'fantastico', 'python', 'è']"}],
-      hint:'sorted(parole, key=lambda p: len(p), reverse=True)',
-      solution:`p=["python","è","linguaggio","fantastico"]\nprint(sorted(p, key=lambda x: len(x), reverse=True))`
+      tests:[OUT("['linguaggio', 'fantastico', 'python', 'è']"),
+        USA('Ordina con una lambda', i=>i.nodes.includes('Lambda') && i.kw.includes('key'), 'Usa sorted(parole, key=lambda p: len(p), reverse=True).')],
+      hint:`sorted(parole, key=lambda p: len(p), reverse=True)`,
+      solution:`parole = ["python", "è", "linguaggio", "fantastico"]
+
+# la lambda riceve una parola e
+# restituisce la sua lunghezza: è il
+# criterio di ordinamento.
+# reverse=True: dalla più lunga alla
+# più corta.
+ordinate = sorted(parole, key=lambda p: len(p), reverse=True)
+print(ordinate)`
     },
     {
       id:'func-5', track:'func', title:'map, filter, reduce', diff:4, xp:80,
@@ -1216,9 +1474,25 @@ reduce(lambda a,b: a*b, [1,2,3,4])     # 24</code></pre>
           <p>Dati <code>nums = [1,2,3,4,5,6,7,8,9,10]</code>, calcola la <b>somma dei quadrati dei numeri pari</b>. Output atteso: <code>220</code></p>
         </div>`,
       starter:`nums = [1,2,3,4,5,6,7,8,9,10]\n# somma dei quadrati dei pari\n`,
-      tests:[{name:'220', check:o=>o.trim()==='220'}],
-      hint:'sum(x*x for x in nums if x%2==0)',
-      solution:`nums=list(range(1,11))\nprint(sum(map(lambda x: x*x, filter(lambda x: x%2==0, nums))))`
+      tests:[OUT('220'),
+        USA('Usa map e filter', i=>(i.calls.map && i.calls.filter) || i.calls.reduce, 'In questa lezione usa le funzioni del capitolo: filter per tenere i pari, map per fare i quadrati, poi sum.'),
+        USA('Niente risultato scritto a mano', i=>senzaNumeri(i, 220), 'Il 220 non va scritto nel codice: deve calcolarlo Python.')],
+      hint:`sum(map(lambda x: x * x, filter(lambda x: x % 2 == 0, nums)))`,
+      solution:`nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# filter tiene solo gli elementi per
+# cui la funzione dà True: i pari
+# (resto 0 diviso 2)
+# 2, 4, 6, 8, 10
+pari = filter(lambda x: x % 2 == 0, nums)
+
+# map applica la funzione a ogni
+# elemento: il quadrato
+# 4, 16, 36, 64, 100
+quadrati = map(lambda x: x * x, pari)
+
+# 220
+print(sum(quadrati))`
     },
     {
       id:'func-6', track:'func', title:'Classi e oggetti', diff:4, xp:90,
@@ -1239,9 +1513,33 @@ print(rex.abbaia())</code></pre>
           <p>Output atteso: <code>100</code></p>
         </div>`,
       starter:`class Conto:\n    def __init__(self, saldo=0):\n        self.saldo = saldo\n    # versa e preleva\n\nc = Conto()\nc.versa(100); c.preleva(30); c.versa(50); c.preleva(20)\nprint(c.saldo)\n`,
-      tests:[{name:'100', check:o=>o.trim()==='100'}],
-      hint:'def versa(self,x): self.saldo += x',
-      solution:`class Conto:\n  def __init__(self, saldo=0): self.saldo=saldo\n  def versa(self,x): self.saldo+=x\n  def preleva(self,x): self.saldo-=x\nc=Conto(); c.versa(100); c.preleva(30); c.versa(50); c.preleva(20)\nprint(c.saldo)`
+      tests:[OUT('100'),
+        USA('Metodi versa e preleva', i=>{const m = (i.classes.Conto || {}).methods || {}; return 'versa' in m && 'preleva' in m;}, 'Nella classe Conto aggiungi def versa(self, x): e def preleva(self, x):, che cambiano self.saldo.'),
+        PROVA('c2 = Conto(10)\nc2.versa(5)\nc2.preleva(4)\nprint(c2.saldo)', '11')],
+      hint:`def versa(self, x): self.saldo += x`,
+      solution:`class Conto:
+    def __init__(self, saldo=0):
+        # ogni conto ha il suo saldo
+        self.saldo = saldo
+
+    def versa(self, x):
+        # self è il conto su cui si
+        # chiama il metodo
+        self.saldo += x
+
+    def preleva(self, x):
+        self.saldo -= x
+
+c = Conto()
+# 100
+c.versa(100)
+# 70
+c.preleva(30)
+# 120
+c.versa(50)
+# 100
+c.preleva(20)
+print(c.saldo)`
     },
     {
       id:'func-7', track:'func', title:'Ereditarietà', diff:4, xp:100,
@@ -1263,9 +1561,25 @@ print(g.nome, g.verso())</code></pre>
           <p>Crea <code>Veicolo</code> con metodo <code>descrivi()</code> che restituisce <code>"veicolo"</code>. Crea <code>Auto(Veicolo)</code> che fa l'override e restituisce <code>"auto su 4 ruote"</code>. Stampa le descrizioni di entrambi su 2 righe.</p>
         </div>`,
       starter:`class Veicolo:\n    def descrivi(self):\n        return "veicolo"\n\nclass Auto(Veicolo):\n    # override\n    pass\n\nprint(Veicolo().descrivi())\nprint(Auto().descrivi())\n`,
-      tests:[{name:'2 righe corrette', check:o=>o.trim()==='veicolo\nauto su 4 ruote'}],
-      hint:'class Auto(Veicolo):\n    def descrivi(self): return "auto su 4 ruote"',
-      solution:`class Veicolo:\n  def descrivi(self): return "veicolo"\nclass Auto(Veicolo):\n  def descrivi(self): return "auto su 4 ruote"\nprint(Veicolo().descrivi()); print(Auto().descrivi())`
+      tests:[OUT('veicolo\nauto su 4 ruote'),
+        USA('Auto eredita da Veicolo e ridefinisce descrivi', i=>{const a = i.classes.Auto; return !!a && a.bases.includes('Veicolo') && 'descrivi' in a.methods;}, 'Scrivi class Auto(Veicolo): e dentro ridefinisci def descrivi(self): con return "auto su 4 ruote".')],
+      hint:`In class Auto(Veicolo) scrivi def descrivi(self): con return "auto su 4 ruote".`,
+      solution:`class Veicolo:
+    def descrivi(self):
+        return "veicolo"
+
+# Auto(Veicolo): Auto eredita tutto da
+# Veicolo...
+class Auto(Veicolo):
+    # ...ma ridefinisce (override)
+    # descrivi con una versione sua
+    def descrivi(self):
+        return "auto su 4 ruote"
+
+# usa il metodo di Veicolo
+print(Veicolo().descrivi())
+# usa il metodo di Auto
+print(Auto().descrivi())`
     },
     {
       id:'func-8', track:'func', title:'Dunder __str__ e __eq__', diff:4, xp:95,
@@ -1291,9 +1605,20 @@ print(Moneta(2) == Moneta(2))   # True (senza __eq__ sarebbe False)</code></pre>
           <p>Output atteso: <code>Punto(3, 4)</code></p>
         </div>`,
       starter:`class Punto:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n    # __str__\n\nprint(Punto(3, 4))\n`,
-      tests:[{name:'Punto(3, 4)', check:o=>o.trim()==='Punto(3, 4)'}],
-      hint:'def __str__(self): return f"Punto({self.x}, {self.y})"',
-      solution:`class Punto:\n  def __init__(self,x,y): self.x=x; self.y=y\n  def __str__(self): return f"Punto({self.x}, {self.y})"\nprint(Punto(3,4))`
+      tests:[OUT('Punto(3, 4)'),
+        USA('Definisci __str__', i=>'__str__' in ((i.classes.Punto || {}).methods || {}), 'Aggiungi alla classe Punto il metodo def __str__(self): che restituisce il testo.'),
+        PROVA('print(Punto(-1, 7))', 'Punto(-1, 7)')],
+      hint:`def __str__(self): return f"Punto({self.x}, {self.y})"`,
+      solution:`class Punto:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    # print() usa __str__ per sapere
+    # come mostrare l'oggetto
+    def __str__(self):
+        return f"Punto({self.x}, {self.y})"
+
+print(Punto(3, 4))`
     },
     {
       id:'func-9', track:'func', title:'Property (getter/setter)', diff:5, xp:115,
@@ -1313,9 +1638,24 @@ print(c.area)  # niente parentesi!</code></pre>
           <p>Output atteso: <code>77.0</code></p>
         </div>`,
       starter:`class Temperatura:\n    def __init__(self, c):\n        self._celsius = c\n    @property\n    def fahrenheit(self):\n        # F = C * 9/5 + 32\n        pass\n\nt = Temperatura(25)\nprint(t.fahrenheit)\n`,
-      tests:[{name:'77.0', check:o=>o.trim()==='77.0'}],
-      hint:'return self._celsius * 9/5 + 32',
-      solution:`class Temperatura:\n  def __init__(self,c): self._c=c\n  @property\n  def fahrenheit(self): return self._c*9/5+32\nprint(Temperatura(25).fahrenheit)`
+      tests:[OUT('77.0'),
+        USA('fahrenheit è una property', i=>(((i.classes.Temperatura || {}).methods || {}).fahrenheit || []).includes('property'), 'Sopra def fahrenheit(self): ci deve essere @property, e il metodo deve restituire il valore con return.'),
+        PROVA('print(Temperatura(100).fahrenheit)', '212.0')],
+      hint:`return self._celsius * 9/5 + 32`,
+      solution:`class Temperatura:
+    def __init__(self, c):
+        self._celsius = c
+
+    # @property: si legge come un
+    # attributo, t.fahrenheit, senza
+    # parentesi
+    @property
+    def fahrenheit(self):
+        return self._celsius * 9 / 5 + 32
+
+t = Temperatura(25)
+# 25 * 9 / 5 + 32 = 77.0
+print(t.fahrenheit)`
     },
     {
       id:'func-10', track:'func', title:'Decoratori', diff:5, xp:130,
@@ -1336,9 +1676,30 @@ print(saluta("anna"))  # 'CIAO ANNA!'</code></pre>
           <p>Output atteso: <code>14</code></p>
         </div>`,
       starter:`def doppio_risultato(fn):\n    def wrapper(*a, **kw):\n        # ...\n        pass\n    return wrapper\n\n@doppio_risultato\ndef somma(a,b):\n    return a+b\n\nprint(somma(3,4))\n`,
-      tests:[{name:'14', check:o=>o.trim()==='14'}],
-      hint:'return fn(*a,**kw) * 2',
-      solution:`def doppio_risultato(fn):\n  def w(*a,**k): return fn(*a,**k)*2\n  return w\n@doppio_risultato\ndef somma(a,b): return a+b\nprint(somma(3,4))`
+      tests:[OUT('14'),
+        USA('somma è decorata con doppio_risultato', i=>((i.funcs.somma || {}).decorators || []).includes('doppio_risultato'), 'Metti @doppio_risultato sulla riga sopra def somma(a, b):'),
+        PROVA('print(somma(10, 5))', '30')],
+      hint:`return fn(*a, **kw) * 2`,
+      solution:`def doppio_risultato(fn):
+    # wrapper prende il posto della
+    # funzione decorata
+    def wrapper(*a, **kw):
+        # chiama la funzione originale
+        # con gli stessi argomenti
+        risultato = fn(*a, **kw)
+        # e restituisce il suo
+        # risultato raddoppiato
+        return risultato * 2
+    return wrapper
+
+# equivale a: somma =
+# doppio_risultato(somma)
+@doppio_risultato
+def somma(a, b):
+    return a + b
+
+# (3 + 4) * 2 = 14
+print(somma(3, 4))`
     },
   ];
 
@@ -1359,9 +1720,21 @@ finally:
           <p>Output atteso: <code>errore</code></p>
         </div>`,
       starter:`def safe_div(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        pass\n\nprint(safe_div(10, 0))\n`,
-      tests:[{name:'errore', check:o=>o.trim()==='errore'}],
-      hint:'return "errore" in except',
-      solution:`def safe_div(a,b):\n  try: return a/b\n  except ZeroDivisionError: return "errore"\nprint(safe_div(10,0))`
+      tests:[OUT('errore'),
+        USA('Usa try/except ZeroDivisionError', i=>i.nodes.includes('Try') && i.excepts.includes('ZeroDivisionError'), 'Metti la divisione dentro try: e gestisci except ZeroDivisionError: con return "errore".'),
+        PROVA('print(safe_div(10, 4))', '2.5')],
+      hint:`Nel blocco except: return "errore"`,
+      solution:`def safe_div(a, b):
+    try:
+        # se b vale 0 qui nasce un
+        # ZeroDivisionError...
+        return a / b
+    except ZeroDivisionError:
+        # ...che viene intercettato
+        # qui
+        return "errore"
+
+print(safe_div(10, 0))`
     },
     {
       id:'avan-2', track:'avan', title:'Context manager (with)', diff:4, xp:85,
@@ -1387,9 +1760,23 @@ in mezzo
 fine</code></pre>
         </div>`,
       starter:`class Stampante:\n    def __enter__(self):\n        print("inizio")\n        return self\n    def __exit__(self, *a):\n        # ...\n        pass\n\nwith Stampante():\n    print("in mezzo")\n`,
-      tests:[{name:'3 righe', check:o=>o.trim()==='inizio\nin mezzo\nfine'}],
-      hint:'def __exit__(self, *a): print("fine")',
-      solution:`class Stampante:\n  def __enter__(self): print("inizio"); return self\n  def __exit__(self,*a): print("fine")\nwith Stampante(): print("in mezzo")`
+      tests:[OUT('inizio\nin mezzo\nfine'),
+        USA('Context manager con __enter__ e __exit__', i=>{const m = (i.classes.Stampante || {}).methods || {}; return '__enter__' in m && '__exit__' in m && i.nodes.includes('With');}, 'La classe Stampante deve avere __enter__ (stampa "inizio") e __exit__ (stampa "fine"), e va usata con with Stampante():')],
+      hint:`def __exit__(self, *a): print("fine")`,
+      solution:`class Stampante:
+    # eseguito all'ingresso nel blocco
+    # with
+    def __enter__(self):
+        print("inizio")
+        return self
+
+    # eseguito all'uscita, anche in
+    # caso di errore
+    def __exit__(self, *a):
+        print("fine")
+
+with Stampante():
+    print("in mezzo")`
     },
     {
       id:'avan-3', track:'avan', title:'Generatori (yield)', diff:4, xp:95,
@@ -1408,9 +1795,22 @@ for x in conta_alla_rovescia(3):
           <p>Output atteso: <code>[0, 2, 4, 6, 8, 10]</code></p>
         </div>`,
       starter:`def pari_fino_a(n):\n    # usa yield\n    pass\n\nprint(list(pari_fino_a(10)))\n`,
-      tests:[{name:'[0,2,4,6,8,10]', check:o=>o.trim()==='[0, 2, 4, 6, 8, 10]'}],
-      hint:'for i in range(0, n+1, 2): yield i',
-      solution:`def pari_fino_a(n):\n  for i in range(0, n+1, 2): yield i\nprint(list(pari_fino_a(10)))`
+      tests:[OUT('[0, 2, 4, 6, 8, 10]'),
+        USA('Usa yield', i=>i.funcs.pari_fino_a && i.funcs.pari_fino_a.yields, 'pari_fino_a deve essere un generatore: dentro un ciclo usa yield i.'),
+        PROVA('print(list(pari_fino_a(5)))', '[0, 2, 4]')],
+      hint:`for i in range(0, n+1, 2): yield i`,
+      solution:`def pari_fino_a(n):
+    # range(0, n + 1, 2): da 0 a n
+    # compreso, saltando di 2
+    for i in range(0, n + 1, 2):
+        # consegna un valore e si
+        # mette in pausa fino alla
+        # richiesta del prossimo
+        yield i
+
+# list() chiede tutti i valori al
+# generatore
+print(list(pari_fino_a(10)))`
     },
     {
       id:'avan-4', track:'avan', title:'Type hints', diff:4, xp:85,
@@ -1427,9 +1827,20 @@ def media(nums: List[float]) -&gt; float:
           <p>Output atteso: <code>a, b, c</code></p>
         </div>`,
       starter:`def concatena(parole: list[str], sep: str = ", ") -> str:\n    pass\n\nprint(concatena(["a","b","c"]))\n`,
-      tests:[{name:'a, b, c', check:o=>o.trim()==='a, b, c'}],
-      hint:'return sep.join(parole)',
-      solution:`def concatena(parole: list[str], sep: str = ", ") -> str:\n  return sep.join(parole)\nprint(concatena(["a","b","c"]))`
+      tests:[OUT('a, b, c'),
+        USA('Mantieni i type hint', i=>i.funcs.concatena && i.funcs.concatena.annotated, 'Lascia le annotazioni dei tipi: def concatena(parole: list[str], sep: str = ", ") -> str:'),
+        PROVA('print(concatena(["x", "y"], sep="-"))', 'x-y')],
+      hint:`return sep.join(parole)`,
+      solution:`# parole è una lista di testi, sep un
+# testo (", " se non viene passato),
+# e la funzione restituisce un testo:
+# -> str
+def concatena(parole: list[str], sep: str = ", ") -> str:
+    # join mette sep tra un elemento e
+    # l'altro
+    return sep.join(parole)
+
+print(concatena(["a", "b", "c"]))`
     },
     {
       id:'avan-5', track:'avan', title:'Espressioni regolari', diff:4, xp:105,
@@ -1445,9 +1856,22 @@ print(mails)
           <p>Output atteso: <code>[1234, 5678]</code></p>
         </div>`,
       starter:`import re\ntesto = "ordine #1234 spedito il 2024-03-15, ordine #5678 il 2024-04-22"\n# regex per #seguito da cifre\n`,
-      tests:[{name:'[1234, 5678]', check:o=>o.trim()==='[1234, 5678]'}],
-      hint:`re.findall(r"#(\\d+)", testo)  → poi convertire a int`,
-      solution:`import re\nt="ordine #1234 spedito il 2024-03-15, ordine #5678 il 2024-04-22"\nprint([int(x) for x in re.findall(r"#(\\d+)", t)])`
+      tests:[OUT('[1234, 5678]'),
+        USA('Usa re.findall', i=>i.calls.findall && i.calls.int && senzaNumeri(i, 1234, 5678), 'Estrai i numeri con re.findall(r"#(\\d+)", testo) e convertili con int(...); non scriverli a mano.')],
+      hint:`re.findall(r"#(\\d+)", testo)  → poi converti ogni pezzo con int()`,
+      solution:`import re
+
+testo = "ordine #1234 spedito il 2024-03-15, ordine #5678 il 2024-04-22"
+
+# #(\\d+): un cancelletto seguito da
+# una o più cifre.
+# Le parentesi "catturano" solo le
+# cifre: findall restituisce ['1234',
+# '5678'] (testi)
+numeri = re.findall(r"#(\\d+)", testo)
+
+# convertiti in numeri interi
+print([int(x) for x in numeri])`
     },
     {
       id:'avan-6', track:'avan', title:'Datetime', diff:3, xp:75,
@@ -1457,14 +1881,25 @@ oggi = date.today()
 domani = oggi + timedelta(days=1)
 print(oggi.year, oggi.month, oggi.day)
 print(domani.isoformat())</code></pre>
+        <p>Sottraendo due date si ottiene un <code>timedelta</code>; con <code>.days</code> leggi quanti giorni sono: <code>(b - a).days</code>.</p>
         <div class="task-box"><h3>🎯 Esercizio</h3>
           <p>Calcola quanti giorni separano <code>date(2024, 1, 1)</code> da <code>date(2024, 12, 31)</code> e stampa il numero.</p>
           <p>Output atteso: <code>365</code></p>
         </div>`,
       starter:`from datetime import date\na = date(2024, 1, 1)\nb = date(2024, 12, 31)\n# stampa la differenza in giorni\n`,
-      tests:[{name:'365', check:o=>o.trim()==='365'}],
-      hint:'(b - a).days',
-      solution:`from datetime import date\na=date(2024,1,1); b=date(2024,12,31)\nprint((b-a).days)`
+      tests:[OUT('365'),
+        USA('Sottrai le date', i=>i.ops.includes('Sub') && i.attrs.includes('days') && senzaNumeri(i, 365), 'Sottrai le due date (b - a) e leggi i giorni con .days; il 365 non va scritto a mano.')],
+      hint:`(b - a).days`,
+      solution:`from datetime import date
+
+a = date(2024, 1, 1)
+b = date(2024, 12, 31)
+
+# la differenza tra due date è un
+# timedelta; .days dice quanti giorni
+# sono
+differenza = b - a
+print(differenza.days)`
     },
     {
       id:'avan-7', track:'avan', title:'JSON', diff:3, xp:70,
@@ -1478,9 +1913,22 @@ d2 = json.loads(s)          # stringa JSON → dict</code></pre>
           <p>Output atteso: <code>18</code></p>
         </div>`,
       starter:`import json\ns = '{"prodotti":[{"nome":"libro","prezzo":15},{"nome":"penna","prezzo":3}]}'\n# parse e somma\n`,
-      tests:[{name:'18', check:o=>o.trim()==='18'}],
-      hint:'data = json.loads(s); sum(p["prezzo"] for p in data["prodotti"])',
-      solution:`import json\ns='{"prodotti":[{"nome":"libro","prezzo":15},{"nome":"penna","prezzo":3}]}'\nd=json.loads(s)\nprint(sum(p["prezzo"] for p in d["prodotti"]))`
+      tests:[OUT('18'),
+        USA('Leggi il JSON con json.loads', i=>i.calls.loads && senzaNumeri(i, 18), 'Trasforma il testo in dati con json.loads(s), poi somma i valori "prezzo"; il 18 non va scritto a mano.')],
+      hint:`data = json.loads(s); sum(p["prezzo"] for p in data["prodotti"])`,
+      solution:`import json
+
+s = '{"prodotti":[{"nome":"libro","prezzo":15},{"nome":"penna","prezzo":3}]}'
+
+# json.loads trasforma il testo JSON
+# in dizionari e liste di Python
+dati = json.loads(s)
+
+totale = 0
+for prodotto in dati["prodotti"]:
+    totale += prodotto["prezzo"]
+
+print(totale)`
     },
     {
       id:'avan-8', track:'avan', title:'itertools', diff:5, xp:120,
@@ -1493,9 +1941,17 @@ list(product([0,1], repeat=3))   # tutte le combinazioni binarie</code></pre>
           <p>Quante <b>combinazioni di 3 elementi</b> si possono fare da una lista di 10 elementi distinti? Stampa il numero (output: <code>120</code>).</p>
         </div>`,
       starter:`from itertools import combinations\n# stampa il numero di combinazioni di 3 elementi da 10\n`,
-      tests:[{name:'120', check:o=>o.trim()==='120'}],
-      hint:'len(list(combinations(range(10), 3)))',
-      solution:`from itertools import combinations\nprint(len(list(combinations(range(10), 3))))`
+      tests:[OUT('120'),
+        USA('Usa combinations', i=>i.calls.combinations && senzaNumeri(i, 120), 'Genera le terne con combinations(range(10), 3) e contale con len(list(...)); il 120 non va scritto a mano.')],
+      hint:`len(list(combinations(range(10), 3)))`,
+      solution:`from itertools import combinations
+
+# combinations(range(10), 3) produce
+# tutti i gruppi di 3 elementi diversi
+# presi da 0..9, senza contare
+# l'ordine: (0, 1, 2), (0, 1, 3), ...
+terne = list(combinations(range(10), 3))
+print(len(terne))`
     },
     {
       id:'avan-9', track:'avan', title:'functools.lru_cache', diff:5, xp:115,
@@ -1513,9 +1969,22 @@ print(fib(100))  # istantaneo!</code></pre>
           <p>Output atteso: <code>12586269025</code></p>
         </div>`,
       starter:`from functools import lru_cache\n\n@lru_cache(maxsize=None)\ndef fib(n):\n    # ...\n    pass\n\nprint(fib(50))\n`,
-      tests:[{name:'fib(50)', check:o=>o.trim()==='12586269025'}],
-      hint:'if n<2: return n; return fib(n-1) + fib(n-2)',
-      solution:`from functools import lru_cache\n@lru_cache(maxsize=None)\ndef fib(n):\n  return n if n<2 else fib(n-1)+fib(n-2)\nprint(fib(50))`
+      tests:[OUT('12586269025'),
+        USA('fib ricorsiva con @lru_cache', i=>{const f = i.funcs.fib; return !!f && f.recursive && f.decorators.some(d => d.includes('lru_cache'));}, 'fib deve richiamare sé stessa (fib(n - 1) + fib(n - 2)) e avere @lru_cache(maxsize=None) sopra.'),
+        PROVA('print(fib(10))', '55')],
+      hint:`if n < 2: return n — altrimenti return fib(n-1) + fib(n-2)`,
+      solution:`from functools import lru_cache
+
+# ricorda i risultati già calcolati
+@lru_cache(maxsize=None)
+def fib(n):
+    # caso base: fib(0) = 0, fib(1) =
+    # 1
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+print(fib(50))`
     },
     {
       id:'avan-10', track:'avan', title:'Pattern matching (match/case)', diff:5, xp:125,
@@ -1546,9 +2015,29 @@ print(descrivi((0, 5)))</code></pre>
 vado a (3,7)</code></pre>
         </div>`,
       starter:`def classifica(c):\n    match c:\n        case ["quit"]:\n            return "esci"\n        # aggiungi gli altri case\n\nprint(classifica(["go", "nord"]))\nprint(classifica(["go", 3, 7]))\n`,
-      tests:[{name:'2 righe', check:o=>o.trim()==='vado verso nord\nvado a (3,7)'}],
-      hint:'case ["go", direz]: return f"vado verso {direz}"',
-      solution:`def classifica(c):\n  match c:\n    case ["quit"]: return "esci"\n    case ["go", d]: return f"vado verso {d}"\n    case ["go", x, y]: return f"vado a ({x},{y})"\n    case _: return "sconosciuto"\nprint(classifica(["go","nord"])); print(classifica(["go",3,7]))`
+      tests:[OUT('vado verso nord\nvado a (3,7)'),
+        USA('Usa match/case', i=>i.nodes.includes('Match'), 'Dentro classifica usa match c: con un case per ogni forma del comando.'),
+        PROVA('print(classifica(["quit"]))', 'esci'),
+        PROVA('print(classifica(["salta"]))', 'sconosciuto')],
+      hint:`case ["go", direz]: return f"vado verso {direz}"`,
+      solution:`def classifica(c):
+    match c:
+        # lista con il solo "quit"
+        case ["quit"]:
+            return "esci"
+        # "go" più un elemento
+        # qualsiasi
+        case ["go", direzione]:
+            return f"vado verso {direzione}"
+        # "go" più due elementi
+        case ["go", x, y]:
+            return f"vado a ({x},{y})"
+        # _ = qualsiasi altra cosa
+        case _:
+            return "sconosciuto"
+
+print(classifica(["go", "nord"]))
+print(classifica(["go", 3, 7]))`
     },
   ];
 
@@ -1567,12 +2056,23 @@ vado a (3,7)</code></pre>
           <p>Esegui FizzBuzz da 1 a 15, una riga per numero.</p>
         </div>`,
       starter:`# FizzBuzz da 1 a 15\nfor i in range(1, 16):\n    # ...\n    pass\n`,
-      tests:[{name:'FizzBuzz 1..15', check:o=>{
-        const exp = ['1','2','Fizz','4','Buzz','Fizz','7','8','Fizz','Buzz','11','Fizz','13','14','FizzBuzz'].join('\n');
-        return o.trim()===exp;
-      }}],
-      hint:'Controlla prima il %15, poi %3, poi %5',
-      solution:`for i in range(1,16):\n  if i%15==0: print("FizzBuzz")\n  elif i%3==0: print("Fizz")\n  elif i%5==0: print("Buzz")\n  else: print(i)`
+      tests:[OUT('1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz'),
+        USA('Usa un ciclo e il resto %', i=>i.nodes.includes('For') && i.ops.includes('Mod') && (i.calls.print || 0) <= 5, 'Usa il ciclo for con if/elif e l\'operatore % (resto della divisione), non 15 print separati.')],
+      hint:`Controlla prima il %15, poi %3, poi %5`,
+      solution:`for i in range(1, 16):
+    # % è il resto: i % 3 == 0 vuol
+    # dire "i è multiplo di 3".
+    # Il caso 15 va controllato per
+    # primo, altrimenti verrebbe preso
+    # da quello del 3.
+    if i % 15 == 0:
+        print("FizzBuzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    elif i % 5 == 0:
+        print("Buzz")
+    else:
+        print(i)`
     },
     {
       id:'algo-2', track:'algo', title:'Inverti stringa', diff:2, xp:55,
@@ -1584,9 +2084,16 @@ vado a (3,7)</code></pre>
           <p>Output atteso: <code>nohtyPtseuQedoC</code></p>
         </div>`,
       starter:`def reverse(s):\n    pass\n\nprint(reverse("CodeQuestPython"))\n`,
-      tests:[{name:'Reverse', check:o=>o.trim()==='nohtyPtseuQedoC'}],
-      hint:'return s[::-1]',
-      solution:`def reverse(s): return s[::-1]\nprint(reverse("CodeQuestPython"))`
+      tests:[OUT('nohtyPtseuQedoC'),
+        USA('reverse restituisce il risultato', i=>i.funcs.reverse && i.funcs.reverse.returns, 'Dentro reverse, al posto di pass, serve return s[::-1].'),
+        PROVA('print(reverse("abc"))', 'cba')],
+      hint:`return s[::-1]`,
+      solution:`def reverse(s):
+    # slicing con passo -1:
+    # dall'ultimo carattere al primo
+    return s[::-1]
+
+print(reverse("CodeQuestPython"))`
     },
     {
       id:'algo-3', track:'algo', title:'Palindromo', diff:3, xp:65,
@@ -1597,9 +2104,21 @@ vado a (3,7)</code></pre>
           <p>Scrivi <code>is_pal(s)</code> case-insensitive. Stampa is_pal("Anna") e is_pal("Pippo") su due righe.</p>
         </div>`,
       starter:`def is_pal(s):\n    pass\n\nprint(is_pal("Anna"))\nprint(is_pal("Pippo"))\n`,
-      tests:[{name:'True/False', check:o=>o.trim()==='True\nFalse'}],
-      hint:'s = s.lower(); return s == s[::-1]',
-      solution:`def is_pal(s): s=s.lower(); return s==s[::-1]\nprint(is_pal("Anna")); print(is_pal("Pippo"))`
+      tests:[OUT('True\nFalse'),
+        USA('is_pal restituisce True o False', i=>i.funcs.is_pal && i.funcs.is_pal.returns, 'is_pal deve restituire il confronto: s = s.lower() e poi return s == s[::-1].'),
+        PROVA('print(is_pal("Osso"))', 'True'),
+        PROVA('print(is_pal("Casa"))', 'False')],
+      hint:`s = s.lower(); return s == s[::-1]`,
+      solution:`def is_pal(s):
+    # "Anna" → "anna": così le
+    # maiuscole non contano
+    s = s.lower()
+    # palindroma se è uguale alla sua
+    # versione al contrario
+    return s == s[::-1]
+
+print(is_pal("Anna"))
+print(is_pal("Pippo"))`
     },
     {
       id:'algo-4', track:'algo', title:'Fibonacci iterativo', diff:3, xp:75,
@@ -1610,9 +2129,21 @@ vado a (3,7)</code></pre>
           <p>Stampa <code>F(30)</code>, il numero di Fibonacci di indice 30 (output: <code>832040</code>).</p>
         </div>`,
       starter:`# calcola fib(30) in modo iterativo\n`,
-      tests:[{name:'832040', check:o=>o.trim()==='832040'}],
-      hint:'a, b = 0, 1; for _ in range(30): a, b = b, a+b',
-      solution:`a,b=0,1\nfor _ in range(30): a,b=b,a+b\nprint(a)`
+      tests:[OUT('832040'),
+        USA('Calcolo con un ciclo', i=>(i.nodes.includes('For') || i.nodes.includes('While')) && senzaNumeri(i, 832040), 'Calcola F(30) con un ciclo che ripete a, b = b, a + b; il risultato non va scritto a mano.')],
+      hint:`a, b = 0, 1; for _ in range(30): a, b = b, a+b`,
+      solution:`# F(0) e F(1)
+a, b = 0, 1
+
+# a ogni passo la coppia avanza di
+# uno: (F(1), F(2)), (F(2), F(3)), ...
+for _ in range(30):
+    # i due valori si aggiornano
+    # insieme
+    a, b = b, a + b
+
+# dopo 30 passi a è F(30)
+print(a)`
     },
     {
       id:'algo-5', track:'algo', title:'Bubble Sort', diff:4, xp:90,
@@ -1627,9 +2158,28 @@ vado a (3,7)</code></pre>
           <p>Output atteso: <code>[1, 2, 3, 5, 7, 8, 9]</code></p>
         </div>`,
       starter:`a = [5, 2, 8, 1, 9, 3, 7]\n# implementa bubble sort\nprint(a)\n`,
-      tests:[{name:'Ordinata', check:(o,c)=>o.trim()==='[1, 2, 3, 5, 7, 8, 9]' && !/sorted\s*\(/.test(c) && !/\.sort\s*\(/.test(c)}],
-      hint:'Doppio ciclo, scambia gli adiacenti',
-      solution:`a=[5,2,8,1,9,3,7]\nn=len(a)\nfor i in range(n):\n  for j in range(n-i-1):\n    if a[j]>a[j+1]: a[j],a[j+1]=a[j+1],a[j]\nprint(a)`
+      tests:[OUT('[1, 2, 3, 5, 7, 8, 9]'),
+        USA('Niente sorted() né .sort()', i=>!i.calls.sorted && !i.calls.sort, 'Qui l\'ordinamento va scritto a mano: niente sorted() né .sort().'),
+        USA('Due cicli con scambio', i=>i.nodes.includes('For') && i.nodes.includes('Compare') && i.nodes.includes('Unpack'), 'Usa due cicli for uno dentro l\'altro e scambia i vicini fuori ordine con a[j], a[j + 1] = a[j + 1], a[j].'),
+        USA('Niente lista scritta a mano', i=>i.bigLiterals <= 1, 'Non scrivere la lista ordinata a mano: deve ordinarla il tuo algoritmo.')],
+      hint:`Doppio ciclo, scambia gli adiacenti`,
+      solution:`a = [5, 2, 8, 1, 9, 3, 7]
+n = len(a)
+
+# Ogni passata porta in fondo il più
+# grande tra quelli rimasti, come una
+# bolla che sale:
+# per questo la passata i può fermarsi
+# n - i - 1 posizioni prima.
+for i in range(n):
+    for j in range(n - i - 1):
+        # due vicini nell'ordine
+        # sbagliato...
+        if a[j] > a[j + 1]:
+            # ...si scambiano
+            a[j], a[j + 1] = a[j + 1], a[j]
+
+print(a)`
     },
     {
       id:'algo-6', track:'algo', title:'Binary Search', diff:4, xp:100,
@@ -1640,9 +2190,34 @@ vado a (3,7)</code></pre>
           <p>Output atteso: <code>7</code></p>
         </div>`,
       starter:`def bsearch(arr, t):\n    # ...\n    pass\n\narr = [1,3,5,7,11,15,23,42,57,89]\nprint(bsearch(arr, 42))\n`,
-      tests:[{name:'7', check:o=>o.trim()==='7'}],
-      hint:'lo, hi = 0, len(arr)-1; while lo <= hi: mid = (lo+hi)//2...',
-      solution:`def bsearch(arr, t):\n  lo, hi = 0, len(arr)-1\n  while lo <= hi:\n    mid = (lo+hi)//2\n    if arr[mid]==t: return mid\n    if arr[mid]<t: lo=mid+1\n    else: hi=mid-1\n  return -1\nprint(bsearch([1,3,5,7,11,15,23,42,57,89], 42))`
+      tests:[OUT('7'),
+        USA('Ricerca binaria', i=>i.nodes.includes('While') && i.ops.includes('FloorDiv') && !i.calls.index, 'Usa while lo <= hi: con mid = (lo + hi) // 2 e dimezza la zona di ricerca; niente .index().'),
+        PROVA('print(bsearch([1, 3, 5, 7, 11, 15, 23, 42, 57, 89], 1))', '0'),
+        PROVA('print(bsearch([1, 3, 5, 7, 11, 15, 23, 42, 57, 89], 4))', '-1')],
+      hint:`lo, hi = 0, len(arr)-1; while lo <= hi: mid = (lo+hi)//2...`,
+      solution:`def bsearch(arr, t):
+    # la zona dove può trovarsi t
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        # posizione centrale (// =
+        # divisione intera)
+        mid = (lo + hi) // 2
+        if arr[mid] == t:
+            # trovato
+            return mid
+        if arr[mid] < t:
+            # t è più grande: cerca
+            # nella metà destra
+            lo = mid + 1
+        else:
+            # t è più piccolo: cerca
+            # nella metà sinistra
+            hi = mid - 1
+    # zona vuota: non c'è
+    return -1
+
+arr = [1, 3, 5, 7, 11, 15, 23, 42, 57, 89]
+print(bsearch(arr, 42))`
     },
     {
       id:'algo-7', track:'algo', title:'Two Sum', diff:4, xp:105,
@@ -1653,9 +2228,24 @@ vado a (3,7)</code></pre>
           <p>In <code>[2, 7, 11, 15]</code> con target <code>9</code>, stampa <code>(0, 1)</code>.</p>
         </div>`,
       starter:`def two_sum(arr, t):\n    # ...\n    pass\n\nprint(two_sum([2,7,11,15], 9))\n`,
-      tests:[{name:'(0, 1)', check:o=>o.trim()==='(0, 1)'}],
-      hint:'visti = {}; for i, x in enumerate(arr): c = t - x; if c in visti: return (visti[c], i); visti[x] = i',
-      solution:`def two_sum(a, t):\n  v={}\n  for i, x in enumerate(a):\n    c=t-x\n    if c in v: return (v[c], i)\n    v[x]=i\nprint(two_sum([2,7,11,15], 9))`
+      tests:[OUT('(0, 1)'),
+        USA('two_sum restituisce la coppia di indici', i=>i.funcs.two_sum && i.funcs.two_sum.returns, 'two_sum deve restituire la tupla degli indici con return (i, j).'),
+        PROVA('print(two_sum([3, 2, 4], 6))', '(1, 2)')],
+      hint:`visti = {}; for i, x in enumerate(arr): c = t - x; if c in visti: return (visti[c], i); visti[x] = i`,
+      solution:`def two_sum(arr, t):
+    # valore già visto → sua posizione
+    visti = {}
+    for i, x in enumerate(arr):
+        # il numero che servirebbe
+        # insieme a x
+        manca = t - x
+        if manca in visti:
+            # trovato prima: ecco la
+            # coppia di indici
+            return (visti[manca], i)
+        visti[x] = i
+
+print(two_sum([2, 7, 11, 15], 9))`
     },
     {
       id:'algo-8', track:'algo', title:'Anagrammi', diff:3, xp:75,
@@ -1666,9 +2256,22 @@ vado a (3,7)</code></pre>
           <p>Scrivi <code>is_anagram(a, b)</code> case-insensitive. Testa con <code>"Listen"</code>/<code>"silent"</code> e <code>"hello"</code>/<code>"world"</code> su due righe.</p>
         </div>`,
       starter:`def is_anagram(a, b):\n    # ...\n    pass\n\nprint(is_anagram("Listen", "silent"))\nprint(is_anagram("hello", "world"))\n`,
-      tests:[{name:'True/False', check:o=>o.trim()==='True\nFalse'}],
-      hint:'sorted(a.lower()) == sorted(b.lower())',
-      solution:`def is_anagram(a,b): return sorted(a.lower())==sorted(b.lower())\nprint(is_anagram("Listen","silent")); print(is_anagram("hello","world"))`
+      tests:[OUT('True\nFalse'),
+        USA('is_anagram restituisce True o False', i=>i.funcs.is_anagram && i.funcs.is_anagram.returns, 'is_anagram deve restituire il confronto: return sorted(a.lower()) == sorted(b.lower()).'),
+        PROVA('print(is_anagram("Roma", "amor"))', 'True'),
+        PROVA('print(is_anagram("ab", "abc"))', 'False')],
+      hint:`sorted(a.lower()) == sorted(b.lower())`,
+      solution:`def is_anagram(a, b):
+    # sorted mette in fila le lettere:
+    # "listen" e "silent" diventano
+    # entrambe
+    # ['e', 'i', 'l', 'n', 's', 't'];
+    # lower() rende uguali maiuscole e
+    # minuscole
+    return sorted(a.lower()) == sorted(b.lower())
+
+print(is_anagram("Listen", "silent"))
+print(is_anagram("hello", "world"))`
     },
     {
       id:'algo-9', track:'algo', title:'Sliding Window', diff:5, xp:135,
@@ -1681,9 +2284,26 @@ vado a (3,7)</code></pre>
           <p>Output atteso: <code>17</code> (finestra [7,4,6]).</p>
         </div>`,
       starter:`arr = [2,1,5,1,3,2,7,4,6]\nk = 3\n# trova la somma massima della finestra di k elementi\n`,
-      tests:[{name:'17', check:o=>o.trim()==='17'}],
-      hint:'somma iniziale = sum(arr[:k]); per i in range(k, len(arr)): somma += arr[i] - arr[i-k]; tieni il massimo',
-      solution:`arr=[2,1,5,1,3,2,7,4,6]; k=3\ns=sum(arr[:k]); m=s\nfor i in range(k, len(arr)):\n  s += arr[i] - arr[i-k]\n  if s>m: m=s\nprint(m)`
+      tests:[OUT('17'),
+        USA('Finestra che scorre', i=>i.nodes.includes('For') && senzaNumeri(i, 17), 'Scorri l\'array con un ciclo for aggiornando la somma (aggiungi l\'elemento che entra, togli quello che esce); il 17 non va scritto a mano.'),
+        VARIANTE(/arr\s*=\s*\[[^\]]*\]/, 'arr = [1, 9, 1, 1, 8, 1]', '11')],
+      hint:`somma iniziale = sum(arr[:k]); per i in range(k, len(arr)): somma += arr[i] - arr[i-k]; tieni il massimo`,
+      solution:`arr = [2, 1, 5, 1, 3, 2, 7, 4, 6]
+k = 3
+
+# somma della prima finestra: 2 + 1 +
+# 5
+somma = sum(arr[:k])
+massimo = somma
+
+# la finestra avanza di uno: entra
+# arr[i], esce arr[i - k]
+for i in range(k, len(arr)):
+    somma += arr[i] - arr[i - k]
+    if somma > massimo:
+        massimo = somma
+
+print(massimo)`
     },
     {
       id:'algo-10', track:'algo', title:'1000° numero primo', diff:5, xp:145,
@@ -1694,9 +2314,35 @@ vado a (3,7)</code></pre>
           <p>Output atteso: <code>7919</code></p>
         </div>`,
       starter:`def is_prime(n):\n    # ...\n    pass\n\ncount = 0\nn = 1\n# trova il 1000° primo\n`,
-      tests:[{name:'7919', check:o=>o.trim()==='7919'}],
-      hint:'Loop while count < 1000: n += 1; if is_prime(n): count += 1',
-      solution:`def is_prime(n):\n  if n<2: return False\n  if n<4: return True\n  if n%2==0: return False\n  i=3\n  while i*i<=n:\n    if n%i==0: return False\n    i+=2\n  return True\nc,n=0,1\nwhile c<1000:\n  n+=1\n  if is_prime(n): c+=1\nprint(n)`
+      tests:[OUT('7919'),
+        USA('Funzione is_prime e conteggio', i=>i.funcs.is_prime && i.funcs.is_prime.returns && senzaNumeri(i, 7919), 'Completa is_prime(n) con return True/False e conta i primi in un ciclo; il 7919 non va scritto a mano.'),
+        PROVA('print(is_prime(97), is_prime(91), is_prime(2))', 'True False True')],
+      hint:`Loop while count < 1000: n += 1; if is_prime(n): count += 1`,
+      solution:`def is_prime(n):
+    if n < 2:
+        return False
+    # basta provare i divisori fino
+    # alla radice di n: se ce n'è uno
+    # più grande,
+    # il suo "compagno" (n diviso quel
+    # numero) è più piccolo e
+    # l'avremmo già trovato
+    d = 2
+    while d * d <= n:
+        if n % d == 0:
+            return False
+        d += 1
+    return True
+
+count = 0
+n = 1
+# si ferma al millesimo primo trovato
+while count < 1000:
+    n += 1
+    if is_prime(n):
+        count += 1
+
+print(n)`
     },
   ];
 
@@ -1989,7 +2635,7 @@ function loadLesson(id){
       <p>${l.hint || 'Nessun suggerimento per questa lezione.'}</p>
     </div>
     <div id="solution-box" class="help-box" hidden>
-      <h3>🔓 Soluzione</h3>
+      <h3>🔓 Soluzione commentata</h3>
       <pre><code id="solution-code">${htmlEscape(l.solution || 'Nessuna soluzione fornita.')}</code></pre>
       <button class="btn btn-warn" id="btn-use-solution">📋 Carica nell'editor</button>
     </div>
@@ -2051,7 +2697,16 @@ async function runCode(){
   clearConsole();
   consoleTab = 'out';
   document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active', t.dataset.ctab==='out'));
-  await runPython(code, true);
+  markErrorLine(null);
+  const r = await runPython(code, true);
+  if(!r.ok){
+    // l'errore completo e' gia' in console: qui la riga e la spiegazione
+    const n = [...String(r.error).matchAll(/File "<exec>", line (\d+)/g)].pop();
+    const type = (String(r.error).trim().split('\n').pop().match(/^(\w+(?:Error|Exception))/) || [])[1];
+    if(n) logTo('out', `❌ Errore alla riga ${n[1]}: <code>${htmlEscape((code.split('\n')[n[1]-1] || '').trim())}</code>`, 'log-err');
+    if(type && ERROR_HELP[type]) logTo('out', '💡 ' + ERROR_HELP[type], 'log-warn');
+    markErrorLine(n ? +n[1] : null);
+  }
 }
 
 // Debug: esegue il codice cosi' com'e' (nessun try/rientro aggiunto), con il nome di file
@@ -2136,6 +2791,177 @@ async function debugCode(){
   }
 }
 
+// Analisi del codice fatta da Python (modulo ast): quali costrutti usa (for, if, f-string,
+// slicing...), quali funzioni chiama, che funzioni e classi definisce, quali valori sono
+// scritti a mano. Commenti e testi tra virgolette non contano, quindi non ingannano le verifiche.
+const CODE_INFO = String.raw`
+import ast as __cq_ast, json as __cq_json
+def __cq_analyze(src):
+    ast = __cq_ast
+    tree = ast.parse(src)
+    info = {'nodes': set(), 'ops': set(), 'calls': {}, 'attrs': set(), 'used': set(), 'assigned': set(),
+            'consts': [], 'funcs': {}, 'classes': {}, 'imports': set(), 'kw': set(), 'excepts': set(),
+            'bigLiterals': 0}
+    for n in ast.walk(tree):
+        info['nodes'].add(type(n).__name__)
+        if isinstance(n, (ast.BinOp, ast.BoolOp, ast.UnaryOp, ast.AugAssign)):
+            info['ops'].add(type(n.op).__name__)
+        if isinstance(n, ast.Compare):
+            for o in n.ops:
+                info['ops'].add(type(o).__name__)
+        if isinstance(n, ast.Call):
+            f = n.func
+            name = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else None
+            if name:
+                info['calls'][name] = info['calls'].get(name, 0) + 1
+            for k in n.keywords:
+                if k.arg:
+                    info['kw'].add(k.arg)
+        if isinstance(n, ast.Attribute):
+            info['attrs'].add(n.attr)
+        if isinstance(n, ast.Name):
+            (info['used'] if isinstance(n.ctx, ast.Load) else info['assigned']).add(n.id)
+        if isinstance(n, ast.Constant) and not isinstance(n.value, bool) and isinstance(n.value, (int, float, str)):
+            info['consts'].append(n.value)
+        if isinstance(n, (ast.List, ast.Tuple, ast.Set)) and len(n.elts) >= 5:
+            info['bigLiterals'] += 1
+        if isinstance(n, ast.Dict) and len(n.keys) >= 5:
+            info['bigLiterals'] += 1
+        if isinstance(n, ast.If) and len(n.orelse) == 1 and isinstance(n.orelse[0], ast.If):
+            info['nodes'].add('Elif')
+        if isinstance(n, ast.Assign) and any(isinstance(x, ast.Tuple) for x in n.targets):
+            info['nodes'].add('Unpack')
+        if isinstance(n, (ast.Import, ast.ImportFrom)):
+            if isinstance(n, ast.ImportFrom) and n.module:
+                info['imports'].add(n.module)
+            for x in n.names:
+                info['imports'].add(x.name)
+        if isinstance(n, ast.ExceptHandler) and n.type is not None:
+            info['excepts'].add(ast.unparse(n.type))
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            a = n.args
+            inner = list(ast.walk(n))
+            info['funcs'][n.name] = {
+                'args': [x.arg for x in a.args],
+                'vararg': a.vararg.arg if a.vararg else None,
+                'kwarg': a.kwarg.arg if a.kwarg else None,
+                'defaults': len(a.defaults),
+                'annotated': all(x.annotation is not None for x in a.args) and n.returns is not None,
+                'yields': any(isinstance(x, (ast.Yield, ast.YieldFrom)) for x in inner),
+                'returns': any(isinstance(x, ast.Return) and x.value is not None for x in inner),
+                'decorators': [ast.unparse(d) for d in n.decorator_list],
+                'recursive': any(isinstance(x, ast.Call) and isinstance(x.func, ast.Name) and x.func.id == n.name for x in inner),
+            }
+        if isinstance(n, ast.ClassDef):
+            info['classes'][n.name] = {
+                'bases': [ast.unparse(x) for x in n.bases],
+                'methods': {m.name: [ast.unparse(d) for d in m.decorator_list]
+                            for m in n.body if isinstance(m, (ast.FunctionDef, ast.AsyncFunctionDef))},
+            }
+    for k in ('nodes', 'ops', 'attrs', 'used', 'assigned', 'imports', 'kw', 'excepts'):
+        info[k] = sorted(info[k])
+    return __cq_json.dumps(info)
+__cq_info = __cq_analyze(__cq_src)
+`;
+function codeInfo(code){
+  try{
+    pyodide.globals.set('__cq_src', code);
+    pyodide.runPython(CODE_INFO);
+    return JSON.parse(pyodide.globals.get('__cq_info'));
+  }catch(_){ return null; }
+}
+
+// Errore Python spiegato a chi impara: riga, testo della riga, causa probabile.
+const ERROR_HELP = {
+  SyntaxError: 'Errore di scrittura: Python non riesce a leggere la riga. Controlla parentesi e virgolette chiuse e i due punti <code>:</code> dopo if, for, while, def e class.',
+  IndentationError: 'Rientro sbagliato: le righe dentro if, for, while, def e class vanno spostate a destra di 4 spazi, tutte allo stesso modo.',
+  TabError: 'Rientri misti: usa solo spazi (4 per livello), non il tasto Tab insieme agli spazi.',
+  NameError: 'Usi un nome che Python non conosce: controlla di averlo scritto uguale (maiuscole comprese) e di averlo creato prima di usarlo. I testi vanno tra virgolette.',
+  TypeError: 'Valore del tipo sbagliato: per esempio un testo sommato a un numero, oppure una funzione chiamata con troppi o troppo pochi argomenti. Se compare NoneType, una funzione non ha restituito nulla (manca il return).',
+  ZeroDivisionError: 'Divisione per zero: il numero sotto la divisione vale 0.',
+  IndexError: 'Posizione che non esiste: gli indici partono da 0, quindi in una lista di 3 elementi l\'ultimo è [2].',
+  KeyError: 'Chiave che non c\'è nel dizionario: controlla come è scritta.',
+  AttributeError: 'Questo valore non ha il metodo o l\'attributo che chiedi: controlla il nome dopo il punto e che l\'oggetto sia quello giusto.',
+  ValueError: 'Valore non valido per questa operazione, per esempio int("ciao") o una lista spacchettata nel numero sbagliato di variabili.',
+  RecursionError: 'La funzione richiama sé stessa all\'infinito: manca il caso base che la fa fermare.',
+  UnboundLocalError: 'Usi una variabile dentro la funzione prima di averle dato un valore.',
+};
+function explainError(error, code, tab){
+  const text = String(error || '');
+  const lines = [...text.matchAll(/File "<exec>", line (\d+)/g)];
+  const n = lines.length ? +lines[lines.length - 1][1] : null;
+  const last = text.trim().split('\n').pop();
+  const type = (last.match(/^(\w+(?:Error|Exception))/) || [])[1];
+  const src = n ? (code.split('\n')[n - 1] || '').trim() : '';
+  if(n) logTo(tab, `❌ Errore alla riga ${n}: <code>${htmlEscape(src)}</code>`, 'log-err');
+  logTo(tab, htmlEscape(last), 'log-err');
+  if(type && ERROR_HELP[type]) logTo(tab, '💡 ' + ERROR_HELP[type], 'log-warn');
+  markErrorLine(n);
+}
+
+// Output atteso e output ottenuto: dove si separano e perché.
+function explainOutput(expect, gotRaw){
+  const got = (gotRaw || '').replace(/\s+$/, '');
+  const why = [];
+  const c = (x) => `<code>${htmlEscape(x)}</code>`;
+  if(!got.trim()){
+    why.push('Il programma non stampa nulla: manca un print(...)? (oppure è rimasto solo il pass)');
+    return why;
+  }
+  const e = expect.split('\n'), g = got.split('\n').map(x => x.replace(/\s+$/, ''));
+  let k = 0;
+  while(k < Math.max(e.length, g.length) && e[k] === g[k]) k++;
+  if(k < Math.max(e.length, g.length)){
+    const ex = e[k], gx = g[k];
+    why.push(`Riga ${k + 1}: atteso ${ex === undefined ? '(nessuna riga)' : c(ex)}, il tuo programma stampa ${gx === undefined ? '(nessuna riga)' : c(gx)}`);
+    if(ex !== undefined && gx !== undefined){
+      let j = 0;
+      while(j < ex.length && ex[j] === gx[j]) j++;
+      const ch = (x) => x === undefined ? 'fine riga' : x === ' ' ? 'uno spazio' : `"${htmlEscape(x)}"`;
+      why.push(`La differenza inizia al carattere ${j + 1}: atteso ${ch(ex[j])}, trovato ${ch(gx[j])}.`);
+    }
+  }
+  if(g.length !== e.length) why.push(`Hai stampato ${g.length} ${g.length === 1 ? 'riga' : 'righe'}, ne ${e.length === 1 ? 'serve 1' : `servono ${e.length}`}.`);
+  if(got.toLowerCase() === expect.toLowerCase()) why.push('Cambiano solo maiuscole e minuscole: Python le considera diverse.');
+  else if(got.replace(/\s+/g, '') === expect.replace(/\s+/g, '')) why.push('Cambiano solo gli spazi: controlla spazi e a capo.');
+  if(/\bNone\b/.test(got) && !/\bNone\b/.test(expect)) why.push('Compare None: di solito una funzione non ha il return (o è rimasto il pass).');
+  return why;
+}
+
+// Una verifica: output atteso, struttura del codice, prova con altri valori o con dati cambiati.
+async function runTest(t, output, code, info){
+  const c = (x) => `<code>${htmlEscape(x)}</code>`;
+  const firstErr = (r) => htmlEscape(String(r.error || '').trim().split('\n').pop());
+  if(t.probe !== undefined){
+    const r = await runPython(code + '\n' + t.probe, false);
+    if(!r.ok) return {ok:false, why:[`Provo la tua soluzione con ${c(t.probe.split('\n').pop())} e si verifica un errore: ${firstErr(r)}`]};
+    const n = t.expect.split('\n').length;
+    const got = r.output.replace(/\s+$/, '').split('\n').slice(-n).join('\n').trim();
+    if(got === t.expect) return {ok:true};
+    const why = [`Provo la tua soluzione con altri valori: ${c(t.probe.split('\n').pop())} dovrebbe dare ${c(t.expect)}, invece dà ${c(got || '(niente)')}.`];
+    if(/\bNone\b/.test(got)) why.push('Compare None: la funzione non ha il return (o è rimasto il pass).');
+    else why.push('Il risultato giusto deve venire dal calcolo, non essere scritto a mano.');
+    return {ok:false, why};
+  }
+  if(t.variant){
+    const [from, to] = t.variant;
+    if(!from.test(code)) return {ok:false, why:['Non trovo la riga con i dati di partenza del codice iniziale: non cambiarla, il programma deve funzionare con quei dati.']};
+    const r = await runPython(code.replace(from, to), false);
+    if(!r.ok) return {ok:false, why:[`Se i dati diventano ${c(to)} il programma va in errore: ${firstErr(r)}`]};
+    const got = r.output.trim();
+    if(got === t.expect) return {ok:true};
+    return {ok:false, why:[`Se i dati diventano ${c(to)} il programma dovrebbe stampare ${c(t.expect)}, invece stampa ${c(got || '(niente)')}.`,
+      'Il programma deve ragionare sui dati (con if, cicli, calcoli), non stampare direttamente la risposta.']};
+  }
+  if(t.expect !== undefined){
+    if(output.trim() === t.expect) return {ok:true};
+    return {ok:false, why: explainOutput(t.expect, output)};
+  }
+  let ok = false;
+  try{ ok = !!t.check(output, code, info); }catch(_){ ok = false; }
+  return ok ? {ok:true} : {ok:false, why:[t.fail || 'Il risultato non è quello richiesto.']};
+}
+
 async function checkCode(){
   if(!currentLesson || !currentLesson.tests || !currentLesson.tests.length){
     toast('Nessun test in questa modalità','');
@@ -2146,29 +2972,36 @@ async function checkCode(){
   document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active', t.dataset.ctab==='tres'));
   testLogs = [];
   refreshConsole();
+  markErrorLine(null);
+  const lesson = currentLesson;
   const code = editor.getValue();
   logTo('tres','▶ Esecuzione test...','log-trace');
   const res = await runPython(code, false);
   if(!res.ok){
-    countFailedAttempt(currentLesson);
-    logTo('tres', `❌ Errore durante l'esecuzione:`, 'log-err');
-    logTo('tres', htmlEscape(res.error||''), 'log-err');
+    countFailedAttempt(lesson);
+    explainError(res.error, code, 'tres');
     toast('Errore nel codice. Controlla la console.', 'bad');
+    Sfx.fail();
     return;
   }
+  const info = codeInfo(code);
   let passed = 0;
-  for(const t of currentLesson.tests){
-    let ok = false;
-    try{ ok = !!t.check(res.output||'', code); }catch{ ok = false; }
-    if(ok){ logTo('tres', `✓ ${t.name}`, 'log-ok'); passed++; }
-    else logTo('tres', `✗ ${t.name}`, 'log-err');
+  const detto = new Set();   // la stessa spiegazione una volta sola
+  for(const t of lesson.tests){
+    const r = await runTest(t, res.output || '', code, info);
+    if(r.ok){ logTo('tres', `✓ ${htmlEscape(t.name)}`, 'log-ok'); passed++; }
+    else {
+      logTo('tres', `✗ ${htmlEscape(t.name)}`, 'log-err');
+      r.why.filter(w => !detto.has(w)).forEach(w => { detto.add(w); logTo('tres', '&nbsp;&nbsp;→ ' + w, 'log-warn'); });
+    }
   }
-  const total = currentLesson.tests.length;
+  const total = lesson.tests.length;
   logTo('tres', `\n— Risultato: ${passed}/${total} test passati`, passed===total?'log-ok':'log-warn');
   if(passed === total){
-    onLessonSolved(currentLesson, code);
+    onLessonSolved(lesson, code);
   } else {
-    countFailedAttempt(currentLesson);
+    countFailedAttempt(lesson);
+    logTo('tres', '💡 Se sei bloccato: nella lezione trovi «Mostra suggerimento» e «Mostra soluzione».', 'log-trace');
     toast(`Test falliti: ${total-passed}/${total}`, 'bad');
     Sfx.fail();
   }
