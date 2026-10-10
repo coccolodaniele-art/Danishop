@@ -132,7 +132,9 @@
   "casesCtaDefault": "Haben Sie ein ähnliches Problem? *Sprechen wir darüber – unverbindlich.*",
   "casesHomeTitle": "Echte Probleme, wirklich gelöst",
   "casesHomeSub": "Einige konkrete Fälle aus meinen Projekten, mit gemessenem Ergebnis.",
-  "casesHomeLink": "Alle Fälle lesen"
+  "casesHomeLink": "Alle Fälle lesen",
+  "aiValueTitle": "Warum ein KI-Abo allein nicht genügt",
+  "aiValueSub": "Werkzeuge mit künstlicher Intelligenz stehen allen offen, und ich nutze sie täglich. Der Wert einer Fachkraft liegt in allem, was vor und nach dem Code geschehen muss."
  },
  "settings": {
   "tagline": "Maßgeschneiderte Automatisierungen und Software",
@@ -158,9 +160,11 @@
   "gamesIntro": "Spiele direkt im Browser, auch auf dem Smartphone: nichts herunterzuladen oder zu installieren.",
   "city": "Udine, Italien",
   "toolsIntro": "Praktische Werkzeuge für den Arbeitsalltag – direkt im Browser nutzbar, auch auf dem Smartphone: keine Installation und keine Dateien, die ins Internet hochgeladen werden.",
-  "casesIntro": "Hier beschreibe ich einige echte Probleme aus meinen Projekten: was nicht funktionierte, wie wir es gelöst haben und welches Ergebnis es gebracht hat. Ich arbeite mit künstlicher Intelligenz als Werkzeug: Damit schreibe und prüfe ich Code deutlich schneller, während das Problem verstehen, die Lösung wählen und sie überprüfen meine Aufgabe bleiben. Mit derselben Methode arbeite ich in Projekten für Unternehmen und Selbstständige.",
+  "casesIntro": "Hier beschreibe ich einige echte Probleme aus meinen Projekten: was nicht funktionierte, wie wir es gelöst haben und welches Ergebnis es gebracht hat. Genauso arbeite ich auch in Projekten für Unternehmen und Selbstständige.",
   "aiMethod": "Verstehen und messen: Bevor ich etwas ändere, sammle ich Fakten und Zahlen. Oft sieht ein Problem nach etwas anderem aus, als es ist.\nDen Weg wählen: Ich wäge die Alternativen ab und wähle die einfachste, die das Problem wirklich löst, ohne Funktionierendes umzukrempeln.\nDie KI beschleunigt, ich kontrolliere: Ich nutze künstliche Intelligenz, um Code schnell zu schreiben und zu überprüfen. Jeder Vorschlag durchläuft meine Prüfung.\nMit Zahlen prüfen: Vor der Übergabe teste ich das Ergebnis an echten Fällen und vergleiche es mit der Ausgangslage.",
-  "casesCta": "Haben Sie ein ähnliches Problem oder eine Aufgabe, die Sie jede Woche Zeit kostet? *Erzählen Sie mir davon: Die erste Beratung ist kostenlos und unverbindlich.*"
+  "casesCta": "Haben Sie ein ähnliches Problem oder eine Aufgabe, die Sie jede Woche Zeit kostet? *Erzählen Sie mir davon: Die erste Beratung ist kostenlos und unverbindlich.*",
+  "aiValue": "Verstehen, was wirklich gebraucht wird: Die KI beantwortet, was man sie fragt. Der heikelste Teil ist, das Problem, die Daten und die Rahmenbedingungen Ihres Unternehmens zu verstehen und in präzise Anforderungen zu übersetzen.\nPrüfen, ob das Ergebnis stimmt: Ein Programm, das läuft, ist nicht automatisch ein richtiges Programm. Ich prüfe jede Lösung an echten Fällen und mit Zahlen, bevor sie bei Ihnen ankommt.\nSicher in Betrieb nehmen: Anbindung an die Werkzeuge, die Sie bereits nutzen, Kosten der Dienste, Schutz und Vertraulichkeit der Daten – Dinge, die Ihnen ein Abo nicht abnimmt.\nDa sein, wenn sich etwas ändert: Dienste, die ihre Regeln ändern, wachsende Datenmengen, neue Anforderungen – Sie haben einen Ansprechpartner, der die Lösung kennt und langfristig pflegt.",
+  "aiValueNote": "Und wenn für Ihren Fall ein KI-Assistent genügt, den Sie selbst nutzen können, sage ich es Ihnen: Auch das ist Beratung."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -299,7 +303,9 @@
   "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
-  "settings.casesIntro": "e976a23ca66a",
+  "settings.casesIntro": "834fa894d5fa",
+  "settings.aiValue": "83f914b46796",
+  "settings.aiValueNote": "5fb93e8198f8",
   "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",

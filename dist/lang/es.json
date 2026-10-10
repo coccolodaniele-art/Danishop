@@ -132,7 +132,9 @@
   "casesCtaDefault": "¿Tienes un problema parecido? *Hablemos, sin compromiso.*",
   "casesHomeTitle": "Problemas reales, resueltos de verdad",
   "casesHomeSub": "Algunos casos concretos de mis proyectos, con el resultado medido.",
-  "casesHomeLink": "Leer todos los casos"
+  "casesHomeLink": "Leer todos los casos",
+  "aiValueTitle": "Por qué no basta con una suscripción a la IA",
+  "aiValueSub": "Las herramientas de inteligencia artificial están al alcance de todos, y las uso a diario. El valor de un profesional está en todo lo que hace falta antes y después del código."
  },
  "settings": {
   "tagline": "Automatizaciones y software a medida",
@@ -158,9 +160,11 @@
   "gamesIntro": "Juegos para jugar directamente en el navegador, también en el móvil: nada que descargar ni instalar.",
   "city": "Udine, Italia",
   "toolsIntro": "Herramientas prácticas para el trabajo diario, para usar directamente en el navegador, también en el móvil: nada que instalar y ningún archivo subido a internet.",
-  "casesIntro": "Aquí cuento algunos problemas reales que he afrontado en mis proyectos: qué fallaba, cómo lo resolvimos y qué resultado dio. Trabajo con la inteligencia artificial como herramienta: me permite escribir y revisar código mucho más rápido, mientras que entender el problema, elegir la solución y comprobarla siguen siendo tareas mías. Es el mismo método que aplico en los proyectos para empresas y profesionales.",
+  "casesIntro": "Aquí cuento algunos problemas reales que he afrontado en mis proyectos: qué fallaba, cómo lo resolvimos y qué resultado dio. Es la misma forma de trabajar que aplico en los proyectos para empresas y profesionales.",
   "aiMethod": "Entiendo y mido: Antes de tocar nada reúno los hechos y los números. A menudo un problema parece una cosa y es otra.\nElijo el camino: Valoro las alternativas y elijo la más sencilla que de verdad lo resuelve, sin trastocar lo que ya funciona.\nLa IA acelera, yo controlo: Uso la inteligencia artificial para escribir y revisar código en poco tiempo. Cada propuesta pasa por mi comprobación.\nCompruebo con números: Antes de entregar pruebo el resultado en casos reales y lo comparo con la situación de partida.",
-  "casesCta": "¿Tienes un problema parecido, o una tarea que te roba tiempo cada semana? *Cuéntamelo: la primera consulta es gratuita y sin compromiso.*"
+  "casesCta": "¿Tienes un problema parecido, o una tarea que te roba tiempo cada semana? *Cuéntamelo: la primera consulta es gratuita y sin compromiso.*",
+  "aiValue": "Entender qué hace falta de verdad: La IA responde a lo que le pides. Lo más delicado es entender el problema, los datos y las limitaciones de tu actividad, y convertirlos en peticiones precisas.\nComprobar que el resultado es correcto: Un programa que funciona no es necesariamente un programa correcto. Compruebo cada solución en casos reales y con números antes de que te llegue.\nPonerlo en marcha de forma segura: La conexión con las herramientas que ya usas, los costes de los servicios, la protección y la confidencialidad de los datos: aspectos que una suscripción no gestiona por ti.\nEstar ahí cuando algo cambia: Servicios que cambian sus reglas, datos que crecen, nuevas necesidades: tienes una persona de referencia que conoce la solución y la mantiene en el tiempo.",
+  "aiValueNote": "Y si en tu caso basta con un asistente de IA para usar por tu cuenta, te lo digo: eso también es asesoramiento."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -299,7 +303,9 @@
   "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
-  "settings.casesIntro": "e976a23ca66a",
+  "settings.casesIntro": "834fa894d5fa",
+  "settings.aiValue": "83f914b46796",
+  "settings.aiValueNote": "5fb93e8198f8",
   "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",

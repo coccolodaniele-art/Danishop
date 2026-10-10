@@ -132,7 +132,9 @@
   "casesCtaDefault": "Facing a similar problem? *Let's talk, with no obligation.*",
   "casesHomeTitle": "Real problems, really solved",
   "casesHomeSub": "A few concrete cases from my projects, with measured results.",
-  "casesHomeLink": "Read all the cases"
+  "casesHomeLink": "Read all the cases",
+  "aiValueTitle": "Why an AI subscription isn't enough",
+  "aiValueSub": "Artificial intelligence tools are within everyone's reach, and I use them every day. A professional's value lies in everything that has to happen before and after the code."
  },
  "settings": {
   "tagline": "Custom automations and software",
@@ -158,9 +160,11 @@
   "gamesIntro": "Games to play directly in the browser, on a phone too: nothing to download or install.",
   "city": "Udine, Italy",
   "toolsIntro": "Practical tools for everyday work, used directly in the browser, on a phone too: nothing to install and no files uploaded to the internet.",
-  "casesIntro": "Here I describe some real problems I have tackled in my projects: what was wrong, how we solved it and what result it brought. I work with artificial intelligence as a tool: it lets me write and check code much faster, while understanding the problem, choosing the solution and verifying it remain my job. It is the same method I bring to projects for companies and professionals.",
+  "casesIntro": "Here I describe some real problems I have tackled in my projects: what was wrong, how we solved it and what result it brought. It is the same way of working I bring to projects for companies and professionals.",
   "aiMethod": "I understand and measure: Before touching anything I gather the facts and the numbers. A problem often looks like one thing and turns out to be another.\nI choose the way forward: I weigh the alternatives and pick the simplest one that really solves the problem, without overturning what already works.\nAI speeds things up, I check: I use artificial intelligence to write and review code quickly. Every proposal goes through my own verification.\nI verify with numbers: Before delivering, I test the result on real cases and compare it with the starting point.",
-  "casesCta": "Facing a similar problem, or a task that eats up your time every week? *Tell me about it: the first consultation is free and without obligation.*"
+  "casesCta": "Facing a similar problem, or a task that eats up your time every week? *Tell me about it: the first consultation is free and without obligation.*",
+  "aiValue": "Understanding what is really needed: AI answers what you ask it. The most delicate part is understanding the problem, the data and the constraints of your business, and turning them into precise requests.\nChecking that the result is right: A program that runs is not necessarily a correct program. I verify every solution on real cases and with numbers before it reaches you.\nPutting it to work safely: Connecting it to the tools you already use, service costs, data protection and confidentiality: things a subscription does not handle for you.\nBeing there when things change: Services that change their rules, growing data, new needs: you have a point of contact who knows the solution and keeps it running over time.",
+  "aiValueNote": "And if all your case needs is an AI assistant you can use on your own, I'll tell you: that's consultancy too."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -299,7 +303,9 @@
   "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
-  "settings.casesIntro": "e976a23ca66a",
+  "settings.casesIntro": "834fa894d5fa",
+  "settings.aiValue": "83f914b46796",
+  "settings.aiValueNote": "5fb93e8198f8",
   "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",

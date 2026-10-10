@@ -1004,3 +1004,11 @@ input[type="checkbox"] { accent-color: var(--accent); }
   .case-head { flex-direction: column; }
   .case-hl { text-align: left; max-width: none; }
 }
+
+/* Casi reali: "Perché non basta un abbonamento all'AI" */
+.value-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.value-note {
+  display: flex; align-items: flex-start; gap: 10px; margin: 18px 0 0; max-width: 760px;
+  color: var(--text-2); font-size: .98rem;
+}
+.value-note svg { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 2px; fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }

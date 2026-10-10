@@ -132,7 +132,9 @@
   "casesCtaDefault": "Vous avez un problème similaire ? *Parlons-en, sans engagement.*",
   "casesHomeTitle": "Des problèmes réels, vraiment résolus",
   "casesHomeSub": "Quelques cas concrets tirés de mes projets, avec des résultats mesurés.",
-  "casesHomeLink": "Lire tous les cas"
+  "casesHomeLink": "Lire tous les cas",
+  "aiValueTitle": "Pourquoi un abonnement à l'IA ne suffit pas",
+  "aiValueSub": "Les outils d'intelligence artificielle sont à la portée de tous, et je les utilise chaque jour. La valeur d'un professionnel tient à tout ce qu'il faut faire avant et après le code."
  },
  "settings": {
   "tagline": "Automatisations et logiciels sur mesure",
@@ -158,9 +160,11 @@
   "gamesIntro": "Des jeux à lancer directement dans le navigateur, sur téléphone aussi : rien à télécharger ni à installer.",
   "city": "Udine, Italie",
   "toolsIntro": "Des outils pratiques pour le travail de tous les jours, à utiliser directement dans le navigateur, sur téléphone aussi : rien à installer et aucun fichier envoyé sur internet.",
-  "casesIntro": "Je présente ici quelques problèmes réels rencontrés dans mes projets : ce qui n'allait pas, comment nous l'avons résolu et quel résultat cela a donné. Je travaille avec l'intelligence artificielle comme un outil : elle me permet d'écrire et de vérifier du code bien plus vite, tandis que comprendre le problème, choisir la solution et la vérifier restent mon travail. C'est la même méthode que j'applique aux projets pour les entreprises et les professionnels.",
+  "casesIntro": "Je présente ici quelques problèmes réels rencontrés dans mes projets : ce qui n'allait pas, comment nous l'avons résolu et quel résultat cela a donné. C'est la même façon de travailler que j'applique aux projets pour les entreprises et les professionnels.",
   "aiMethod": "Je comprends et je mesure : Avant de toucher à quoi que ce soit, je rassemble les faits et les chiffres. Souvent, un problème semble être une chose et en est une autre.\nJe choisis la voie : Je compare les options et je retiens la plus simple qui résout vraiment le problème, sans bouleverser ce qui fonctionne déjà.\nL'IA accélère, je contrôle : J'utilise l'intelligence artificielle pour écrire et relire du code rapidement. Chaque proposition passe par ma vérification.\nJe vérifie avec des chiffres : Avant de livrer, je teste le résultat sur des cas réels et je le compare à la situation de départ.",
-  "casesCta": "Vous avez un problème similaire, ou une tâche qui vous fait perdre du temps chaque semaine ? *Racontez-moi : la première consultation est gratuite et sans engagement.*"
+  "casesCta": "Vous avez un problème similaire, ou une tâche qui vous fait perdre du temps chaque semaine ? *Racontez-moi : la première consultation est gratuite et sans engagement.*",
+  "aiValue": "Comprendre ce qui est vraiment nécessaire : L'IA répond à ce qu'on lui demande. Le plus délicat est de comprendre le problème, les données et les contraintes de votre activité, puis de les traduire en demandes précises.\nVérifier que le résultat est juste : Un programme qui fonctionne n'est pas forcément un programme correct. Je vérifie chaque solution sur des cas réels et avec des chiffres, avant qu'elle ne vous parvienne.\nLe mettre en service en toute sécurité : Raccordement aux outils que vous utilisez déjà, coûts des services, protection et confidentialité des données : autant d'aspects qu'un abonnement ne gère pas à votre place.\nÊtre là quand les choses changent : Des services qui changent leurs règles, des données qui augmentent, de nouveaux besoins : vous avez un interlocuteur qui connaît la solution et la fait vivre dans le temps.",
+  "aiValueNote": "Et si, dans votre cas, un assistant IA à utiliser vous-même suffit, je vous le dis : cela aussi, c'est du conseil."
  },
  "programs": {
   "mun4oc3661ldu": {
@@ -299,7 +303,9 @@
   "settings.toolsIntro": "22cce7a1e686",
   "settings.gamesIntro": "a69c7ddf449f",
   "settings.city": "a2a4f052d812",
-  "settings.casesIntro": "e976a23ca66a",
+  "settings.casesIntro": "834fa894d5fa",
+  "settings.aiValue": "83f914b46796",
+  "settings.aiValueNote": "5fb93e8198f8",
   "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",
