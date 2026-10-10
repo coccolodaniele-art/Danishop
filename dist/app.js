@@ -31,6 +31,9 @@
       tradingIntro: 'I miei programmi per chi investe e fa trading: dati ufficiali, analisi dei mercati e intelligenza artificiale.',
       gamesIntro: 'Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.',
       toolsIntro: 'Strumenti pratici per il lavoro di tutti i giorni, da usare direttamente nel browser.',
+      casesIntro: '',
+      aiMethod: '',
+      casesCta: '',
       ownerName: '',
       email: '',
       phone: '',
@@ -43,7 +46,8 @@
       about: ''
     },
     programs: [],
-    certificates: []
+    certificates: [],
+    cases: []
   };
 
   // Sezioni della pagina Programmi: ogni programma appartiene a una delle schede.
@@ -60,7 +64,7 @@
      =========================================================
      L'italiano è la lingua base: i testi dell'interfaccia sono qui sotto (UI_IT) e i contenuti
      in data.json, modificabili dal Gestore. Le altre lingue stanno in lang/<codice>.json:
-     "ui" (testi dell'interfaccia), "settings", "programs", "certificates" (contenuti tradotti)
+     "ui" (testi dell'interfaccia), "settings", "programs", "certificates", "cases" (contenuti tradotti)
      e "source" (impronta del testo italiano da cui è nata ogni traduzione, per accorgersi
      quando l'italiano cambia). L'area admin resta sempre in italiano. */
 
@@ -76,13 +80,14 @@
   const TR_FIELDS = {
     settings: ['tagline', 'homeEyebrow', 'homeTitle', 'homeIntro', 'homePoints', 'painPoints', 'services', 'steps', 'certsIntro',
       'ctaTitle', 'ctaText', 'aboutTitle', 'aboutIntro', 'about', 'skills', 'values', 'siteAbout', 'aboutCta',
-      'programsIntro', 'tradingIntro', 'toolsIntro', 'gamesIntro', 'city'],
+      'programsIntro', 'tradingIntro', 'toolsIntro', 'gamesIntro', 'city', 'casesIntro', 'aiMethod', 'casesCta'],
     programs: ['name', 'tagline', 'platform', 'description', 'features', 'trialLabel', 'trialInfo', 'requirements'],
-    certificates: ['title']
+    certificates: ['title'],
+    cases: ['title', 'area', 'highlight', 'highlightLabel', 'problem', 'solution', 'result', 'role', 'forYou']
   };
 
   const UI_IT = {
-    navHome: 'Home', navAbout: 'Chi sono', navLearning: 'Apprendimento', navTrading: 'Trading e finanza', navTools: 'Strumenti', navGames: 'Giochi',
+    navHome: 'Home', navAbout: 'Chi sono', navCases: 'Casi reali', navLearning: 'Apprendimento', navTrading: 'Trading e finanza', navTools: 'Strumenti', navGames: 'Giochi',
     sec_apprendimento: "Programmi per l'apprendimento", sec_finanza: 'Programmi per trading e finanza', sec_strumenti: 'Strumenti utili', sec_giochi: 'Giochi',
     langLabel: 'Lingua', close: 'Chiudi', menuLabel: 'Menu',
     metaDescription: 'Daniele Coccolo crea automazioni su misura per aziende e professionisti: meno lavoro ripetitivo al computer, con Python, Excel, SQL e intelligenza artificiale.',
@@ -128,7 +133,15 @@
     formEmail: 'La tua email', formNeedEmail: 'Scrivi un indirizzo email valido, così posso risponderti',
     formSending: 'Invio in corso…', formSentTitle: 'Messaggio inviato!', formSentText: 'Grazie, ti rispondo al più presto. Se non vedi la mia risposta, controlla anche nella cartella spam.',
     formSendAnother: 'Scrivi un altro messaggio', formError: 'Invio non riuscito. Riprova tra poco oppure scrivimi direttamente a {email}',
-    formPrivacy: 'Uso i tuoi dati solo per risponderti, senza iscriverti a nessuna lista.'
+    formPrivacy: 'Uso i tuoi dati solo per risponderti, senza iscriverti a nessuna lista.',
+    casesTitle: 'Problemi reali, *risolti davvero*', casesBtn: 'Raccontami il tuo problema',
+    aiMethodTitle: "Come lavoro con l'intelligenza artificiale", aiMethodSub: "L'AI è uno strumento potente, ma non decide al posto mio: ecco come divido il lavoro.",
+    casesListTitle: 'I casi', casesListSub: 'Ogni caso racconta il problema, la soluzione, il risultato e la parte che ho seguito in prima persona.',
+    caseProblem: 'Il problema', caseSolution: 'Cosa abbiamo fatto', caseResult: 'Il risultato', caseRole: 'Il mio ruolo',
+    caseForYou: 'Per la tua azienda', caseSee: 'Guarda il programma', casesEmpty: 'Casi in arrivo.',
+    casesCtaDefault: 'Hai un problema simile? *Parliamone, senza impegno.*',
+    casesHomeTitle: 'Problemi reali, risolti davvero', casesHomeSub: 'Alcuni casi concreti dai miei progetti, con il risultato misurato.',
+    casesHomeLink: 'Leggi tutti i casi'
   };
 
   const i18n = { lang: 'it', pack: null };
@@ -192,7 +205,8 @@
     return Object.assign({}, d, {
       settings: overlay(d.settings, p.settings, TR_FIELDS.settings),
       programs: each(d.programs, p.programs, TR_FIELDS.programs),
-      certificates: each(d.certificates, p.certificates, TR_FIELDS.certificates)
+      certificates: each(d.certificates, p.certificates, TR_FIELDS.certificates),
+      cases: each(d.cases, p.cases, TR_FIELDS.cases)
     });
   }
 
@@ -290,6 +304,7 @@
       features: '', trialLabel: '', trialInfo: '', trialUrl: '', requirements: '', category: PROGRAM_SECTIONS[0].value
     }, p)).map((p) => Object.assign(p, { category: sectionByValue(p.category).value })) : [];
     d.certificates = Array.isArray(raw.certificates) ? raw.certificates.map((c) => Object.assign(newCert(), c)) : [];
+    d.cases = Array.isArray(raw.cases) ? raw.cases.map((c) => Object.assign(newCase(), c)) : [];
     // Articoli e libri delle schede Shop usato e Libri (tolte dal sito): non si vedono più,
     // ma restano nel file così come sono.
     if (Array.isArray(raw.items)) d.items = raw.items;
@@ -299,6 +314,11 @@
 
   function newCert() {
     return { id: uid(), title: '', issuer: '', teacher: '', tag: '', date: '', hours: '', url: '', image: '' };
+  }
+  // Un caso reale: problema, soluzione, risultato, il mio ruolo e cosa può fare per un'azienda.
+  function newCase() {
+    return { id: 'case-' + uid(), title: '', area: '', highlight: '', highlightLabel: '', problem: '', solution: '',
+      result: '', role: '', forYou: '', link: '' };
   }
 
   function isLocalHost() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
@@ -476,7 +496,7 @@
     if (ANCHORS[r]) return ANCHORS[r];
     if (r === 'info') return 'home';
     if (r === 'chi-sono') return 'chisono';
-    return ['home', 'chisono', 'admin'].concat(PROGRAM_SECTIONS.map((x) => x.route)).includes(r) ? r : 'home';
+    return ['home', 'chisono', 'casi', 'admin'].concat(PROGRAM_SECTIONS.map((x) => x.route)).includes(r) ? r : 'home';
   }
 
   function render() {
@@ -484,7 +504,7 @@
     state.view = localizedData();
     insight.section(state.route);
     updateChrome();
-    const views = { home: renderHome, chisono: renderAbout, admin: renderAdmin };
+    const views = { home: renderHome, chisono: renderAbout, casi: renderCases, admin: renderAdmin };
     const section = PROGRAM_SECTIONS.find((x) => x.route === state.route);
     app.innerHTML = section ? renderPrograms(section) : views[state.route]();
     afterRender();
@@ -494,9 +514,9 @@
     const s = (state.view || state.data).settings;
     document.getElementById('brandName').textContent = s.siteName || 'Il mio sito';
     document.getElementById('brandTagline').textContent = s.tagline || '';
-    const titles = { home: s.tagline || t('navHome'), chisono: t('navAbout'), admin: 'Area admin' };
+    const titles = { home: s.tagline || t('navHome'), chisono: t('navAbout'), casi: t('navCases'), admin: 'Area admin' };
     PROGRAM_SECTIONS.forEach((x) => { titles[x.route] = t('sec_' + x.value); });
-    const navKeys = { home: 'navHome', chisono: 'navAbout', programmi: 'navLearning', trading: 'navTrading', strumenti: 'navTools', giochi: 'navGames' };
+    const navKeys = { home: 'navHome', chisono: 'navAbout', casi: 'navCases', programmi: 'navLearning', trading: 'navTrading', strumenti: 'navTools', giochi: 'navGames' };
     document.querySelectorAll('[data-nav]').forEach((a) => { a.querySelector('span').textContent = t(navKeys[a.dataset.nav]); });
     const pick = document.getElementById('langSelect');
     if (!pick.options.length) pick.innerHTML = LANGS.map((l) => `<option value="${l.code}">${esc(l.name)}</option>`).join('');
@@ -528,6 +548,7 @@
     const prev = state.route;
     render();
     if (pageAnchor()) scrollToAnchor();
+    else if (subAnchor()) scrollToId(subAnchor());
     else if (prev !== state.route) window.scrollTo(0, 0);
   });
 
@@ -540,6 +561,8 @@
     if (el) el.scrollIntoView({ block: 'start' }); // morbido grazie a scroll-behavior nel CSS
   }
   function scrollToAnchor() { scrollToId(pageAnchor() || 'contatti'); }
+  // #casi/case-traffico apre la pagina Casi reali direttamente su quel caso.
+  function subAnchor() { return location.hash.replace(/^#\/?/, '').split('/')[1] || ''; }
 
   /* =========================================================
      Statistiche: raccolta anonima di visite e click
@@ -767,6 +790,8 @@
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     shield: '<path d="M12 3 4 6v6c0 5 3.4 8.6 8 9 4.6-.4 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
+    idea: '<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
     arrow: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>'
   };
   // Icone dei servizi, nell'ordine in cui compaiono (si ripetono se i servizi sono di più).
@@ -919,9 +944,102 @@
         </div>
       </section>
 
+      ${casesTeaser()}
+
       ${ctaBand(s.ctaTitle || t('ctaDefault'))}
 
       ${renderContacts()}`;
+  }
+
+  /* ---------- Casi reali ---------- */
+
+  // Home: i primi tre casi con un numero in evidenza, che portano alla pagina completa.
+  function casesTeaser() {
+    const list = state.view.cases.filter((c) => c.highlight && c.title).slice(0, 3);
+    if (!list.length) return '';
+    return `
+      <section class="home-section">
+        <h2 class="section-title">${esc(t('casesHomeTitle'))}</h2>
+        <p class="section-sub">${esc(t('casesHomeSub'))}</p>
+        <div class="case-teasers">${list.map((c) => `
+          <a class="case-teaser" href="#casi/${esc(c.id)}" data-track="home-link" data-label="Caso: ${esc((findCase(c.id) || c).title)}">
+            <strong>${esc(c.highlight)}</strong>
+            <span class="case-teaser-label">${esc(c.highlightLabel)}</span>
+            <span class="case-teaser-title">${esc(c.title)}</span>
+          </a>`).join('')}
+        </div>
+        <p class="case-teasers-more"><a href="#casi" data-track="home-link" data-label="Leggi tutti i casi">${esc(t('casesHomeLink'))} →</a></p>
+      </section>`;
+  }
+
+  function findCase(id) { return state.data.cases.find((c) => c.id === id); }
+
+  function renderCases() {
+    const s = state.view.settings;
+    const steps = pairs(s.aiMethod);
+    const list = state.view.cases.filter((c) => c.title);
+    return `
+      <section class="about-hero solo">
+        <div class="hero-text">
+          <span class="hero-eyebrow">${esc(t('navCases'))}</span>
+          <h1>${hl(t('casesTitle'))}</h1>
+          ${s.casesIntro ? `<p class="hero-lead">${esc(s.casesIntro)}</p>` : ''}
+          <div class="row">
+            <a class="btn big" href="#contatti" data-track="cases-link" data-label="Raccontami il tuo problema">${ICONS.mail} ${esc(t('casesBtn'))}</a>
+          </div>
+        </div>
+      </section>
+
+      ${steps.length ? `
+      <section class="home-section">
+        <h2 class="section-title">${esc(t('aiMethodTitle'))}</h2>
+        <p class="section-sub">${esc(t('aiMethodSub'))}</p>
+        <ol class="steps">${steps.map((x, i) => `
+          <li class="step">
+            <span class="step-n">${String(i + 1).padStart(2, '0')}</span>
+            <h3>${esc(x.title)}</h3>
+            ${x.text ? `<p>${esc(x.text)}</p>` : ''}
+          </li>`).join('')}
+        </ol>
+      </section>` : ''}
+
+      <section class="home-section">
+        <h2 class="section-title">${esc(t('casesListTitle'))}</h2>
+        <p class="section-sub">${esc(t('casesListSub'))}</p>
+        ${list.length ? `<div class="cases">${list.map(renderCase).join('')}</div>` : `<div class="empty">${esc(t('casesEmpty'))}</div>`}
+      </section>
+
+      ${ctaBand(s.casesCta || t('casesCtaDefault'))}`;
+  }
+
+  function renderCase(c) {
+    const link = c.link && (/^#[\w-]+$/.test(c.link) ? c.link : safeUrl(c.link));
+    const part = (key, text) => text ? `<div class="case-part"><h4>${esc(t(key))}</h4><p>${esc(text)}</p></div>` : '';
+    return `
+      <article class="case card" id="${esc(c.id)}">
+        <header class="case-head">
+          <div>
+            ${c.area ? `<span class="case-area">${esc(c.area)}</span>` : ''}
+            <h3>${esc(c.title)}</h3>
+          </div>
+          ${c.highlight ? `<div class="case-hl"><strong>${esc(c.highlight)}</strong>${c.highlightLabel ? `<span>${esc(c.highlightLabel)}</span>` : ''}</div>` : ''}
+        </header>
+        <div class="case-grid">
+          ${part('caseProblem', c.problem)}
+          ${part('caseSolution', c.solution)}
+          ${part('caseResult', c.result)}
+        </div>
+        ${c.role ? `
+        <div class="case-role">
+          <span class="area-ico">${homeIcon('user')}</span>
+          <div><h4>${esc(t('caseRole'))}</h4><p>${esc(c.role)}</p></div>
+        </div>` : ''}
+        ${c.forYou || link ? `
+        <footer class="case-foot">
+          ${c.forYou ? `<p><strong>${esc(t('caseForYou'))}:</strong> ${esc(c.forYou)}</p>` : ''}
+          ${link ? `<a class="btn secondary small" href="${esc(link)}" data-track="cases-link" data-label="${esc((findCase(c.id) || c).title)}"${link.startsWith('#') ? '' : ' target="_blank" rel="noopener"'}>${esc(t('caseSee'))} →</a>` : ''}
+        </footer>` : ''}
+      </article>`;
   }
 
   /* ---------- Chi sono ---------- */
@@ -1059,15 +1177,20 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     }
     if (!state.isAdmin) return renderLogin();
     const d = state.data;
-    if (state.editing) return state.editing.type === 'cert' ? renderCertEditor(state.editing) : renderProgramEditor(state.editing);
+    if (state.editing) {
+      if (state.editing.type === 'cert') return renderCertEditor(state.editing);
+      if (state.editing.type === 'case') return renderCaseEditor(state.editing);
+      return renderProgramEditor(state.editing);
+    }
     const tabs = [
       ['programmi', 'Programmi', d.programs.length],
+      ['casi', 'Casi reali', d.cases.length],
       ['attestati', 'Attestati', d.certificates.length],
       ['insight', 'Insight'],
       ['dati', 'I miei dati'],
       ['pubblica', state.localServer ? 'Online' : (state.hasDraft ? 'Pubblica ●' : 'Pubblica')]
     ];
-    const bodies = { programmi: adminPrograms, attestati: adminCerts, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
+    const bodies = { programmi: adminPrograms, casi: adminCases, attestati: adminCerts, dati: adminSettings, pubblica: adminPublish, insight: adminInsight };
     return `
       <div class="admin-head">
         <h1>Area admin</h1>
@@ -1121,6 +1244,70 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
           <button class="btn danger small" data-action="delete-program" data-id="${esc(p.id)}">Elimina</button>
         </div>`).join('')}</div>`
         : '<div class="empty"><strong>Nessun programma</strong>Clicca su "Nuovo programma" per aggiungerne uno.</div>'}`;
+  }
+
+  /* ---------- Casi reali ---------- */
+
+  function adminCases() {
+    const list = state.data.cases;
+    return `
+      <div class="row between" style="margin-bottom:14px">
+        <p class="item-meta" style="margin:0">I casi compaiono nella scheda "Casi reali", nell'ordine di questa lista. I primi tre con un numero in evidenza compaiono anche nella Home. I testi introduttivi della pagina sono in "I miei dati".</p>
+        <button class="btn" data-action="new-case">+ Nuovo caso</button>
+      </div>
+      ${list.length ? `<div class="admin-list">${list.map((c, i) => `
+        <div class="admin-row">
+          <div class="thumb case-thumb">${esc(c.highlight || '—')}</div>
+          <div class="info"><strong>${esc(c.title) || '(senza titolo)'}</strong><span>${esc(c.area || '')}</span></div>
+          <button class="btn ghost small" data-action="move-case" data-id="${esc(c.id)}" data-dir="-1" ${i === 0 ? 'disabled' : ''} aria-label="Sposta su">↑</button>
+          <button class="btn ghost small" data-action="move-case" data-id="${esc(c.id)}" data-dir="1" ${i === list.length - 1 ? 'disabled' : ''} aria-label="Sposta giù">↓</button>
+          <button class="btn secondary small" data-action="edit-case" data-id="${esc(c.id)}">Modifica</button>
+          <button class="btn danger small" data-action="delete-case" data-id="${esc(c.id)}">Elimina</button>
+        </div>`).join('')}</div>`
+        : '<div class="empty"><strong>Nessun caso</strong>Clicca su "Nuovo caso" per aggiungerne uno.</div>'}`;
+  }
+
+  function renderCaseEditor(ed) {
+    const c = ed.draft;
+    return `
+      <div class="admin-head">
+        <h1>${ed.isNew ? 'Nuovo caso' : 'Modifica caso'}</h1>
+        <button class="btn ghost small" data-action="cancel-edit">← Torna alla lista</button>
+      </div>
+      <form id="caseForm" class="form-card stack" novalidate>
+        <div class="form-section" style="margin-top:0">Il caso</div>
+        ${field('title', 'Titolo', c.title, { req: true, placeholder: 'Es. Un servizio online bloccato dai consumi', hint: 'Il problema visto con gli occhi di un cliente.' })}
+        ${field('area', 'Ambito', c.area, { placeholder: 'Es. Servizi cloud e costi', hint: 'La piccola etichetta sopra il titolo.' })}
+        <div class="grid-2">
+          ${field('highlight', 'Numero in evidenza', c.highlight, { placeholder: 'Es. 1.200×', hint: 'Facoltativo. Se c\'è, il caso può comparire anche nella Home.' })}
+          ${field('highlightLabel', 'Cosa indica il numero', c.highlightLabel, { placeholder: 'Es. meno dati trasferiti' })}
+        </div>
+        ${field('problem', 'Il problema', c.problem, { textarea: true, rows: 3 })}
+        ${field('solution', 'Cosa abbiamo fatto', c.solution, { textarea: true, rows: 4 })}
+        ${field('result', 'Il risultato', c.result, { textarea: true, rows: 2, hint: 'Meglio con un numero misurato.' })}
+        ${field('role', 'Il mio ruolo', c.role, { textarea: true, rows: 3, hint: 'Fatti concreti: cosa hai notato, proposto, chiesto o deciso tu.' })}
+        ${field('forYou', 'Per la tua azienda', c.forYou, { textarea: true, rows: 2, hint: 'Come lo stesso lavoro può servire a un cliente.' })}
+        ${field('link', 'Link (facoltativo)', c.link, { placeholder: '#trading oppure https://…', hint: 'Il pulsante "Guarda il programma": una scheda del sito (#programmi, #trading, #strumenti, #giochi) o un indirizzo.' })}
+
+        <div class="sticky-actions row end">
+          <button type="button" class="btn secondary" data-action="cancel-edit">Annulla</button>
+          <button type="submit" class="btn">Salva caso</button>
+        </div>
+      </form>`;
+  }
+
+  async function saveCaseForm(form) {
+    const v = readForm(form);
+    const ed = state.editing;
+    if (!v.title) { toast('Inserisci il titolo del caso', true); form.elements['title'].focus(); return; }
+    const item = Object.assign(ed.draft, v);
+    if (ed.isNew) state.data.cases.push(item);
+    else state.data.cases = state.data.cases.map((c) => (c.id === item.id ? item : c));
+    if (await saveDraft()) {
+      state.editing = null;
+      toast('Caso salvato');
+      render();
+    }
   }
 
   /* ---------- Attestati ---------- */
@@ -1268,7 +1455,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   }
 
   function syncEditorFromForm() {
-    const form = document.getElementById('programForm') || document.getElementById('certForm');
+    const form = document.getElementById('programForm') || document.getElementById('certForm') || document.getElementById('caseForm');
     if (form && state.editing) Object.assign(state.editing.draft, readForm(form));
   }
 
@@ -1329,6 +1516,11 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         ${field('certsIntro', 'Formazione certificata', s.certsIntro, { textarea: true, rows: 2, hint: 'Testo sopra gli attestati, nella pagina Chi sono (si gestiscono nella scheda Attestati).' })}
         ${field('aboutCta', 'Banner finale: titolo', s.aboutCta, { placeholder: 'Hai un problema da risolvere al computer? *Parliamone.*' })}
 
+        <div class="form-section">Pagina Casi reali (i casi si gestiscono nella scheda Casi reali)</div>
+        ${field('casesIntro', 'Presentazione', s.casesIntro, { textarea: true, rows: 4, hint: 'Compare sotto il titolo della pagina.' })}
+        ${field('aiMethod', "Come lavoro con l'intelligenza artificiale", s.aiMethod, { textarea: true, rows: 4, hint: 'Un passaggio per riga, nella forma "Titolo: descrizione". Se lasci vuoto, la sezione non compare.' })}
+        ${field('casesCta', 'Banner finale: titolo', s.casesCta, { hint: 'Le parole tra *asterischi* vengono evidenziate.' })}
+
         <div class="form-section">Testi delle schede</div>
         ${field('programsIntro', 'Testo introduttivo della scheda Apprendimento', s.programsIntro, { textarea: true, rows: 2 })}
         ${field('tradingIntro', 'Testo introduttivo della scheda Trading e finanza', s.tradingIntro, { textarea: true, rows: 2 })}
@@ -1383,12 +1575,12 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
   /* ---------- Insight (statistiche del sito) ---------- */
 
   const INSIGHT_PERIODS = [[1, 'Oggi'], [7, '7 giorni'], [30, '30 giorni'], [90, '3 mesi'], [365, '12 mesi']];
-  const SECTION_NAMES = { home: 'Home', chisono: 'Chi sono', strumenti: 'Strumenti', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
+  const SECTION_NAMES = { home: 'Home', chisono: 'Chi sono', casi: 'Casi reali', strumenti: 'Strumenti', programmi: 'Apprendimento', trading: 'Trading e finanza', giochi: 'Giochi', info: 'Info e contatti' };
   const CLICK_NAMES = {
     'open-program': 'Programmi aperti', 'download': 'Programmi scaricati', 'play-game': 'Giochi avviati',
     'zoom-image': 'Immagini dei programmi ingrandite', 'ask-info': 'Richieste di informazioni',
     'contact': 'Contatti cliccati', 'contact-form': 'Messaggi dal modulo', 'external-link': 'Link esterni aperti',
-    'home-link': 'Clic sui riquadri della Home', 'about-link': 'Clic nella pagina Chi sono', 'zoom-cert': 'Attestati ingranditi', 'cert-verify': 'Attestati verificati'
+    'home-link': 'Clic sui riquadri della Home', 'about-link': 'Clic nella pagina Chi sono', 'cases-link': 'Clic nella pagina Casi reali', 'zoom-cert': 'Attestati ingranditi', 'cert-verify': 'Attestati verificati'
   };
   const LABEL_GROUPS = ['open-program', 'play-game', 'home-link', 'about-link', 'zoom-cert', 'cert-verify', 'download', 'ask-info', 'contact', 'external-link', 'zoom-image'];
   const WEEKDAYS = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
@@ -1925,6 +2117,34 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
       await saveDraft();
       render();
     },
+    'new-case': () => {
+      state.editing = { type: 'case', isNew: true, draft: newCase() };
+      render();
+      window.scrollTo(0, 0);
+    },
+    'edit-case': (el) => {
+      const c = findCase(el.dataset.id);
+      if (!c) return;
+      state.editing = { type: 'case', isNew: false, draft: clone(c) };
+      render();
+      window.scrollTo(0, 0);
+    },
+    'delete-case': async (el) => {
+      const c = findCase(el.dataset.id);
+      if (!c || !confirm(`Eliminare il caso "${c.title}"?`)) return;
+      state.data.cases = state.data.cases.filter((x) => x.id !== c.id);
+      await saveDraft();
+      render();
+    },
+    'move-case': async (el) => {
+      const list = state.data.cases;
+      const i = list.findIndex((x) => x.id === el.dataset.id);
+      const j = i + Number(el.dataset.dir);
+      if (i < 0 || j < 0 || j >= list.length) return;
+      [list[i], list[j]] = [list[j], list[i]];
+      await saveDraft();
+      render();
+    },
     'pick-cert-image': () => document.getElementById('certImageInput').click(),
     'pick-home-photo': () => document.getElementById('homePhotoInput').click(),
     'remove-home-photo': async () => {
@@ -2070,6 +2290,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
       }
       case 'programForm': await saveProgramForm(form); break;
       case 'certForm': await saveCertForm(form); break;
+      case 'caseForm': await saveCaseForm(form); break;
       case 'settingsForm': await saveSettingsForm(form); break;
     }
   });
@@ -2087,7 +2308,7 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     if (state.route !== 'admin' || !state.isAdmin || !(window.crypto && crypto.subtle)) return;
     const texts = {};
     TR_FIELDS.settings.forEach((f) => { if (state.data.settings[f]) texts[`settings.${f}`] = state.data.settings[f]; });
-    ['programs', 'certificates'].forEach((g) => state.data[g].forEach((x) => TR_FIELDS[g].forEach((f) => { if (x[f]) texts[`${g}.${x.id}.${f}`] = x[f]; })));
+    ['programs', 'certificates', 'cases'].forEach((g) => state.data[g].forEach((x) => TR_FIELDS[g].forEach((f) => { if (x[f]) texts[`${g}.${x.id}.${f}`] = x[f]; })));
     const key = JSON.stringify(texts);
     if (state.trCheck && state.trCheck.key === key) return;
     const prints = {};
@@ -2132,5 +2353,6 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
     await loadData();
     render();
     if (pageAnchor()) setTimeout(scrollToAnchor, 50);
+    else if (subAnchor()) setTimeout(() => scrollToId(subAnchor()), 50);
   })();
 })();

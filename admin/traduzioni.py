@@ -27,9 +27,11 @@ LANGS = ["en", "es", "de", "fr", "pt"]
 FIELDS = {
     "settings": ["tagline", "homeEyebrow", "homeTitle", "homeIntro", "homePoints", "painPoints", "services", "steps",
                  "certsIntro", "ctaTitle", "ctaText", "aboutTitle", "aboutIntro", "about", "skills", "values",
-                 "siteAbout", "aboutCta", "programsIntro", "tradingIntro", "toolsIntro", "gamesIntro", "city"],
+                 "siteAbout", "aboutCta", "programsIntro", "tradingIntro", "toolsIntro", "gamesIntro", "city",
+                 "casesIntro", "aiMethod", "casesCta"],
     "programs": ["name", "tagline", "platform", "description", "features", "trialLabel", "trialInfo", "requirements"],
     "certificates": ["title"],
+    "cases": ["title", "area", "highlight", "highlightLabel", "problem", "solution", "result", "role", "forYou"],
 }
 
 
@@ -46,7 +48,7 @@ def italian_texts():
         text = data.get("settings", {}).get(field, "")
         if text:
             out[f"settings.{field}"] = ("settings", None, field, text)
-    for group in ("programs", "certificates"):
+    for group in ("programs", "certificates", "cases"):
         for item in data.get(group, []):
             for field in FIELDS[group]:
                 text = item.get(field, "")
