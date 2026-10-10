@@ -511,10 +511,79 @@
   button:disabled{opacity:.5; cursor:not-allowed; transform:none !important;}
 
   @media (max-width: 1100px){ .app{grid-template-columns: 220px 1fr;} }
+  /* Telefono e tablet verticale: lezioni in un menu a scomparsa (☰), "Lezione" e "Codice"
+     in due schede a tutto schermo, barra in alto su due righe. */
+  .mobile-only, .mobile-inline, .drawer-back{display:none;}
   @media (max-width: 880px){
-    .app{grid-template-columns: 1fr; grid-template-rows: 64px auto 1fr;}
-    aside.sidebar{max-height:240px;}
-    .workspace{grid-template-columns: 1fr;}
+    .app{grid-template-columns: 1fr; grid-template-rows: auto 1fr; height:100vh; height:100dvh;}
+    header.topbar{flex-wrap:wrap; gap:8px 8px; padding:8px 12px;}
+    .top-stats{display:contents;}
+    .logo{font-size:17px;}
+    .logo .badge{font-size:9.5px; padding:2px 6px;}
+    .stat{margin-left:auto; padding:5px 10px;}
+    .xp-wrap{order:10; flex:1 1 100%; max-width:none; padding:5px 10px;}
+    .icon-btn{width:36px; height:36px; flex-shrink:0;}
+    .mobile-only{display:flex;}
+    .mobile-inline{display:inline;}
+    #btn-lessons{font-size:17px;}
+    @media (max-width: 440px){
+      header.topbar{gap:8px 6px; padding:8px 10px;}
+      .logo .badge{display:none;}
+      .icon-btn{width:34px; height:34px;}
+      .stat{padding:5px 8px;}
+    }
+
+    aside.sidebar{
+      position:fixed; top:0; left:0; bottom:0; z-index:60;
+      width:min(86vw, 340px); padding:14px 12px 40px;
+      background:#f7fbfb; border-right:1px solid var(--line);
+      box-shadow: 8px 0 30px rgba(11,37,48,.18);
+      transform:translateX(-105%); transition:transform .25s ease; visibility:hidden;
+    }
+    .app.lessons-open aside.sidebar{transform:none; visibility:visible;}
+    .drawer-back{position:fixed; inset:0; z-index:55; background:rgba(11,37,48,.4);}
+    .app.lessons-open .drawer-back{display:block;}
+    .drawer-head{display:flex; align-items:center; justify-content:space-between; margin:0 2px 12px; font-weight:700; font-size:15px;}
+    .lesson-item{padding:10px 10px; font-size:14px;}
+    .track-head{padding:12px;}
+
+    .lesson-bar{flex-wrap:wrap; gap:6px 8px; padding:10px 14px;}
+    .lesson-title{flex:1 1 100%; font-size:16px;}
+    .view-tabs{display:flex; gap:6px; padding:8px 12px; background:rgba(255,255,255,.75); border-bottom:1px solid var(--line);}
+    .view-tabs button{
+      flex:1; padding:9px 8px; border-radius:9px; cursor:pointer;
+      border:1px solid #bcd6d3; background:#fff; color:var(--muted); font-size:14px; font-weight:600;
+    }
+    .view-tabs button.on{background:var(--accent); border-color:transparent; color:#fff;}
+
+    .workspace{grid-template-columns:1fr;}
+    .app[data-view="code"] .lesson-panel, .app:not([data-view="code"]) .editor-panel{display:none;}
+    .lesson-panel{padding:16px 16px 28px; border-right:0;}
+    .lesson-panel h2{font-size:19px;}
+    .lesson-panel p, .lesson-panel ul, .lesson-panel ol{font-size:15px;}
+    .lesson-help .btn{flex:1 1 auto; justify-content:center; padding:10px 12px; font-size:13.5px;}
+
+    .editor-toolbar{flex-wrap:wrap; gap:6px; padding:8px;}
+    .editor-toolbar .btn{flex:1 1 28%; min-width:0; justify-content:center; padding:8px 4px; font-size:12.5px; white-space:nowrap;}
+    .editor-toolbar #btn-run, .editor-toolbar #btn-check{flex-basis:45%; padding:10px 6px; font-size:14px;}
+    .pylabel{flex:1 1 100%; margin:0; justify-content:center;}
+    .CodeMirror{font-size:14px;}
+    .CodeMirror textarea{font-size:16px !important;}  /* niente zoom automatico sull'iPhone */
+    .console-wrap{height:36%; max-height:none; resize:none;}
+    .console-head{padding:6px 8px; gap:6px;}
+    .ctab{padding:5px 8px; font-size:12px;}
+
+    .toast-wrap{top:auto; bottom:16px; left:12px; right:12px; align-items:center;}
+    .toast{min-width:0; max-width:100%;}
+    .lu-card{padding:28px 26px; margin:0 16px;}
+    .lu-card .star{font-size:60px;}
+    .lu-card h2{font-size:26px;}
+    .modal{padding:20px 18px; width:94%;}
+    .modal-actions{flex-wrap:wrap;}
+    .welcome .py-icon{font-size:64px;}
+    .welcome h1{font-size:44px;}
+    .welcome p{font-size:15px;}
+    .welcome input{width:100%; max-width:320px;}
   }
 </style>
 
@@ -542,6 +611,7 @@
 
 <div class="app" id="app" style="display:none;">
   <header class="topbar">
+    <button class="icon-btn mobile-only" id="btn-lessons" title="Lezioni" aria-label="Apri l'elenco delle lezioni">☰</button>
     <div class="logo">🐍 CodeQuest <span class="badge">PYTHON</span></div>
     <div class="top-stats">
       <div class="stat" title="Streak giornaliera"><span class="ico">🔥</span><span id="ui-streak">0</span></div>
@@ -556,6 +626,7 @@
   </header>
 
   <aside class="sidebar" id="sidebar"></aside>
+  <div class="drawer-back" id="drawer-back"></div>
 
   <main class="main">
     <div class="lesson-bar">
@@ -565,12 +636,16 @@
       <span class="gap"></span>
       <span class="lesson-meta">Reward: <b style="color:var(--xp)" id="lb-xp">+0 XP</b></span>
     </div>
+    <div class="view-tabs mobile-only" id="view-tabs">
+      <button type="button" data-view="lesson" class="on">📖 Lezione</button>
+      <button type="button" data-view="code">💻 Codice</button>
+    </div>
     <div class="workspace">
       <div class="lesson-panel" id="lesson-panel">
         <h2>🐍 Benvenuto in CodeQuest Python!</h2>
         <p>Questa è la tua palestra per imparare <b>Python</b> dal livello base assoluto fino a quello professionale. Ecco come funziona:</p>
         <ul>
-          <li>Apri una <b>traccia</b> dalla sidebar e seleziona la prima lezione.</li>
+          <li>Apri una <b>traccia</b> dalla sidebar<span class="mobile-inline"> (sul telefono: pulsante ☰ in alto)</span> e seleziona la prima lezione.</li>
           <li>Ogni lezione ha <b>teoria</b>, un <b>esercizio</b> e <b>test automatici</b> per validarlo.</li>
           <li>Premi <b>▶ Esegui</b> per lanciare il codice, <b>✅ Verifica</b> per testarlo, <b>🐞 Debug</b> per analizzarlo.</li>
           <li>Guadagni <b>XP</b>, sali di <b>livello</b>, ottieni <b>badge</b> e mantieni la tua <b>streak</b> quotidiana.</li>
@@ -1643,7 +1718,8 @@ function countDoneInTrack(s, track){
 /* ============ RENDERING ============ */
 function renderSidebar(){
   const sb = document.getElementById('sidebar');
-  sb.innerHTML = '';
+  sb.innerHTML = '<div class="drawer-head mobile-only"><span>📚 Lezioni</span><button class="icon-btn" id="btn-lessons-close" aria-label="Chiudi">✕</button></div>';
+  document.getElementById('btn-lessons-close').onclick = () => showLessons(false);
   TRACKS.forEach((tr,idx)=>{
     const lessons = LESSONS.filter(l=>l.track===tr.id);
     const done = lessons.filter(l=>S.progress[l.id]?.done).length;
@@ -1899,7 +1975,25 @@ function loadLesson(id){
   clearConsole();
   renderSidebar();
   saveState();
+  showLessons(false);
+  showView('lesson');
 }
+
+/* ============ TELEFONO: menu lezioni e schede Lezione / Codice ============ */
+function showLessons(open){
+  document.getElementById('app').classList.toggle('lessons-open', open);
+}
+function showView(view){
+  const app = document.getElementById('app');
+  app.dataset.view = view;
+  document.querySelectorAll('#view-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.view===view));
+  if(view==='code' && editor) setTimeout(()=>editor.refresh(), 0);
+  const lp = document.getElementById('lesson-panel');
+  if(view==='lesson' && lp) lp.scrollTop = 0;
+}
+document.getElementById('btn-lessons').onclick = () => showLessons(true);
+document.getElementById('drawer-back').onclick = () => showLessons(false);
+document.querySelectorAll('#view-tabs button').forEach(b=>{ b.onclick = () => showView(b.dataset.view); });
 
 /* ============ AZIONI ============ */
 async function runCode(){
@@ -2411,6 +2505,7 @@ function useSolution(){
     if(!confirm('Sostituire il tuo codice corrente con la soluzione?')) return;
   }
   editor.setValue(currentLesson.solution);
+  showView('code');
   toast('Soluzione caricata. Premi ▶ per eseguirla!','');
 }
 
