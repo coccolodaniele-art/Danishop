@@ -288,6 +288,7 @@
   .CodeMirror-linenumber{color:#475569 !important;}
   #editor-area .cm-s-dracula.CodeMirror{background-color:var(--code-bg) !important;}
   #editor-area .cm-s-dracula .CodeMirror-gutters{background-color:var(--code-bg-2) !important;}
+  .cq-err-line{background:rgba(251,113,133,.22) !important;}
 
   .console-wrap{
     height: 220px; min-height:80px; max-height:50%;
@@ -1889,17 +1890,52 @@ async function resetPythonGlobals(){
   }catch(_){}
 }
 
+// Errore Python come lo vede l'allievo: senza "PythonError:" e senza le righe interne di Pyodide.
+function cleanPyError(e){
+  const out = [];
+  let skip = false;
+  for(const line of String(e).replace(/^PythonError:\s*/, '').split('\n')){
+    if(/^  File "/.test(line)) skip = /python\d+\.zip|_pyodide/.test(line);
+    else if(!/^\s/.test(line)) skip = false;
+    if(!skip) out.push(line);
+  }
+  return out.join('\n').trim();
+}
+
 async function runPython(code, captureOut){
   await ensurePyodide();
   await resetPythonGlobals();
   let buf = '';
-  pyodide.setStdout({batched: t=>{ buf += t+'\n'; if(captureOut) logTo('out', htmlEscape(t));} });
-  pyodide.setStderr({batched: t=>{ buf += t+'\n'; if(captureOut) logTo('out', htmlEscape(t), 'log-err');} });
+  // Riga per riga come prima; in piu' l'ultima riga senza "a capo" (print(..., end=""))
+  // viene consegnata a fine esecuzione invece di perdersi o finire nell'esecuzione dopo.
+  const line = (t, cls) => { buf += t+'\n'; if(captureOut) logTo('out', htmlEscape(t), cls); };
+  const stream = (cls) => {
+    const dec = new TextDecoder();
+    let pending = '';
+    return {
+      write: (bytes) => {
+        pending += dec.decode(bytes, {stream:true});
+        let i;
+        while((i = pending.indexOf('\n')) >= 0){ line(pending.slice(0, i), cls); pending = pending.slice(i + 1); }
+        return bytes.length;
+      },
+      end: () => { pending += dec.decode(); if(pending){ line(pending, cls); pending = ''; } }
+    };
+  };
+  const out = stream('log-info'), err = stream('log-err');
+  pyodide.setStdout({write: out.write});
+  pyodide.setStderr({write: err.write});
+  const flush = () => {
+    try{ pyodide.runPython('import sys\nsys.stdout.flush()\nsys.stderr.flush()'); }catch(_){}
+    out.end(); err.end();
+  };
   try{
     await pyodide.runPythonAsync(code);
+    flush();
     return {ok:true, output:buf};
   }catch(e){
-    const msg = String(e);
+    flush();
+    const msg = cleanPyError(e);
     if(captureOut) logTo('out', htmlEscape(msg), 'log-err');
     return {ok:false, output:buf, error:msg};
   }finally{
@@ -2006,54 +2042,85 @@ async function runCode(){
   await runPython(code, true);
 }
 
+// Debug: esegue il codice cosi' com'e' (nessun try/rientro aggiunto), con il nome di file
+// "<codice>" cosi' i numeri di riga degli errori sono quelli dell'editor; poi mostra
+// l'esito, la riga dell'errore evidenziata e le variabili con il loro tipo.
+const DEBUG_RUNNER = [
+  "import traceback as __cq_tb, types as __cq_types, json as __cq_json, linecache as __cq_lc",
+  "__cq_lc.cache['<codice>'] = (len(__cq_src), None, __cq_src.splitlines(True), '<codice>')",
+  "__cq_ns = {'__name__': '__main__'}",
+  "__cq_res = {'err': None, 'line': None, 'vars': [], 'more': 0}",
+  "try:",
+  "    exec(compile(__cq_src, '<codice>', 'exec'), __cq_ns)",
+  "except SyntaxError as __e:",
+  "    __cq_res['line'] = __e.lineno",
+  "    __cq_res['err'] = ''.join(__cq_tb.format_exception_only(type(__e), __e))",
+  "except BaseException as __e:",
+  "    __cq_te = __cq_tb.TracebackException.from_exception(__e)",
+  "    __cq_te.stack = __cq_tb.StackSummary.from_list([f for f in __cq_te.stack if f.filename == '<codice>'])",
+  "    if __cq_te.stack: __cq_res['line'] = __cq_te.stack[-1].lineno",
+  "    __cq_res['err'] = ''.join(__cq_te.format())",
+  "__cq_vars = []",
+  "for __k, __v in list(__cq_ns.items()):",
+  "    if __k.startswith('_') or isinstance(__v, __cq_types.ModuleType) or callable(__v): continue",
+  "    try: __r = repr(__v)",
+  "    except Exception: __r = '<non rappresentabile>'",
+  "    if len(__r) > 120: __r = __r[:117] + '...'",
+  "    __cq_vars.append([__k, type(__v).__name__, __r])",
+  "__cq_res['vars'] = __cq_vars[:30]",
+  "__cq_res['more'] = max(0, len(__cq_vars) - 30)",
+  "__cq_out = __cq_json.dumps(__cq_res)"
+].join('\n');
+
+let dbgErrLine = null, dbgClearOnEdit = false;
+function markErrorLine(n){
+  if(dbgErrLine){ editor.removeLineClass(dbgErrLine, 'background', 'cq-err-line'); dbgErrLine = null; }
+  if(n && n <= editor.lineCount()){
+    dbgErrLine = editor.addLineClass(n - 1, 'background', 'cq-err-line');
+    if(!dbgClearOnEdit){ dbgClearOnEdit = true; editor.on('change', ()=>markErrorLine(null)); }
+  }
+}
+
 async function debugCode(){
   if(!currentLesson) return;
   Sfx.click();
   consoleTab='dbg';
   document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active', t.dataset.ctab==='dbg'));
   dbgLogs = [];
-  refreshConsole();
-  const code = editor.getValue();
+  markErrorLine(null);
   logTo('dbg','🐞 Avvio debug Python...', 'log-trace');
+  const code = editor.getValue();
+  const r = await runPython('__cq_src = ' + JSON.stringify(code) + '\n' + DEBUG_RUNNER, false);
+  let res = null;
+  try{ res = JSON.parse(pyodide.globals.get('__cq_out')); }catch(_){ res = null; }
+  dbgLogs = [];
+  logTo('dbg','🐞 Debug Python','log-trace');
+  if(!r.ok || !res){
+    logTo('dbg', htmlEscape(r.error || 'Debug non riuscito.'), 'log-err');
+    return;
+  }
   logTo('dbg','─── Codice ───','log-trace');
-  code.split('\n').forEach((line,i)=> logTo('dbg', `${String(i+1).padStart(3,' ')} │ ${htmlEscape(line)}`,'log-trace'));
+  code.split('\n').forEach((line,i)=>{
+    const bad = res.line === i + 1;
+    logTo('dbg', `${String(i+1).padStart(3,' ')} │ ${htmlEscape(line)}${bad ? '   ◀ errore' : ''}`, bad ? 'log-err' : 'log-trace');
+  });
   logTo('dbg','─── Esecuzione ───','log-trace');
-  // FIX: eseguiamo il codice utente una SOLA volta, catturando contemporaneamente
-  // output, traceback e variabili. Prima si eseguiva due volte (duplicava i print).
-  const wrap =
-    "import sys, traceback, json as __cq_json\n" +
-    "__cq_err = False\n" +
-    "try:\n" +
-    code.split('\n').map(l=>'    '+l).join('\n') + "\n" +
-    "except Exception:\n" +
-    "    __cq_err = True\n" +
-    "    traceback.print_exc()\n" +
-    "try:\n" +
-    "    __cq_vars = {k: repr(v) for k,v in list(globals().items())\n" +
-    "                 if not k.startswith('_') and not callable(v)\n" +
-    "                 and k not in ('sys','traceback','__cq_json')}\n" +
-    "    print('__CQ_VARS__' + __cq_json.dumps(__cq_vars))\n" +
-    "except Exception:\n" +
-    "    pass\n";
-  const r = await runPython(wrap, false);
-  const out = r.output || '';
-  let varsObj = null;
-  const cleaned = out.split('\n').filter(line=>{
-    const m = line.match(/^__CQ_VARS__(\{.*\})$/);
-    if(m){ try{ varsObj = JSON.parse(m[1]); }catch(_){} return false; }
-    return true;
-  }).join('\n');
-  if(cleaned) cleaned.split('\n').forEach(line=> line && logTo('dbg', htmlEscape(line)));
-  if(r.error) logTo('dbg', htmlEscape(r.error), 'log-err');
-  if(r.ok) logTo('dbg','✓ Esecuzione conclusa','log-ok');
-  if(varsObj){
-    const entries = Object.entries(varsObj);
-    if(entries.length){
-      logTo('dbg','─── Variabili ───','log-trace');
-      entries.slice(0,20).forEach(([k,v])=>{
-        logTo('dbg', `  <b>${htmlEscape(k)}</b> = ${htmlEscape(v)}`, 'log-trace');
-      });
-    }
+  const out = (r.output || '').replace(/\n$/, '');
+  if(out) out.split('\n').forEach(line=> logTo('dbg', htmlEscape(line)));
+  else if(!res.err) logTo('dbg','(nessun output)','log-trace');
+  if(res.err){
+    res.err.trim().split('\n').forEach(line=> logTo('dbg', htmlEscape(line), 'log-err'));
+    logTo('dbg', res.line ? `✗ Esecuzione interrotta alla riga ${res.line}` : '✗ Esecuzione interrotta da un errore', 'log-err');
+    markErrorLine(res.line);
+  } else {
+    logTo('dbg','✓ Esecuzione conclusa senza errori','log-ok');
+  }
+  if(res.vars.length){
+    logTo('dbg', res.err ? '─── Variabili (al momento dell\'errore) ───' : '─── Variabili ───', 'log-trace');
+    res.vars.forEach(([k,type,v])=>{
+      logTo('dbg', `  <b>${htmlEscape(k)}</b> = ${htmlEscape(v)}   <span style="opacity:.6">(${htmlEscape(type)})</span>`, 'log-trace');
+    });
+    if(res.more) logTo('dbg', `  … e altre ${res.more} variabili`, 'log-trace');
   }
 }
 
