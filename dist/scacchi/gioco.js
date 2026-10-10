@@ -166,7 +166,7 @@
   function getWorker() {
     if (worker || workerFailed) return worker;
     try {
-      worker = new Worker('motore.js');
+      worker = new Worker(document.querySelector('script[src^="motore.js"]').getAttribute('src'));  // stessa versione della pagina
       worker.onmessage = (e) => { const cb = pending.get(e.data.id); pending.delete(e.data.id); if (cb) cb(e.data); };
       worker.onerror = (e) => {
         e.preventDefault && e.preventDefault();
