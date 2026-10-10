@@ -134,7 +134,13 @@
     table.style.setProperty('--cw', G.cw + 'px');
     table.style.setProperty('--ch', G.ch + 'px');
     table.style.setProperty('--f', G.f + 'px');
-    table.classList.toggle('compatte', G.cw < 66);
+    // Il disegno centrale (largo al massimo il 56% della carta, le figure) si restringe se i valori
+    // negli angoli, piu' grandi in proporzione sulle carte piccole, lo coprirebbero.
+    const angolo = 0.05 + 0.95 * G.f / G.cw;
+    const arte = Math.min(1, (0.5 - angolo) / 0.28);
+    table.style.setProperty('--arte', arte.toFixed(3));
+    // i semi delle carte numerate recuperano un po' di grandezza (fino a +25%): c'e' spazio tra l'uno e l'altro
+    table.style.setProperty('--pip', Math.min(1.25, 1 / arte).toFixed(3));
     table.style.height = G.H + 'px';
 
     const place = (el, x, y) => { el.style.transform = `translate(${x}px, ${y}px)`; };

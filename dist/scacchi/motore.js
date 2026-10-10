@@ -785,7 +785,11 @@
     for (const m of legal) {
       pos.make(m);
       let s;
-      if (depth <= 1) s =-this.qsearch(pos, -INF, INF, 1);
+      if (depth <= 0) {
+        // guarda solo la mossa: non vede le risposte dell'avversario (ma riconosce il matto in una)
+        s = pos.inCheck() && !pos.legalMoves().length ? MATE : -evaluate(pos);
+      }
+      else if (depth === 1) s = -this.qsearch(pos, -INF, INF, 1);
       else s = -this.search(pos, depth - 1, -INF, INF, 1, true);
       pos.unmake();
       const noisy = s + (Math.random() * 2 - 1) * noise;
@@ -798,11 +802,11 @@
   /* Livelli e aperture                                                  */
   /* ------------------------------------------------------------------ */
   const LEVELS = [
-    { name: 'Principiante', desc: 'Sbaglia spesso: ideale per imparare', depth: 1, noise: 220, random: 0.3 },
-    { name: 'Facile', desc: 'Vede solo le minacce più semplici', depth: 2, noise: 110, random: 0.1 },
-    { name: 'Intermedio', desc: 'Gioca con attenzione, qualche svista', depth: 3, noise: 40, random: 0, book: true },
-    { name: 'Avanzato', desc: 'Calcola alcune mosse in avanti', time: 700, maxDepth: 6, book: true },
-    { name: 'Esperto', desc: 'Difficile da battere', time: 1600, maxDepth: 12, book: true },
+    { name: 'Principiante', desc: 'Muove quasi senza pensare e lascia pezzi in presa', depth: 0, noise: 200, random: 0.3 },
+    { name: 'Facile', desc: 'Cattura volentieri, ma non vede le tue risposte', depth: 0, noise: 80, random: 0.1 },
+    { name: 'Intermedio', desc: 'Valuta gli scambi, con parecchie sviste', depth: 1, noise: 120, random: 0.05 },
+    { name: 'Avanzato', desc: 'Vede le minacce più semplici', depth: 2, noise: 50, random: 0, book: true },
+    { name: 'Esperto', desc: 'Calcola alcune mosse in avanti: difficile da battere', time: 700, maxDepth: 6, book: true },
     { name: 'Maestro', desc: 'Il massimo: pensa più a lungo', time: 3500, maxDepth: 40, book: true }
   ];
 

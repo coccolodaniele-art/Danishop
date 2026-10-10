@@ -135,22 +135,16 @@
       seme(s, x + w - 5 * scala - d / 2, y + h - 5 * scala - d / 2, d, true);
   }
 
-  // Disegno centrale di una carta: due versioni, "pieno" (carte grandi) e "compatto" (carte piccole, telefono).
+  // Disegno centrale di una carta, come nelle carte vere. Sulle carte piccole (telefono) gioco.js lo
+  // restringe (--arte) quanto basta per lasciare liberi i valori negli angoli.
   function arte(v, s) {
-    let pieno, compatto;
-    if (v === 1) {
-      const d = s === 0 ? 120 : 84;
-      pieno = seme(s, 125, 175, d, false);
-      compatto = seme(s, 148, 232, 128, false);
-    } else if (v > 10) {
-      const k = ['J', 'Q', 'K'][v - 11];
-      pieno = riquadro(k, s, 55, 36, 1);
-      compatto = riquadro(k, s, 116, 104, 0.84);
-    } else {
-      pieno = POS[v].map(([x, y]) => seme(s, x, y, 46, y > 175)).join('');
-      compatto = seme(s, 148, 232, 128, false);
-    }
-    return `<svg class="arte" viewBox="0 0 250 350" preserveAspectRatio="none" aria-hidden="true"><g class="pieno">${pieno}</g><g class="compatto">${compatto}</g></svg>`;
+    let disegno;
+    if (v === 1) disegno = seme(s, 125, 175, s === 0 ? 120 : 84, false);
+    else if (v > 10) disegno = riquadro(['J', 'Q', 'K'][v - 11], s, 55, 36, 1);
+    // ogni seme spostato al suo posto (e capovolto nella meta' bassa); dentro, il gruppo .pip
+    // ha l'origine al centro del seme, cosi' l'ingrandimento --pip non lo sposta
+    else disegno = POS[v].map(([x, y]) => `<g transform="translate(${x} ${y})${y > 175 ? ' rotate(180)' : ''}"><g class="pip">${seme(s, 0, 0, 46, false)}</g></g>`).join('');
+    return `<svg class="arte" viewBox="0 0 250 350" preserveAspectRatio="none" aria-hidden="true"><g class="disegno">${disegno}</g></svg>`;
   }
 
   const VALORI = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
