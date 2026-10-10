@@ -84,7 +84,7 @@
     const cw = Math.floor(Math.min((W - g * 8) / 7, 108, Math.max(56, (altezza - 40) / 5.5)));
     const ch = Math.round(cw * 1.42);
     const left = Math.round((W - (7 * cw + 6 * g)) / 2);
-    const f = Math.round((cw * 0.12 + 6.5) * 10) / 10;   // grandezza del valore negli angoli
+    const f = Math.round(cw * 1.8) / 10;   // valore negli angoli: in proporzione alla carta, uguale su computer e telefono
     const topY = g;
     const tabY = topY + ch + Math.round(g * 1.8);
     const avail = Math.max(altezza, tabY + ch * 3);
@@ -134,13 +134,6 @@
     table.style.setProperty('--cw', G.cw + 'px');
     table.style.setProperty('--ch', G.ch + 'px');
     table.style.setProperty('--f', G.f + 'px');
-    // Il disegno centrale (largo al massimo il 56% della carta, le figure) si restringe se i valori
-    // negli angoli, piu' grandi in proporzione sulle carte piccole, lo coprirebbero.
-    const angolo = 0.05 + 0.95 * G.f / G.cw;
-    const arte = Math.min(1, (0.5 - angolo) / 0.28);
-    table.style.setProperty('--arte', arte.toFixed(3));
-    // i semi delle carte numerate recuperano un po' di grandezza (fino a +25%): c'e' spazio tra l'uno e l'altro
-    table.style.setProperty('--pip', Math.min(1.25, 1 / arte).toFixed(3));
     table.style.height = G.H + 'px';
 
     const place = (el, x, y) => { el.style.transform = `translate(${x}px, ${y}px)`; };
