@@ -394,9 +394,9 @@
   "cases.case-ai-api.highlight": "4e07408562be",
   "cases.case-ai-api.highlightLabel": "01d97953f044",
   "cases.case-ai-api.problem": "b6a908150970",
-  "cases.case-ai-api.solution": "9f5651ea749c",
+  "cases.case-ai-api.solution": "1042139657b9",
   "cases.case-ai-api.result": "5dfb5dd94d98",
-  "cases.case-ai-api.role": "91c06b6fe0c5",
+  "cases.case-ai-api.role": "753ce51c2ddf",
   "cases.case-ai-api.forYou": "ff716326c3a6",
   "cases.case-traffico.title": "1543c49c1761",
   "cases.case-traffico.area": "00e8a4ffacc2",
@@ -513,9 +513,9 @@
    "highlight": "3",
    "highlightLabel": "moteurs d'IA connectables : Gemini, OpenAI, Anthropic",
    "problem": "Dans mes programmes d'analyse financière, je voulais que l'IA travaille directement sur les données : expliquer simplement pourquoi un titre se trouve à tel niveau, ou donner un avis synthétique sur ses comptes. Copier les données dans un chat à chaque fois aurait été lent, peu fiable et impossible à répéter sur des centaines de titres.",
-   "solution": "Nous avons relié les moteurs d'IA aux programmes par leurs API, les points d'accès conçus pour les logiciels : Gemini et, dans Sintesi Mercati, aussi OpenAI et Anthropic. Le programme prépare les bonnes données (cours et derniers rapports trimestriels officiels), les envoie avec des consignes précises et reçoit des réponses dans un format qu'il sait exploiter : un texte à afficher ou un feu rouge, orange ou vert. Les clés d'accès restent dans le navigateur de la personne qui utilise le programme.",
+   "solution": "Nous avons relié les moteurs d'IA aux programmes par leurs API, les points d'accès conçus pour les logiciels : Gemini et, dans Sintesi Mercati, aussi OpenAI et Anthropic. Le programme prépare les bonnes données (cours et derniers rapports trimestriels officiels), les envoie avec des consignes précises et reçoit des réponses dans un format qu'il sait exploiter et afficher. Les clés d'accès restent dans le navigateur de la personne qui utilise le programme.",
    "result": "Des explications et des évaluations en un clic, sur des centaines de titres, toujours fondées sur les mêmes données et les mêmes règles.",
-   "role": "J'ai décidé quoi demander à l'IA et comment : s'appuyer sur les derniers rapports trimestriels, expliquer les données plutôt que les contester, répondre simplement du point de vue de quelqu'un qui évalue un investissement. J'ai aussi demandé que le feu ne s'active que sur les titres qui respectent mes critères de prix, pour ne pas gaspiller de requêtes.",
+   "role": "J'ai décidé quoi demander à l'IA et comment : s'appuyer sur les derniers rapports trimestriels, expliquer les données plutôt que les contester, répondre simplement du point de vue de quelqu'un qui évalue un investissement.",
    "forYou": "Relier l'IA à vos programmes et à vos données, c'est la faire travailler au cœur des processus de l'entreprise : trier des demandes, résumer des documents, contrôler des données, avec des règles claires, des coûts maîtrisés et des résultats reproductibles."
   }
  }

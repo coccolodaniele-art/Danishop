@@ -321,9 +321,9 @@
    "highlight": "3",
    "highlightLabel": "motori AI collegabili: Gemini, OpenAI, Anthropic",
    "problem": "Nei miei programmi di analisi finanziaria volevo che l'AI lavorasse direttamente sui dati: spiegare in parole semplici perché un titolo si trova in una certa posizione, o dare un giudizio sintetico sui suoi bilanci. Copiare i dati in una chat ogni volta sarebbe stato lento, poco affidabile e impossibile da ripetere su centinaia di titoli.",
-   "solution": "Abbiamo collegato i motori AI ai programmi tramite le loro API, cioè le porte d'accesso pensate per i programmi: Gemini, e in Sintesi Mercati anche OpenAI e Anthropic. Il programma prepara i dati giusti (prezzi e ultimi bilanci trimestrali ufficiali), li invia con istruzioni precise e riceve risposte in un formato che sa usare: un testo da mostrare o un semaforo rosso, giallo o verde. Le chiavi d'accesso restano nel browser di chi usa il programma.",
+   "solution": "Abbiamo collegato i motori AI ai programmi tramite le loro API, cioè le porte d'accesso pensate per i programmi: Gemini, e in Sintesi Mercati anche OpenAI e Anthropic. Il programma prepara i dati giusti (prezzi e ultimi bilanci trimestrali ufficiali), li invia con istruzioni precise e riceve risposte in un formato che sa usare e mostrare. Le chiavi d'accesso restano nel browser di chi usa il programma.",
    "result": "Spiegazioni e valutazioni con un clic, su centinaia di titoli, sempre basate sugli stessi dati e sulle stesse regole.",
-   "role": "Ho deciso io cosa chiedere all'AI e come: basarsi sui bilanci trimestrali più recenti, non contestare i dati ma spiegarli, rispondere in modo semplice dal punto di vista di chi valuta un investimento. Ho anche chiesto di attivare il semaforo solo sui titoli che rispettano i miei criteri di prezzo, per non sprecare richieste.",
+   "role": "Ho deciso io cosa chiedere all'AI e come: basarsi sui bilanci trimestrali più recenti, non contestare i dati ma spiegarli, rispondere in modo semplice dal punto di vista di chi valuta un investimento.",
    "forYou": "Collegare l'AI ai tuoi programmi e ai tuoi dati significa farla lavorare dentro i processi dell'azienda: classificare richieste, riassumere documenti, controllare dati, con regole chiare, costi sotto controllo e risultati ripetibili."
   },
   {

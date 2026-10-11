@@ -394,9 +394,9 @@
   "cases.case-ai-api.highlight": "4e07408562be",
   "cases.case-ai-api.highlightLabel": "01d97953f044",
   "cases.case-ai-api.problem": "b6a908150970",
-  "cases.case-ai-api.solution": "9f5651ea749c",
+  "cases.case-ai-api.solution": "1042139657b9",
   "cases.case-ai-api.result": "5dfb5dd94d98",
-  "cases.case-ai-api.role": "91c06b6fe0c5",
+  "cases.case-ai-api.role": "753ce51c2ddf",
   "cases.case-ai-api.forYou": "ff716326c3a6",
   "cases.case-traffico.title": "1543c49c1761",
   "cases.case-traffico.area": "00e8a4ffacc2",
@@ -513,9 +513,9 @@
    "highlight": "3",
    "highlightLabel": "anbindbare KI-Modelle: Gemini, OpenAI, Anthropic",
    "problem": "In meinen Finanzanalyse-Programmen sollte die KI direkt mit den Daten arbeiten: in einfachen Worten erklären, warum eine Aktie an einer bestimmten Stelle steht, oder ihre Abschlüsse kurz bewerten. Die Daten jedes Mal in einen Chat zu kopieren, wäre langsam, unzuverlässig und bei Hunderten von Aktien nicht wiederholbar gewesen.",
-   "solution": "Wir haben die KI-Modelle über ihre APIs – die für Programme gedachten Zugänge – an die Programme angebunden: Gemini und in Sintesi Mercati auch OpenAI und Anthropic. Das Programm bereitet die passenden Daten vor (Kurse und die neuesten offiziellen Quartalsberichte), sendet sie mit präzisen Anweisungen und erhält Antworten in einem Format, das es verarbeiten kann: einen Text zur Anzeige oder eine Ampel in Rot, Gelb oder Grün. Die Zugangsschlüssel bleiben im Browser der Person, die das Programm nutzt.",
+   "solution": "Wir haben die KI-Modelle über ihre APIs – die für Programme gedachten Zugänge – an die Programme angebunden: Gemini und in Sintesi Mercati auch OpenAI und Anthropic. Das Programm bereitet die passenden Daten vor (Kurse und die neuesten offiziellen Quartalsberichte), sendet sie mit präzisen Anweisungen und erhält Antworten in einem Format, das es verarbeiten und anzeigen kann. Die Zugangsschlüssel bleiben im Browser der Person, die das Programm nutzt.",
    "result": "Erklärungen und Bewertungen per Klick, für Hunderte von Aktien, immer auf Basis derselben Daten und Regeln.",
-   "role": "Ich habe entschieden, was die KI gefragt wird und wie: auf Basis der neuesten Quartalsberichte, die Daten nicht anzweifeln, sondern erklären, und einfach antworten – aus Sicht von jemandem, der eine Investition prüft. Außerdem habe ich verlangt, die Ampel nur bei Aktien zu aktivieren, die meine Kurskriterien erfüllen, um keine Abfragen zu verschwenden.",
+   "role": "Ich habe entschieden, was die KI gefragt wird und wie: auf Basis der neuesten Quartalsberichte, die Daten nicht anzweifeln, sondern erklären, und einfach antworten – aus Sicht von jemandem, der eine Investition prüft.",
    "forYou": "KI an Ihre Programme und Daten anzubinden heißt, sie in den Abläufen Ihres Unternehmens arbeiten zu lassen: Anfragen einordnen, Dokumente zusammenfassen, Daten prüfen – mit klaren Regeln, kontrollierten Kosten und wiederholbaren Ergebnissen."
   }
  }
