@@ -41,7 +41,6 @@
   "gamesIntro": "Giochi da fare direttamente nel browser, anche da telefono: niente da scaricare né installare.",
   "toolsIntro": "Strumenti pratici per il lavoro di tutti i giorni, da usare direttamente nel browser, anche da telefono: niente da installare e nessun file caricato su internet.",
   "casesIntro": "Qui racconto alcuni problemi veri che ho affrontato nei miei progetti: cosa non andava, come l'abbiamo risolto e quale risultato ha portato. È lo stesso modo di lavorare che porto nei progetti per aziende e professionisti.",
-  "aiMethod": "Capisco e misuro: Prima di toccare qualcosa raccolgo i fatti e i numeri. Spesso un problema sembra una cosa ed è un'altra.\nScelgo la strada: Valuto le alternative e scelgo la più semplice che risolve davvero, senza stravolgere ciò che già funziona.\nL'AI accelera, io controllo: Uso l'intelligenza artificiale per scrivere e rivedere il codice in tempi brevi. Ogni proposta passa dalla mia verifica.\nVerifico con i numeri: Prima di consegnare provo il risultato su casi reali e lo confronto con la situazione di partenza.",
   "casesCta": "Hai un problema simile, o un lavoro che ti ruba tempo ogni settimana? *Raccontamelo: la prima consulenza è gratuita e senza impegno.*",
   "aiValue": "Capire che cosa serve davvero: L'AI risponde a ciò che le chiedi. La parte più delicata è capire il problema, i dati e i vincoli della tua attività, e tradurli in richieste precise.\nControllare che il risultato sia corretto: Un programma che funziona non è per forza un programma giusto. Verifico ogni soluzione su casi reali e con i numeri, prima che arrivi a te.\nMetterlo in funzione in modo sicuro: Collegamento agli strumenti che usi già, costi dei servizi, protezione e riservatezza dei dati: aspetti che un abbonamento non gestisce al posto tuo.\nEsserci quando qualcosa cambia: Servizi che cambiano regole, dati che crescono, nuove esigenze: hai un riferimento che conosce la soluzione e la mantiene nel tempo.",
   "aiValueNote": "E se per il tuo caso basta un assistente AI da usare in autonomia, te lo dico: anche questa è una consulenza."
@@ -313,6 +312,19 @@
    "result": "Nessun programma da installare per il cliente, trasferimenti che riprendono da dove si erano interrotti, nessun abbonamento da pagare.",
    "role": "L'idea di appoggiarmi allo spazio cloud del sito è stata mia. Poi ho provato il sistema mettendomi nei panni del cliente: così sono emersi il blocco di Windows e un'interfaccia troppo complicata, e ho chiesto di eliminarli.",
    "forYou": "Se nella tua azienda si scambiano file pesanti con clienti o fornitori tra email respinte, chiavette e servizi a pagamento, posso costruirti un canale tuo, sicuro e semplice da usare."
+  },
+  {
+   "id": "case-ai-api",
+   "link": "#trading",
+   "title": "L'intelligenza artificiale dentro i programmi, non in una chat a parte",
+   "area": "Intelligenza artificiale nei programmi",
+   "highlight": "3",
+   "highlightLabel": "motori AI collegabili: Gemini, OpenAI, Anthropic",
+   "problem": "Nei miei programmi di analisi finanziaria volevo che l'AI lavorasse direttamente sui dati: spiegare in parole semplici perché un titolo si trova in una certa posizione, o dare un giudizio sintetico sui suoi bilanci. Copiare i dati in una chat ogni volta sarebbe stato lento, poco affidabile e impossibile da ripetere su centinaia di titoli.",
+   "solution": "Abbiamo collegato i motori AI ai programmi tramite le loro API, cioè le porte d'accesso pensate per i programmi: Gemini, e in Sintesi Mercati anche OpenAI e Anthropic. Il programma prepara i dati giusti (prezzi e ultimi bilanci trimestrali ufficiali), li invia con istruzioni precise e riceve risposte in un formato che sa usare: un testo da mostrare o un semaforo rosso, giallo o verde. Le chiavi d'accesso restano nel browser di chi usa il programma.",
+   "result": "Spiegazioni e valutazioni con un clic, su centinaia di titoli, sempre basate sugli stessi dati e sulle stesse regole.",
+   "role": "Ho deciso io cosa chiedere all'AI e come: basarsi sui bilanci trimestrali più recenti, non contestare i dati ma spiegarli, rispondere in modo semplice dal punto di vista di chi valuta un investimento. Ho anche chiesto di attivare il semaforo solo sui titoli che rispettano i miei criteri di prezzo, per non sprecare richieste.",
+   "forYou": "Collegare l'AI ai tuoi programmi e ai tuoi dati significa farla lavorare dentro i processi dell'azienda: classificare richieste, riassumere documenti, controllare dati, con regole chiare, costi sotto controllo e risultati ripetibili."
   },
   {
    "id": "case-traffico",

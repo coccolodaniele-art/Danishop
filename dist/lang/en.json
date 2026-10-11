@@ -118,8 +118,6 @@
   "navCases": "Case studies",
   "casesTitle": "Real problems, *really solved*",
   "casesBtn": "Tell me about your problem",
-  "aiMethodTitle": "How I work with artificial intelligence",
-  "aiMethodSub": "AI is a powerful tool, but it doesn't decide for me: this is how I split the work.",
   "casesListTitle": "The cases",
   "casesListSub": "Each case covers the problem, the solution, the result and the part I handled myself.",
   "caseProblem": "The problem",
@@ -161,7 +159,6 @@
   "city": "Udine, Italy",
   "toolsIntro": "Practical tools for everyday work, used directly in the browser, on a phone too: nothing to install and no files uploaded to the internet.",
   "casesIntro": "Here I describe some real problems I have tackled in my projects: what was wrong, how we solved it and what result it brought. It is the same way of working I bring to projects for companies and professionals.",
-  "aiMethod": "I understand and measure: Before touching anything I gather the facts and the numbers. A problem often looks like one thing and turns out to be another.\nI choose the way forward: I weigh the alternatives and pick the simplest one that really solves the problem, without overturning what already works.\nAI speeds things up, I check: I use artificial intelligence to write and review code quickly. Every proposal goes through my own verification.\nI verify with numbers: Before delivering, I test the result on real cases and compare it with the starting point.",
   "casesCta": "Facing a similar problem, or a task that eats up your time every week? *Tell me about it: the first consultation is free and without obligation.*",
   "aiValue": "Understanding what is really needed: AI answers what you ask it. The most delicate part is understanding the problem, the data and the constraints of your business, and turning them into precise requests.\nChecking that the result is right: A program that runs is not necessarily a correct program. I verify every solution on real cases and with numbers before it reaches you.\nPutting it to work safely: Connecting it to the tools you already use, service costs, data protection and confidentiality: things a subscription does not handle for you.\nBeing there when things change: Services that change their rules, growing data, new needs: you have a point of contact who knows the solution and keeps it running over time.",
   "aiValueNote": "And if all your case needs is an AI assistant you can use on your own, I'll tell you: that's consultancy too."
@@ -306,7 +303,6 @@
   "settings.casesIntro": "834fa894d5fa",
   "settings.aiValue": "83f914b46796",
   "settings.aiValueNote": "5fb93e8198f8",
-  "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -393,6 +389,15 @@
   "cases.case-trasferimento.result": "1898bd875cfb",
   "cases.case-trasferimento.role": "bcddcec90e6c",
   "cases.case-trasferimento.forYou": "4724e5d388f8",
+  "cases.case-ai-api.title": "1456a9d2a143",
+  "cases.case-ai-api.area": "07581476ccc2",
+  "cases.case-ai-api.highlight": "4e07408562be",
+  "cases.case-ai-api.highlightLabel": "01d97953f044",
+  "cases.case-ai-api.problem": "b6a908150970",
+  "cases.case-ai-api.solution": "9f5651ea749c",
+  "cases.case-ai-api.result": "5dfb5dd94d98",
+  "cases.case-ai-api.role": "91c06b6fe0c5",
+  "cases.case-ai-api.forYou": "ff716326c3a6",
   "cases.case-traffico.title": "1543c49c1761",
   "cases.case-traffico.area": "00e8a4ffacc2",
   "cases.case-traffico.highlight": "790c402b1e22",
@@ -501,6 +506,17 @@
    "result": "Every format was checked by reopening the files produced in the real programs, such as Word and Excel.",
    "role": "I tried the first version and found it too complex for everyday use: I asked for a path of just a few steps, with no options to figure out.",
    "forYou": "Internal tools only work if staff are happy to use them. I can build you tailor-made tools that are simple to use and keep confidential data inside the company."
+  },
+  "case-ai-api": {
+   "title": "Artificial intelligence inside the programs, not in a separate chat",
+   "area": "AI inside programs",
+   "highlight": "3",
+   "highlightLabel": "AI engines that can be connected: Gemini, OpenAI, Anthropic",
+   "problem": "In my financial analysis programs I wanted AI to work directly on the data: explaining in plain words why a stock sits where it does, or giving a short verdict on its financial statements. Pasting the data into a chat every time would have been slow, unreliable and impossible to repeat across hundreds of stocks.",
+   "solution": "We connected AI engines to the programs through their APIs, the access points designed for software: Gemini, and in Sintesi Mercati also OpenAI and Anthropic. The program prepares the right data (prices and the latest official quarterly reports), sends it with precise instructions and receives answers in a format it can use: a text to display or a red, amber or green traffic light. Access keys stay in the browser of whoever uses the program.",
+   "result": "Explanations and assessments in one click, across hundreds of stocks, always based on the same data and the same rules.",
+   "role": "I decided what to ask the AI and how: rely on the latest quarterly reports, explain the data rather than dispute it, and answer simply from the point of view of someone assessing an investment. I also asked for the traffic light to run only on stocks that meet my price criteria, so as not to waste requests.",
+   "forYou": "Connecting AI to your programs and your data means putting it to work inside your company's processes: sorting requests, summarising documents, checking data, with clear rules, controlled costs and repeatable results."
   }
  }
 }

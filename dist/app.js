@@ -34,7 +34,6 @@
       casesIntro: '',
       aiValue: '',
       aiValueNote: '',
-      aiMethod: '',
       casesCta: '',
       ownerName: '',
       email: '',
@@ -82,7 +81,7 @@
   const TR_FIELDS = {
     settings: ['tagline', 'homeEyebrow', 'homeTitle', 'homeIntro', 'homePoints', 'painPoints', 'services', 'steps', 'certsIntro',
       'ctaTitle', 'ctaText', 'aboutTitle', 'aboutIntro', 'about', 'skills', 'values', 'siteAbout', 'aboutCta',
-      'programsIntro', 'tradingIntro', 'toolsIntro', 'gamesIntro', 'city', 'casesIntro', 'aiValue', 'aiValueNote', 'aiMethod', 'casesCta'],
+      'programsIntro', 'tradingIntro', 'toolsIntro', 'gamesIntro', 'city', 'casesIntro', 'aiValue', 'aiValueNote', 'casesCta'],
     programs: ['name', 'tagline', 'platform', 'description', 'features', 'trialLabel', 'trialInfo', 'requirements'],
     certificates: ['title'],
     cases: ['title', 'area', 'highlight', 'highlightLabel', 'problem', 'solution', 'result', 'role', 'forYou']
@@ -138,7 +137,6 @@
     formPrivacy: 'Uso i tuoi dati solo per risponderti, senza iscriverti a nessuna lista.',
     casesTitle: 'Problemi reali, *risolti davvero*', casesBtn: 'Raccontami il tuo problema',
     aiValueTitle: "Perché non basta un abbonamento all'AI", aiValueSub: "Gli strumenti di intelligenza artificiale sono alla portata di tutti, e li uso ogni giorno. Il valore di un professionista sta in tutto ciò che serve prima e dopo il codice.",
-    aiMethodTitle: "Come lavoro con l'intelligenza artificiale", aiMethodSub: "L'AI è uno strumento potente, ma non decide al posto mio: ecco come divido il lavoro.",
     casesListTitle: 'I casi', casesListSub: 'Ogni caso racconta il problema, la soluzione, il risultato e la parte che ho seguito in prima persona.',
     caseProblem: 'Il problema', caseSolution: 'Cosa abbiamo fatto', caseResult: 'Il risultato', caseRole: 'Il mio ruolo',
     caseForYou: 'Per la tua azienda', caseSee: 'Guarda il programma', casesEmpty: 'Casi in arrivo.',
@@ -983,7 +981,6 @@
   function renderCases() {
     const s = state.view.settings;
     const values = pairs(s.aiValue);
-    const steps = pairs(s.aiMethod);
     const list = state.view.cases.filter((c) => c.title);
     return `
       <section class="about-hero solo">
@@ -995,6 +992,12 @@
             <a class="btn big" href="#contatti" data-track="cases-link" data-label="Raccontami il tuo problema">${ICONS.mail} ${esc(t('casesBtn'))}</a>
           </div>
         </div>
+      </section>
+
+      <section class="home-section">
+        <h2 class="section-title">${esc(t('casesListTitle'))}</h2>
+        <p class="section-sub">${esc(t('casesListSub'))}</p>
+        ${list.length ? `<div class="cases">${list.map(renderCase).join('')}</div>` : `<div class="empty">${esc(t('casesEmpty'))}</div>`}
       </section>
 
       ${values.length ? `
@@ -1010,25 +1013,6 @@
         </div>
         ${s.aiValueNote ? `<p class="value-note">${homeIcon('check')}<span>${esc(s.aiValueNote)}</span></p>` : ''}
       </section>` : ''}
-
-      ${steps.length ? `
-      <section class="home-section">
-        <h2 class="section-title">${esc(t('aiMethodTitle'))}</h2>
-        <p class="section-sub">${esc(t('aiMethodSub'))}</p>
-        <ol class="steps">${steps.map((x, i) => `
-          <li class="step">
-            <span class="step-n">${String(i + 1).padStart(2, '0')}</span>
-            <h3>${esc(x.title)}</h3>
-            ${x.text ? `<p>${esc(x.text)}</p>` : ''}
-          </li>`).join('')}
-        </ol>
-      </section>` : ''}
-
-      <section class="home-section">
-        <h2 class="section-title">${esc(t('casesListTitle'))}</h2>
-        <p class="section-sub">${esc(t('casesListSub'))}</p>
-        ${list.length ? `<div class="cases">${list.map(renderCase).join('')}</div>` : `<div class="empty">${esc(t('casesEmpty'))}</div>`}
-      </section>
 
       ${ctaBand(s.casesCta || t('casesCtaDefault'))}`;
   }
@@ -1541,7 +1525,6 @@ ${skills.map((k) => `    <span class="tok-str">"${esc(k)}"</span>,`).join('\n')}
         ${field('casesIntro', 'Presentazione', s.casesIntro, { textarea: true, rows: 4, hint: 'Compare sotto il titolo della pagina.' })}
         ${field('aiValue', "Perché non basta un abbonamento all'AI", s.aiValue, { textarea: true, rows: 5, hint: 'Un punto per riga, nella forma "Titolo: descrizione": il valore che porti rispetto all\'AI usata da soli. Se lasci vuoto, la sezione non compare.' })}
         ${field('aiValueNote', 'Nota sotto i punti', s.aiValueNote, { textarea: true, rows: 2 })}
-        ${field('aiMethod', "Come lavoro con l'intelligenza artificiale", s.aiMethod, { textarea: true, rows: 4, hint: 'Un passaggio per riga, nella forma "Titolo: descrizione". Se lasci vuoto, la sezione non compare.' })}
         ${field('casesCta', 'Banner finale: titolo', s.casesCta, { hint: 'Le parole tra *asterischi* vengono evidenziate.' })}
 
         <div class="form-section">Testi delle schede</div>

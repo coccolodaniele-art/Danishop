@@ -118,8 +118,6 @@
   "navCases": "Praxisfälle",
   "casesTitle": "Echte Probleme, *wirklich gelöst*",
   "casesBtn": "Schildern Sie mir Ihr Problem",
-  "aiMethodTitle": "Wie ich mit künstlicher Intelligenz arbeite",
-  "aiMethodSub": "KI ist ein starkes Werkzeug, aber sie entscheidet nicht für mich – so teile ich die Arbeit auf.",
   "casesListTitle": "Die Fälle",
   "casesListSub": "Jeder Fall beschreibt das Problem, die Lösung, das Ergebnis und den Teil, den ich selbst übernommen habe.",
   "caseProblem": "Das Problem",
@@ -161,7 +159,6 @@
   "city": "Udine, Italien",
   "toolsIntro": "Praktische Werkzeuge für den Arbeitsalltag – direkt im Browser nutzbar, auch auf dem Smartphone: keine Installation und keine Dateien, die ins Internet hochgeladen werden.",
   "casesIntro": "Hier beschreibe ich einige echte Probleme aus meinen Projekten: was nicht funktionierte, wie wir es gelöst haben und welches Ergebnis es gebracht hat. Genauso arbeite ich auch in Projekten für Unternehmen und Selbstständige.",
-  "aiMethod": "Verstehen und messen: Bevor ich etwas ändere, sammle ich Fakten und Zahlen. Oft sieht ein Problem nach etwas anderem aus, als es ist.\nDen Weg wählen: Ich wäge die Alternativen ab und wähle die einfachste, die das Problem wirklich löst, ohne Funktionierendes umzukrempeln.\nDie KI beschleunigt, ich kontrolliere: Ich nutze künstliche Intelligenz, um Code schnell zu schreiben und zu überprüfen. Jeder Vorschlag durchläuft meine Prüfung.\nMit Zahlen prüfen: Vor der Übergabe teste ich das Ergebnis an echten Fällen und vergleiche es mit der Ausgangslage.",
   "casesCta": "Haben Sie ein ähnliches Problem oder eine Aufgabe, die Sie jede Woche Zeit kostet? *Erzählen Sie mir davon: Die erste Beratung ist kostenlos und unverbindlich.*",
   "aiValue": "Verstehen, was wirklich gebraucht wird: Die KI beantwortet, was man sie fragt. Der heikelste Teil ist, das Problem, die Daten und die Rahmenbedingungen Ihres Unternehmens zu verstehen und in präzise Anforderungen zu übersetzen.\nPrüfen, ob das Ergebnis stimmt: Ein Programm, das läuft, ist nicht automatisch ein richtiges Programm. Ich prüfe jede Lösung an echten Fällen und mit Zahlen, bevor sie bei Ihnen ankommt.\nSicher in Betrieb nehmen: Anbindung an die Werkzeuge, die Sie bereits nutzen, Kosten der Dienste, Schutz und Vertraulichkeit der Daten – Dinge, die Ihnen ein Abo nicht abnimmt.\nDa sein, wenn sich etwas ändert: Dienste, die ihre Regeln ändern, wachsende Datenmengen, neue Anforderungen – Sie haben einen Ansprechpartner, der die Lösung kennt und langfristig pflegt.",
   "aiValueNote": "Und wenn für Ihren Fall ein KI-Assistent genügt, den Sie selbst nutzen können, sage ich es Ihnen: Auch das ist Beratung."
@@ -306,7 +303,6 @@
   "settings.casesIntro": "834fa894d5fa",
   "settings.aiValue": "83f914b46796",
   "settings.aiValueNote": "5fb93e8198f8",
-  "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -393,6 +389,15 @@
   "cases.case-trasferimento.result": "1898bd875cfb",
   "cases.case-trasferimento.role": "bcddcec90e6c",
   "cases.case-trasferimento.forYou": "4724e5d388f8",
+  "cases.case-ai-api.title": "1456a9d2a143",
+  "cases.case-ai-api.area": "07581476ccc2",
+  "cases.case-ai-api.highlight": "4e07408562be",
+  "cases.case-ai-api.highlightLabel": "01d97953f044",
+  "cases.case-ai-api.problem": "b6a908150970",
+  "cases.case-ai-api.solution": "9f5651ea749c",
+  "cases.case-ai-api.result": "5dfb5dd94d98",
+  "cases.case-ai-api.role": "91c06b6fe0c5",
+  "cases.case-ai-api.forYou": "ff716326c3a6",
   "cases.case-traffico.title": "1543c49c1761",
   "cases.case-traffico.area": "00e8a4ffacc2",
   "cases.case-traffico.highlight": "790c402b1e22",
@@ -501,6 +506,17 @@
    "result": "Jedes Format wurde geprüft, indem die erzeugten Dateien in den echten Programmen wie Word und Excel geöffnet wurden.",
    "role": "Ich habe die erste Version ausprobiert und sie für den Alltag zu komplex gefunden: Ich habe einen Ablauf mit wenigen Schritten verlangt, ohne Optionen, die man erst verstehen muss.",
    "forYou": "Interne Werkzeuge funktionieren nur, wenn das Personal sie gern benutzt. Ich kann Ihnen maßgeschneiderte, einfach zu bedienende Werkzeuge bauen, die vertrauliche Daten im Unternehmen halten."
+  },
+  "case-ai-api": {
+   "title": "Künstliche Intelligenz direkt in den Programmen statt in einem separaten Chat",
+   "area": "KI in Programmen",
+   "highlight": "3",
+   "highlightLabel": "anbindbare KI-Modelle: Gemini, OpenAI, Anthropic",
+   "problem": "In meinen Finanzanalyse-Programmen sollte die KI direkt mit den Daten arbeiten: in einfachen Worten erklären, warum eine Aktie an einer bestimmten Stelle steht, oder ihre Abschlüsse kurz bewerten. Die Daten jedes Mal in einen Chat zu kopieren, wäre langsam, unzuverlässig und bei Hunderten von Aktien nicht wiederholbar gewesen.",
+   "solution": "Wir haben die KI-Modelle über ihre APIs – die für Programme gedachten Zugänge – an die Programme angebunden: Gemini und in Sintesi Mercati auch OpenAI und Anthropic. Das Programm bereitet die passenden Daten vor (Kurse und die neuesten offiziellen Quartalsberichte), sendet sie mit präzisen Anweisungen und erhält Antworten in einem Format, das es verarbeiten kann: einen Text zur Anzeige oder eine Ampel in Rot, Gelb oder Grün. Die Zugangsschlüssel bleiben im Browser der Person, die das Programm nutzt.",
+   "result": "Erklärungen und Bewertungen per Klick, für Hunderte von Aktien, immer auf Basis derselben Daten und Regeln.",
+   "role": "Ich habe entschieden, was die KI gefragt wird und wie: auf Basis der neuesten Quartalsberichte, die Daten nicht anzweifeln, sondern erklären, und einfach antworten – aus Sicht von jemandem, der eine Investition prüft. Außerdem habe ich verlangt, die Ampel nur bei Aktien zu aktivieren, die meine Kurskriterien erfüllen, um keine Abfragen zu verschwenden.",
+   "forYou": "KI an Ihre Programme und Daten anzubinden heißt, sie in den Abläufen Ihres Unternehmens arbeiten zu lassen: Anfragen einordnen, Dokumente zusammenfassen, Daten prüfen – mit klaren Regeln, kontrollierten Kosten und wiederholbaren Ergebnissen."
   }
  }
 }

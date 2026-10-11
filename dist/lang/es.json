@@ -118,8 +118,6 @@
   "navCases": "Casos reales",
   "casesTitle": "Problemas reales, *resueltos de verdad*",
   "casesBtn": "Cuéntame tu problema",
-  "aiMethodTitle": "Cómo trabajo con la inteligencia artificial",
-  "aiMethodSub": "La IA es una herramienta potente, pero no decide por mí: así reparto el trabajo.",
   "casesListTitle": "Los casos",
   "casesListSub": "Cada caso explica el problema, la solución, el resultado y la parte que llevé yo personalmente.",
   "caseProblem": "El problema",
@@ -161,7 +159,6 @@
   "city": "Udine, Italia",
   "toolsIntro": "Herramientas prácticas para el trabajo diario, para usar directamente en el navegador, también en el móvil: nada que instalar y ningún archivo subido a internet.",
   "casesIntro": "Aquí cuento algunos problemas reales que he afrontado en mis proyectos: qué fallaba, cómo lo resolvimos y qué resultado dio. Es la misma forma de trabajar que aplico en los proyectos para empresas y profesionales.",
-  "aiMethod": "Entiendo y mido: Antes de tocar nada reúno los hechos y los números. A menudo un problema parece una cosa y es otra.\nElijo el camino: Valoro las alternativas y elijo la más sencilla que de verdad lo resuelve, sin trastocar lo que ya funciona.\nLa IA acelera, yo controlo: Uso la inteligencia artificial para escribir y revisar código en poco tiempo. Cada propuesta pasa por mi comprobación.\nCompruebo con números: Antes de entregar pruebo el resultado en casos reales y lo comparo con la situación de partida.",
   "casesCta": "¿Tienes un problema parecido, o una tarea que te roba tiempo cada semana? *Cuéntamelo: la primera consulta es gratuita y sin compromiso.*",
   "aiValue": "Entender qué hace falta de verdad: La IA responde a lo que le pides. Lo más delicado es entender el problema, los datos y las limitaciones de tu actividad, y convertirlos en peticiones precisas.\nComprobar que el resultado es correcto: Un programa que funciona no es necesariamente un programa correcto. Compruebo cada solución en casos reales y con números antes de que te llegue.\nPonerlo en marcha de forma segura: La conexión con las herramientas que ya usas, los costes de los servicios, la protección y la confidencialidad de los datos: aspectos que una suscripción no gestiona por ti.\nEstar ahí cuando algo cambia: Servicios que cambian sus reglas, datos que crecen, nuevas necesidades: tienes una persona de referencia que conoce la solución y la mantiene en el tiempo.",
   "aiValueNote": "Y si en tu caso basta con un asistente de IA para usar por tu cuenta, te lo digo: eso también es asesoramiento."
@@ -306,7 +303,6 @@
   "settings.casesIntro": "834fa894d5fa",
   "settings.aiValue": "83f914b46796",
   "settings.aiValueNote": "5fb93e8198f8",
-  "settings.aiMethod": "ab4eebdf8887",
   "settings.casesCta": "de8f0fe617f8",
   "programs.mun4oc3661ldu.name": "375af9724371",
   "programs.mun4oc3661ldu.tagline": "b925b8116352",
@@ -393,6 +389,15 @@
   "cases.case-trasferimento.result": "1898bd875cfb",
   "cases.case-trasferimento.role": "bcddcec90e6c",
   "cases.case-trasferimento.forYou": "4724e5d388f8",
+  "cases.case-ai-api.title": "1456a9d2a143",
+  "cases.case-ai-api.area": "07581476ccc2",
+  "cases.case-ai-api.highlight": "4e07408562be",
+  "cases.case-ai-api.highlightLabel": "01d97953f044",
+  "cases.case-ai-api.problem": "b6a908150970",
+  "cases.case-ai-api.solution": "9f5651ea749c",
+  "cases.case-ai-api.result": "5dfb5dd94d98",
+  "cases.case-ai-api.role": "91c06b6fe0c5",
+  "cases.case-ai-api.forYou": "ff716326c3a6",
   "cases.case-traffico.title": "1543c49c1761",
   "cases.case-traffico.area": "00e8a4ffacc2",
   "cases.case-traffico.highlight": "790c402b1e22",
@@ -501,6 +506,17 @@
    "result": "Cada formato se comprobó abriendo de nuevo los archivos generados en los programas reales, como Word y Excel.",
    "role": "Probé la primera versión y me pareció demasiado compleja para el día a día: pedí un recorrido de pocos pasos, sin opciones que entender.",
    "forYou": "Las herramientas internas solo funcionan si el personal las usa con gusto. Puedo crearte herramientas a medida, fáciles de usar, que mantienen los datos confidenciales dentro de la empresa."
+  },
+  "case-ai-api": {
+   "title": "La inteligencia artificial dentro de los programas, no en un chat aparte",
+   "area": "IA dentro de los programas",
+   "highlight": "3",
+   "highlightLabel": "motores de IA conectables: Gemini, OpenAI, Anthropic",
+   "problem": "En mis programas de análisis financiero quería que la IA trabajara directamente con los datos: explicar con palabras sencillas por qué un valor está en cierta posición o dar una valoración breve de sus balances. Copiar los datos en un chat cada vez habría sido lento, poco fiable e imposible de repetir con cientos de valores.",
+   "solution": "Conectamos los motores de IA a los programas mediante sus API, las puertas de acceso pensadas para los programas: Gemini y, en Sintesi Mercati, también OpenAI y Anthropic. El programa prepara los datos adecuados (precios y últimos informes trimestrales oficiales), los envía con instrucciones precisas y recibe respuestas en un formato que sabe usar: un texto que mostrar o un semáforo rojo, amarillo o verde. Las claves de acceso se quedan en el navegador de quien usa el programa.",
+   "result": "Explicaciones y valoraciones con un clic, en cientos de valores, siempre basadas en los mismos datos y las mismas reglas.",
+   "role": "Decidí qué pedirle a la IA y cómo: basarse en los últimos informes trimestrales, no discutir los datos sino explicarlos y responder de forma sencilla desde el punto de vista de quien valora una inversión. También pedí activar el semáforo solo en los valores que cumplen mis criterios de precio, para no malgastar peticiones.",
+   "forYou": "Conectar la IA a tus programas y a tus datos significa ponerla a trabajar dentro de los procesos de la empresa: clasificar solicitudes, resumir documentos, comprobar datos, con reglas claras, costes bajo control y resultados repetibles."
   }
  }
 }
