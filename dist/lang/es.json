@@ -431,16 +431,7 @@
   "cases.case-codequest.solution": "dfb313c0c967",
   "cases.case-codequest.result": "9b63e40927db",
   "cases.case-codequest.role": "bc734c30764c",
-  "cases.case-codequest.forYou": "19f2df8e148b",
-  "cases.case-convertitore.title": "cb9765573691",
-  "cases.case-convertitore.area": "5b870b70e8cc",
-  "cases.case-convertitore.highlight": "5feceb66ffc8",
-  "cases.case-convertitore.highlightLabel": "e8345473c11a",
-  "cases.case-convertitore.problem": "624e75b4dd3d",
-  "cases.case-convertitore.solution": "a737c0b6f9a6",
-  "cases.case-convertitore.result": "e060ae17925d",
-  "cases.case-convertitore.role": "961fc63a5a9f",
-  "cases.case-convertitore.forYou": "0f8917f429a4"
+  "cases.case-codequest.forYou": "19f2df8e148b"
  },
  "cases": {
   "case-trasferimento": {
@@ -495,17 +486,6 @@
    "result": "Las soluciones correctas pasan aunque estén escritas de otra forma, los atajos se detectan y en el móvil el editor pasó de una línea a pantalla completa.",
    "role": "Usé la app como lo haría un estudiante y señalé lo que no cuadraba. En especial pedí que cada error se explicara: quien aprende tiene que entender dónde se equivoca, no solo saber que se ha equivocado.",
    "forYou": "El mismo principio vale para los controles en la empresa: comprobaciones automáticas de datos, documentos o procedimientos que no se limitan a decir «error», sino que indican dónde y por qué."
-  },
-  "case-convertitore": {
-   "title": "Una herramienta potente hecha sencilla",
-   "area": "Herramientas de oficina",
-   "highlight": "0",
-   "highlightLabel": "archivos enviados a servidores externos",
-   "problem": "El conversor de archivos transforma imágenes, PDF, documentos, hojas de cálculo, audio y vídeo en decenas de formatos. La primera versión tenía pestañas y opciones: completa, pero demasiado complicada para quien solo quiere convertir un archivo al momento.",
-   "solution": "La reconstruimos en torno a un único recorrido: subes el archivo, el programa reconoce el tipo y muestra solo los formatos posibles, un clic y lo descargas. Todo ocurre en el navegador, así que los documentos nunca salen del ordenador. También cuidamos detalles como la coma decimal de las hojas de cálculo europeas.",
-   "result": "Cada formato se comprobó abriendo de nuevo los archivos generados en los programas reales, como Word y Excel.",
-   "role": "Probé la primera versión y me pareció demasiado compleja para el día a día: pedí un recorrido de pocos pasos, sin opciones que entender.",
-   "forYou": "Las herramientas internas solo funcionan si el personal las usa con gusto. Puedo crearte herramientas a medida, fáciles de usar, que mantienen los datos confidenciales dentro de la empresa."
   },
   "case-ai-api": {
    "title": "La inteligencia artificial dentro de los programas, no en un chat aparte",

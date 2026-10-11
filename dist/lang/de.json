@@ -431,16 +431,7 @@
   "cases.case-codequest.solution": "dfb313c0c967",
   "cases.case-codequest.result": "9b63e40927db",
   "cases.case-codequest.role": "bc734c30764c",
-  "cases.case-codequest.forYou": "19f2df8e148b",
-  "cases.case-convertitore.title": "cb9765573691",
-  "cases.case-convertitore.area": "5b870b70e8cc",
-  "cases.case-convertitore.highlight": "5feceb66ffc8",
-  "cases.case-convertitore.highlightLabel": "e8345473c11a",
-  "cases.case-convertitore.problem": "624e75b4dd3d",
-  "cases.case-convertitore.solution": "a737c0b6f9a6",
-  "cases.case-convertitore.result": "e060ae17925d",
-  "cases.case-convertitore.role": "961fc63a5a9f",
-  "cases.case-convertitore.forYou": "0f8917f429a4"
+  "cases.case-codequest.forYou": "19f2df8e148b"
  },
  "cases": {
   "case-trasferimento": {
@@ -495,17 +486,6 @@
    "result": "Richtige Lösungen werden auch in anderer Schreibweise akzeptiert, Abkürzungen werden erkannt, und auf dem Smartphone wuchs der Editor von einer Zeile auf Vollbild.",
    "role": "Ich habe die App wie ein Lernender benutzt und gemeldet, was nicht stimmte. Vor allem habe ich verlangt, dass jeder Fehler erklärt wird: Wer lernt, muss verstehen, wo der Fehler liegt, und nicht nur wissen, dass es einen gibt.",
    "forYou": "Dasselbe Prinzip gilt für Kontrollen im Unternehmen: automatische Prüfungen von Daten, Dokumenten oder Abläufen, die nicht nur „Fehler“ melden, sondern zeigen, wo und warum."
-  },
-  "case-convertitore": {
-   "title": "Ein leistungsstarkes Werkzeug, einfach gemacht",
-   "area": "Werkzeuge fürs Büro",
-   "highlight": "0",
-   "highlightLabel": "Dateien an externe Server gesendet",
-   "problem": "Der Dateikonverter wandelt Bilder, PDFs, Dokumente, Tabellen, Audio und Video in Dutzende Formate um. Die erste Version hatte Reiter und Optionen: vollständig, aber zu kompliziert für alle, die nur schnell eine Datei umwandeln wollen.",
-   "solution": "Wir haben ihn um einen einzigen Ablauf herum neu gebaut: Datei hochladen, das Programm erkennt den Typ und zeigt nur die möglichen Formate, ein Klick und der Download startet. Alles geschieht im Browser, die Dokumente verlassen den Computer also nie. Auch Details wie das Dezimalkomma europäischer Tabellen haben wir berücksichtigt.",
-   "result": "Jedes Format wurde geprüft, indem die erzeugten Dateien in den echten Programmen wie Word und Excel geöffnet wurden.",
-   "role": "Ich habe die erste Version ausprobiert und sie für den Alltag zu komplex gefunden: Ich habe einen Ablauf mit wenigen Schritten verlangt, ohne Optionen, die man erst verstehen muss.",
-   "forYou": "Interne Werkzeuge funktionieren nur, wenn das Personal sie gern benutzt. Ich kann Ihnen maßgeschneiderte, einfach zu bedienende Werkzeuge bauen, die vertrauliche Daten im Unternehmen halten."
   },
   "case-ai-api": {
    "title": "Künstliche Intelligenz direkt in den Programmen statt in einem separaten Chat",

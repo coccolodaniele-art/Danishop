@@ -431,16 +431,7 @@
   "cases.case-codequest.solution": "dfb313c0c967",
   "cases.case-codequest.result": "9b63e40927db",
   "cases.case-codequest.role": "bc734c30764c",
-  "cases.case-codequest.forYou": "19f2df8e148b",
-  "cases.case-convertitore.title": "cb9765573691",
-  "cases.case-convertitore.area": "5b870b70e8cc",
-  "cases.case-convertitore.highlight": "5feceb66ffc8",
-  "cases.case-convertitore.highlightLabel": "e8345473c11a",
-  "cases.case-convertitore.problem": "624e75b4dd3d",
-  "cases.case-convertitore.solution": "a737c0b6f9a6",
-  "cases.case-convertitore.result": "e060ae17925d",
-  "cases.case-convertitore.role": "961fc63a5a9f",
-  "cases.case-convertitore.forYou": "0f8917f429a4"
+  "cases.case-codequest.forYou": "19f2df8e148b"
  },
  "cases": {
   "case-trasferimento": {
@@ -495,17 +486,6 @@
    "result": "As soluções corretas passam mesmo escritas de outro jeito, os atalhos são reconhecidos e no celular o editor passou de uma linha para a tela inteira.",
    "role": "Usei o app como um estudante usaria e apontei o que não batia. Pedi principalmente que cada erro fosse explicado: quem aprende precisa entender onde erra, não só saber que errou.",
    "forYou": "O mesmo princípio vale para os controles na empresa: verificações automáticas de dados, documentos ou procedimentos que não se limitam a dizer “erro”, mas mostram onde e por quê."
-  },
-  "case-convertitore": {
-   "title": "Uma ferramenta poderosa que ficou simples",
-   "area": "Ferramentas para o escritório",
-   "highlight": "0",
-   "highlightLabel": "arquivos enviados a servidores externos",
-   "problem": "O conversor de arquivos transforma imagens, PDFs, documentos, planilhas, áudio e vídeo em dezenas de formatos. A primeira versão tinha abas e opções: completa, mas complicada demais para quem só quer converter um arquivo rapidinho.",
-   "solution": "Nós o reconstruímos em torno de um único caminho: você envia o arquivo, o programa reconhece o tipo e mostra só os formatos possíveis, um clique e você baixa. Tudo acontece no navegador, então os documentos nunca saem do computador. Também cuidamos de detalhes como a vírgula decimal das planilhas europeias.",
-   "result": "Cada formato foi verificado abrindo de novo os arquivos gerados nos programas de verdade, como Word e Excel.",
-   "role": "Testei a primeira versão e achei complexa demais para o dia a dia: pedi um caminho com poucos passos, sem opções para entender.",
-   "forYou": "Ferramentas internas só funcionam se a equipe gosta de usá-las. Posso criar para você ferramentas sob medida, fáceis de usar, que mantêm os dados confidenciais dentro da empresa."
   },
   "case-ai-api": {
    "title": "Inteligência artificial dentro dos programas, não em um chat à parte",

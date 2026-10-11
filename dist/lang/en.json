@@ -431,16 +431,7 @@
   "cases.case-codequest.solution": "dfb313c0c967",
   "cases.case-codequest.result": "9b63e40927db",
   "cases.case-codequest.role": "bc734c30764c",
-  "cases.case-codequest.forYou": "19f2df8e148b",
-  "cases.case-convertitore.title": "cb9765573691",
-  "cases.case-convertitore.area": "5b870b70e8cc",
-  "cases.case-convertitore.highlight": "5feceb66ffc8",
-  "cases.case-convertitore.highlightLabel": "e8345473c11a",
-  "cases.case-convertitore.problem": "624e75b4dd3d",
-  "cases.case-convertitore.solution": "a737c0b6f9a6",
-  "cases.case-convertitore.result": "e060ae17925d",
-  "cases.case-convertitore.role": "961fc63a5a9f",
-  "cases.case-convertitore.forYou": "0f8917f429a4"
+  "cases.case-codequest.forYou": "19f2df8e148b"
  },
  "cases": {
   "case-trasferimento": {
@@ -495,17 +486,6 @@
    "result": "Correct solutions pass even when written differently, shortcuts are recognised, and on phones the editor went from a single line to full screen.",
    "role": "I used the app as a student would and reported what didn't add up. In particular, I asked for every mistake to be explained: learners need to understand where they go wrong, not just know that they did.",
    "forYou": "The same principle applies to checks in a company: automatic checks on data, documents or procedures that don't just say “error” but show where and why."
-  },
-  "case-convertitore": {
-   "title": "A powerful tool made simple",
-   "area": "Office tools",
-   "highlight": "0",
-   "highlightLabel": "files sent to external servers",
-   "problem": "The file converter turns images, PDFs, documents, spreadsheets, audio and video into dozens of formats. The first version had tabs and options: complete, but too complicated for someone who just needs to convert a file quickly.",
-   "solution": "We rebuilt it around a single path: you upload the file, the program recognises its type and shows only the possible formats, one click and you download. Everything happens in the browser, so documents never leave the computer. We also took care of details such as the decimal comma in European spreadsheets.",
-   "result": "Every format was checked by reopening the files produced in the real programs, such as Word and Excel.",
-   "role": "I tried the first version and found it too complex for everyday use: I asked for a path of just a few steps, with no options to figure out.",
-   "forYou": "Internal tools only work if staff are happy to use them. I can build you tailor-made tools that are simple to use and keep confidential data inside the company."
   },
   "case-ai-api": {
    "title": "Artificial intelligence inside the programs, not in a separate chat",

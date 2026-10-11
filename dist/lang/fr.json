@@ -431,16 +431,7 @@
   "cases.case-codequest.solution": "dfb313c0c967",
   "cases.case-codequest.result": "9b63e40927db",
   "cases.case-codequest.role": "bc734c30764c",
-  "cases.case-codequest.forYou": "19f2df8e148b",
-  "cases.case-convertitore.title": "cb9765573691",
-  "cases.case-convertitore.area": "5b870b70e8cc",
-  "cases.case-convertitore.highlight": "5feceb66ffc8",
-  "cases.case-convertitore.highlightLabel": "e8345473c11a",
-  "cases.case-convertitore.problem": "624e75b4dd3d",
-  "cases.case-convertitore.solution": "a737c0b6f9a6",
-  "cases.case-convertitore.result": "e060ae17925d",
-  "cases.case-convertitore.role": "961fc63a5a9f",
-  "cases.case-convertitore.forYou": "0f8917f429a4"
+  "cases.case-codequest.forYou": "19f2df8e148b"
  },
  "cases": {
   "case-trasferimento": {
@@ -495,17 +486,6 @@
    "result": "Les solutions correctes passent même écrites autrement, les raccourcis sont détectés et, sur mobile, l'éditeur est passé d'une seule ligne au plein écran.",
    "role": "J'ai utilisé l'application comme le ferait un élève et signalé ce qui clochait. J'ai surtout demandé que chaque erreur soit expliquée : celui qui apprend doit comprendre où il se trompe, pas seulement savoir qu'il s'est trompé.",
    "forYou": "Le même principe vaut pour les contrôles en entreprise : des vérifications automatiques de données, de documents ou de procédures qui ne se contentent pas de dire « erreur », mais montrent où et pourquoi."
-  },
-  "case-convertitore": {
-   "title": "Un outil puissant rendu simple",
-   "area": "Outils de bureau",
-   "highlight": "0",
-   "highlightLabel": "fichier envoyé à des serveurs externes",
-   "problem": "Le convertisseur de fichiers transforme images, PDF, documents, tableurs, audio et vidéo en des dizaines de formats. La première version avait des onglets et des options : complète, mais trop compliquée pour qui veut simplement convertir un fichier en vitesse.",
-   "solution": "Nous l'avons reconstruit autour d'un parcours unique : vous déposez le fichier, le programme reconnaît son type et n'affiche que les formats possibles, un clic et vous téléchargez. Tout se passe dans le navigateur, les documents ne quittent donc jamais l'ordinateur. Nous avons aussi soigné des détails comme la virgule décimale des tableurs européens.",
-   "result": "Chaque format a été vérifié en rouvrant les fichiers produits dans les vrais logiciels, comme Word et Excel.",
-   "role": "J'ai essayé la première version et je l'ai trouvée trop complexe pour un usage quotidien : j'ai demandé un parcours en quelques étapes, sans options à comprendre.",
-   "forYou": "Les outils internes ne fonctionnent que si le personnel les utilise volontiers. Je peux vous créer des outils sur mesure, simples à utiliser, qui gardent les données confidentielles dans l'entreprise."
   },
   "case-ai-api": {
    "title": "L'intelligence artificielle au cœur des programmes, pas dans un chat à part",

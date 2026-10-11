@@ -377,19 +377,6 @@
    "result": "Le soluzioni corrette passano anche se scritte in modo diverso, le scorciatoie vengono riconosciute e sul telefono l'editor è passato da una riga a tutto schermo.",
    "role": "Ho usato l'app come la userebbe uno studente e ho segnalato cosa non tornava. Ho chiesto in particolare che ogni errore fosse spiegato: chi impara deve capire dove sbaglia, non solo sapere di aver sbagliato.",
    "forYou": "Lo stesso principio vale per i controlli in azienda: verifiche automatiche su dati, documenti o procedure che non si limitano a dire «errore», ma indicano dove e perché."
-  },
-  {
-   "id": "case-convertitore",
-   "link": "#strumenti",
-   "title": "Uno strumento potente reso semplice",
-   "area": "Strumenti per l'ufficio",
-   "highlight": "0",
-   "highlightLabel": "file inviati a server esterni",
-   "problem": "Il convertitore di file trasforma immagini, PDF, documenti, fogli di calcolo, audio e video in decine di formati. La prima versione aveva schede e opzioni: completa, ma troppo complicata per chi deve solo convertire un file al volo.",
-   "solution": "L'abbiamo ricostruito attorno a un percorso unico: carichi il file, il programma riconosce il tipo e mostra solo i formati possibili, un clic e scarichi. Tutto avviene nel browser, quindi i documenti non lasciano mai il computer. Abbiamo curato anche dettagli come la virgola decimale dei fogli di calcolo europei.",
-   "result": "Ogni formato è stato verificato riaprendo i file prodotti nei programmi veri, come Word ed Excel.",
-   "role": "Ho provato la prima versione e l'ho trovata troppo complessa per l'uso di tutti i giorni: ho chiesto un percorso in pochi passi, senza opzioni da capire.",
-   "forYou": "Gli strumenti interni funzionano solo se il personale li usa volentieri. Posso costruirti strumenti su misura semplici da usare, che tengono i dati riservati dentro l'azienda."
   }
  ]
 }
