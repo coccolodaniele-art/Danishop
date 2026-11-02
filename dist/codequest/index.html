@@ -174,7 +174,7 @@
 
   .workspace{
     flex:1; display:grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);  /* minmax: una riga di codice lunga non allarga il pannello */
     overflow:hidden; min-height:0;
   }
   .lesson-panel{
@@ -235,7 +235,7 @@
   .tests-summary li{font-size:13px; margin:2px 0;}
 
   .editor-panel{
-    display:flex; flex-direction:column; min-height:0;
+    display:flex; flex-direction:column; min-height:0; min-width:0;
     background:var(--code-bg);
   }
   .editor-tabs{
@@ -251,7 +251,7 @@
   .editor-toolbar{
     display:flex; gap:8px; padding:8px 10px;
     border-bottom:1px solid var(--line); background:#ffffff;
-    align-items:center;
+    align-items:center; flex-wrap:wrap;
   }
   .btn{
     padding:7px 13px; border-radius:7px; border:1px solid #bcd6d3;
@@ -290,6 +290,35 @@
   #editor-area .cm-s-dracula.CodeMirror{background-color:var(--code-bg) !important;}
   #editor-area .cm-s-dracula .CodeMirror-gutters{background-color:var(--code-bg-2) !important;}
   .cq-err-line{background:rgba(251,113,133,.22) !important;}
+
+  /* Barra di scorrimento orizzontale grande sotto l'editor (solo telefono/tablet):
+     sul touch le barre native sono sottili o nascoste. */
+  .hscroll{display:none;}
+  .hscroll{
+    align-items:center; gap:6px; padding:6px 8px;
+    background:var(--code-bg-2); border-top:1px solid var(--code-line);
+    touch-action:none; user-select:none; -webkit-user-select:none;
+  }
+  .hs-btn{
+    flex:0 0 40px; height:32px; border-radius:8px; cursor:pointer;
+    border:1px solid var(--code-line); background:var(--code-bg); color:#bcd6d3; font-size:14px;
+  }
+  .hs-btn:active{background:var(--code-line); color:#fff;}
+  .hs-track{
+    flex:1; position:relative; height:32px; border-radius:16px; cursor:pointer;
+    background:var(--code-bg); border:1px solid var(--code-line);
+  }
+  .hs-thumb{
+    position:absolute; top:3px; bottom:3px; left:3px; min-width:48px; border-radius:13px;
+    background:#3f6b78; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+  .hs-thumb::after{
+    content:""; position:absolute; left:50%; top:50%; width:16px; height:10px; transform:translate(-50%,-50%);
+    background: linear-gradient(90deg, #bcd6d3 2px, transparent 2px) 0 0 / 7px 100% repeat-x;
+    opacity:.7;
+  }
+  .hscroll.dragging .hs-thumb, .hs-thumb:active{background:#5b8e9a;}
+  .hscroll.off .hs-btn, .hscroll.off .hs-track{opacity:.35; pointer-events:none;}
 
   .console-wrap{
     height: 220px; min-height:80px; max-height:50%;
@@ -516,7 +545,7 @@
   /* Telefono e tablet verticale: lezioni in un menu a scomparsa (☰), "Lezione" e "Codice"
      in due schede a tutto schermo, barra in alto su due righe. */
   .mobile-only, .mobile-inline, .drawer-back{display:none;}
-  @media (max-width: 880px){
+  @media (max-width: 880px), (max-height: 500px){
     .app{grid-template-columns: 1fr; grid-template-rows: auto 1fr; height:100vh; height:100dvh;}
     header.topbar{flex-wrap:wrap; gap:8px 8px; padding:8px 12px;}
     .top-stats{display:contents;}
@@ -533,6 +562,14 @@
       .logo .badge{display:none;}
       .icon-btn{width:34px; height:34px;}
       .stat{padding:5px 8px;}
+      .ctab{white-space:nowrap;}
+    }
+    /* Telefoni molto stretti (320-350 px): resta solo il serpente, così i tasti stanno su una riga */
+    @media (max-width: 350px){
+      header.topbar{gap:8px 5px; padding:8px;}
+      .logo-name{display:none;}
+      .ctab{padding:5px 6px;}
+      .console-head{gap:4px;}
     }
 
     aside.sidebar{
@@ -567,13 +604,24 @@
     .lesson-panel pre{font-size:11.5px; padding:10px; white-space:pre-wrap; overflow-wrap:anywhere;}
     .help-box{padding:12px 10px;}
 
-    .editor-toolbar{flex-wrap:wrap; gap:6px; padding:8px;}
-    .editor-toolbar .btn{flex:1 1 28%; min-width:0; justify-content:center; padding:8px 4px; font-size:12.5px; white-space:nowrap;}
-    .editor-toolbar #btn-run, .editor-toolbar #btn-check{flex-basis:45%; padding:10px 6px; font-size:14px;}
-    .pylabel{flex:1 1 100%; margin:0; justify-content:center;}
+    /* Scheda Codice: barre sopra l'editor più basse, così resta spazio per scrivere anche sui telefoni piccoli */
+    .app[data-view="code"] .lesson-bar{padding:6px 14px;}
+    .app[data-view="code"] .lesson-bar > :not(.lesson-title){display:none;}
+    .app[data-view="code"] .lesson-title{font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .view-tabs button{padding:8px;}
+    .xp-wrap{padding:4px 10px;}
+
+    .editor-toolbar{flex-wrap:wrap; gap:5px; padding:6px 8px;}
+    .editor-toolbar .btn{flex:1 1 28%; min-width:0; justify-content:center; padding:7px 4px; font-size:12.5px; white-space:nowrap;}
+    .editor-toolbar #btn-run, .editor-toolbar #btn-check{flex-basis:45%; padding:9px 6px; font-size:14px;}
+    .pylabel{flex:1 1 100%; margin:0; justify-content:center; font-size:10.5px; line-height:1.2;}
     .CodeMirror{font-size:14px;}
     .CodeMirror textarea{font-size:16px !important;}  /* niente zoom automatico sull'iPhone */
-    .console-wrap{height:36%; max-height:none; resize:none;}
+    .hscroll{display:flex;}
+    .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler{display:none !important;}  /* sostituita da .hscroll */
+    .console-wrap{height:34%; min-height:96px; max-height:none; resize:none;}
+    .hscroll{padding:5px 8px;}
+    .hs-btn, .hs-track{height:30px;}
     .console-head{padding:6px 8px; gap:6px;}
     .ctab{padding:5px 8px; font-size:12px;}
 
@@ -588,6 +636,24 @@
     .welcome h1{font-size:44px;}
     .welcome p{font-size:15px;}
     .welcome input{width:100%; max-width:320px;}
+  }
+  /* Telefono in orizzontale (schermo basso): barre su una riga sola, così l'editor resta alto */
+  @media (max-height: 500px){
+    header.topbar{flex-wrap:nowrap; padding:6px 12px;}
+    .xp-wrap{order:0; flex:1 1 auto; max-width:320px; min-width:0;}
+    .app[data-view="code"] .lesson-bar{display:none;}
+    .view-tabs{padding:5px 12px;}
+    .view-tabs button{padding:6px;}
+    .editor-toolbar{flex-wrap:nowrap; padding:5px 8px;}
+    .editor-toolbar .btn{flex:1 1 0; padding:6px 4px;}
+    .editor-toolbar #btn-run, .editor-toolbar #btn-check{flex:1.3 1 0; padding:6px; font-size:13.5px;}
+    .pylabel{flex:0 1 auto; min-width:0; white-space:nowrap; overflow:hidden;}
+    .console-wrap{height:38%; min-height:70px;}
+    .hscroll{padding:3px 8px;}
+    .hs-btn, .hs-track{height:26px;}
+    .welcome{justify-content:flex-start; overflow-y:auto;}
+    .welcome .py-icon{font-size:40px;}
+    .welcome h1{font-size:34px;}
   }
 </style>
 
@@ -616,7 +682,7 @@
 <div class="app" id="app" style="display:none;">
   <header class="topbar">
     <button class="icon-btn mobile-only" id="btn-lessons" title="Lezioni" aria-label="Apri l'elenco delle lezioni">☰</button>
-    <div class="logo">🐍 CodeQuest <span class="badge">PYTHON</span></div>
+    <div class="logo">🐍 <span class="logo-name">CodeQuest</span> <span class="badge">PYTHON</span></div>
     <div class="top-stats">
       <div class="stat" title="Streak giornaliera"><span class="ico">🔥</span><span id="ui-streak">0</span></div>
       <div class="xp-wrap">
@@ -673,6 +739,11 @@
         </div>
         <div id="editor-area">
           <textarea id="code"></textarea>
+        </div>
+        <div class="hscroll off" id="hscroll">
+          <button type="button" class="hs-btn" data-dir="-1" aria-label="Scorri il codice a sinistra">◀</button>
+          <div class="hs-track" id="hs-track" role="scrollbar" aria-orientation="horizontal" aria-controls="editor-area" aria-label="Scorri il codice a destra e a sinistra"><div class="hs-thumb" id="hs-thumb"></div></div>
+          <button type="button" class="hs-btn" data-dir="1" aria-label="Scorri il codice a destra">▶</button>
         </div>
         <div class="console-wrap">
           <div class="console-head">
@@ -2465,6 +2536,68 @@ function initEditor(){
       "Tab": cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.replaceSelection("    ", "end"),
       "Shift-Tab": cm => cm.indentSelection('subtract'),
     }
+  });
+  initHScroll();
+}
+
+/* Barra orizzontale grande sotto l'editor (telefono): si trascina la maniglia, si tocca la
+   pista per saltare in quel punto, ◀ ▶ spostano di mezzo schermo (tenendoli premuti continua). */
+function initHScroll(){
+  const bar = document.getElementById('hscroll');
+  const track = document.getElementById('hs-track');
+  const thumb = document.getElementById('hs-thumb');
+  const PAD = 3;   // margine della maniglia dentro la pista
+  const geom = () => {
+    const i = editor.getScrollInfo();
+    const max = Math.max(0, i.width - i.clientWidth);
+    const room = track.clientWidth - 2*PAD;
+    const tw = Math.min(room, Math.max(48, room * i.clientWidth / Math.max(1, i.width)));
+    return {i, max, room, tw, free: Math.max(1, room - tw)};
+  };
+  const update = () => {
+    if(!track.clientWidth) return;   // barra nascosta (desktop o scheda Lezione)
+    const g = geom();
+    bar.classList.toggle('off', g.max < 2);
+    thumb.style.width = g.tw + 'px';
+    thumb.style.left = (PAD + (g.max ? g.free * g.i.left / g.max : 0)) + 'px';
+  };
+  const scrollTo = x => { const g = geom(); editor.scrollTo(Math.max(0, Math.min(g.max, x)), null); };
+  editor.on('scroll', update);
+  editor.on('update', update);
+  editor.on('refresh', update);
+  window.addEventListener('resize', update);
+
+  let drag = null;
+  track.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const g = geom();
+    if(e.target !== thumb){   // tocco sulla pista: la maniglia si centra lì
+      const r = track.getBoundingClientRect();
+      scrollTo((e.clientX - r.left - PAD - g.tw/2) / g.free * g.max);
+    }
+    drag = {x: e.clientX, left: editor.getScrollInfo().left};
+    track.setPointerCapture(e.pointerId);
+    bar.classList.add('dragging');
+  });
+  track.addEventListener('pointermove', e => {
+    if(!drag) return;
+    const g = geom();
+    scrollTo(drag.left + (e.clientX - drag.x) / g.free * g.max);
+  });
+  const stop = () => { drag = null; bar.classList.remove('dragging'); };
+  track.addEventListener('pointerup', stop);
+  track.addEventListener('pointercancel', stop);
+
+  bar.querySelectorAll('.hs-btn').forEach(b => {
+    let timer = null;
+    const step = () => scrollTo(editor.getScrollInfo().left + b.dataset.dir * editor.getScrollInfo().clientWidth * 0.5);
+    const end = () => { clearTimeout(timer); timer = null; };
+    b.addEventListener('pointerdown', e => {
+      e.preventDefault(); step();
+      const again = () => { step(); timer = setTimeout(again, 120); };
+      timer = setTimeout(again, 400);
+    });
+    ['pointerup','pointerleave','pointercancel'].forEach(t => b.addEventListener(t, end));
   });
 }
 
