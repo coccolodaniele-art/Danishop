@@ -2672,13 +2672,21 @@ async function ensurePyodide(){
 async function resetPythonGlobals(){
   // Pulisce i globals dell'utente tra un'esecuzione e l'altra,
   // così le lezioni non condividono variabili o import.
+  // La pulizia e' fatta da JavaScript, non con codice Python: prima usava list(globals()),
+  // e se l'allievo aveva creato una variabile chiamata list (o globals) la pulizia falliva
+  // in silenzio, quella variabile restava e bloccava tutte le esecuzioni successive.
   if(!pyodideReady) return;
+  let keys = null;
   try{
-    await pyodide.runPythonAsync(
-      "for __k in [k for k in list(globals()) if not k.startswith('_')]:\n" +
-      "    del globals()[__k]\n"
-    );
-  }catch(_){}
+    keys = pyodide.globals.keys();
+    for(const k of [...keys]){
+      if(typeof k === 'string' && !k.startsWith('_')) pyodide.globals.delete(k);
+    }
+  }catch(e){
+    console.warn('CodeQuest: pulizia delle variabili non riuscita', e);
+  }finally{
+    try{ if(keys && keys.destroy) keys.destroy(); }catch(_){}
+  }
 }
 
 // Errore Python come lo vede l'allievo: senza "PythonError:" e senza le righe interne di Pyodide.
@@ -2835,9 +2843,11 @@ async function runCode(){
   if(!r.ok){
     // l'errore completo e' gia' in console: qui la riga e la spiegazione
     const n = [...String(r.error).matchAll(/File "<exec>", line (\d+)/g)].pop();
-    const type = (String(r.error).trim().split('\n').pop().match(/^(\w+(?:Error|Exception))/) || [])[1];
+    const last = String(r.error).trim().split('\n').pop();
+    const type = (last.match(/^(\w+(?:Error|Exception))/) || [])[1];
     if(n) logTo('out', `❌ Errore alla riga ${n[1]}: <code>${htmlEscape((code.split('\n')[n[1]-1] || '').trim())}</code>`, 'log-err');
-    if(type && ERROR_HELP[type]) logTo('out', '💡 ' + ERROR_HELP[type], 'log-warn');
+    const hint = errorHint(last, type, code);
+    if(hint) logTo('out', '💡 ' + hint, 'log-warn');
     markErrorLine(n ? +n[1] : null);
   }
 }
@@ -3034,6 +3044,18 @@ const ERROR_HELP = {
   RecursionError: 'La funzione richiama sé stessa all\'infinito: manca il caso base che la fa fermare.',
   UnboundLocalError: 'Usi una variabile dentro la funzione prima di averle dato un valore.',
 };
+// Spiegazione piu' precisa per i casi in cui quella generica del tipo di errore non basta.
+const BUILTIN_NAMES = ['list','dict','str','int','float','bool','set','tuple','sum','max','min','len','print','input','range','sorted','type','map','filter','abs','round'];
+function errorHint(last, type, code){
+  const m = last.match(/'(\w+)' object is not callable/);
+  if(m){
+    const used = (String(code || '').match(new RegExp('^\\s*(' + BUILTIN_NAMES.join('|') + ')\\s*=[^=]', 'm')) || [])[1];
+    return used
+      ? `Nel tuo codice c'è <code>${used} = ...</code>: una variabile con il nome della funzione <code>${used}</code> la nasconde, e da lì in poi <code>${used}(...)</code> non funziona più. Dai alla variabile un altro nome (per esempio <code>${used === 'list' ? 'lista' : 'mio_' + used}</code>).`
+      : `Stai chiamando con le parentesi <code>(...)</code> un valore di tipo ${m[1]} che non è una funzione. Succede spesso quando una variabile ha lo stesso nome di una funzione (per esempio <code>list = [1, 2]</code> e poi <code>list(...)</code>): usa un nome diverso.`;
+  }
+  return type && ERROR_HELP[type] ? ERROR_HELP[type] : '';
+}
 function explainError(error, code, tab){
   const text = String(error || '');
   const lines = [...text.matchAll(/File "<exec>", line (\d+)/g)];
@@ -3043,7 +3065,8 @@ function explainError(error, code, tab){
   const src = n ? (code.split('\n')[n - 1] || '').trim() : '';
   if(n) logTo(tab, `❌ Errore alla riga ${n}: <code>${htmlEscape(src)}</code>`, 'log-err');
   logTo(tab, htmlEscape(last), 'log-err');
-  if(type && ERROR_HELP[type]) logTo(tab, '💡 ' + ERROR_HELP[type], 'log-warn');
+  const hint = errorHint(last, type, code);
+  if(hint) logTo(tab, '💡 ' + hint, 'log-warn');
   markErrorLine(n);
 }
 
