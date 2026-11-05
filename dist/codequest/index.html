@@ -2928,10 +2928,14 @@ async function debugCode(){
 // slicing...), quali funzioni chiama, che funzioni e classi definisce, quali valori sono
 // scritti a mano. Commenti e testi tra virgolette non contano, quindi non ingannano le verifiche.
 const CODE_INFO = String.raw`
-import ast as __cq_ast, json as __cq_json
+import ast as __cq_ast, json as __cq_json, textwrap as __cq_tw
 def __cq_analyze(src):
     ast = __cq_ast
-    tree = ast.parse(src)
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        # Pyodide esegue il codice dopo averne tolto il rientro comune: l'analisi fa lo stesso
+        tree = ast.parse(__cq_tw.dedent(src))
     info = {'nodes': set(), 'ops': set(), 'calls': {}, 'attrs': set(), 'used': set(), 'assigned': set(),
             'consts': [], 'funcs': {}, 'classes': {}, 'imports': set(), 'kw': set(), 'excepts': set(),
             'bigLiterals': 0}
@@ -2996,12 +3000,23 @@ def __cq_analyze(src):
     return __cq_json.dumps(info)
 __cq_info = __cq_analyze(__cq_src)
 `;
+// L'analisi gira in uno spazio di nomi Python nuovo e vuoto, separato da quello del programma
+// dell'allievo: variabili, import o modifiche lasciate dalle esecuzioni precedenti non la
+// influenzano. Se non riesce, il motivo resta in codeInfo.lastError e viene mostrato nei Test.
 function codeInfo(code){
+  codeInfo.lastError = '';
+  let ns = null;
   try{
-    pyodide.globals.set('__cq_src', code);
-    pyodide.runPython(CODE_INFO);
-    return JSON.parse(pyodide.globals.get('__cq_info'));
-  }catch(_){ return null; }
+    ns = pyodide.toPy({__cq_src: code});
+    pyodide.runPython(CODE_INFO, {globals: ns});
+    return JSON.parse(ns.get('__cq_info'));
+  }catch(e){
+    codeInfo.lastError = cleanPyError(e).split('\n').pop() || String(e);
+    console.warn('CodeQuest: analisi del codice non riuscita', e);
+    return null;
+  }finally{
+    try{ if(ns) ns.destroy(); }catch(_){}
+  }
 }
 
 // Errore Python spiegato a chi impara: riga, testo della riga, causa probabile.
@@ -3118,6 +3133,7 @@ async function checkCode(){
     return;
   }
   const info = codeInfo(code);
+  if(!info) logTo('tres', `⚠ Non riesco ad analizzare come è scritto il codice (${htmlEscape(codeInfo.lastError || 'errore sconosciuto')}): le verifiche sulla scrittura non possono passare. Ricarica la pagina e riprova.`, 'log-warn');
   let passed = 0;
   const detto = new Set();   // la stessa spiegazione una volta sola
   for(const t of lesson.tests){
@@ -3604,6 +3620,20 @@ function doRipasso(){
 }
 
 /* ============ EVENTI ============ */
+// Esegui, Verifica e Debug usano lo stesso Python: uno alla volta. Prima un secondo clic
+// durante un'esecuzione mescolava le uscite (test falliti senza motivo).
+let pyBusy = false;
+function oneAtATime(fn){
+  return async function(...args){
+    if(pyBusy){ toast('Attendi: Python sta ancora eseguendo il codice', ''); return; }
+    pyBusy = true;
+    try{ return await fn.apply(this, args); }
+    finally{ pyBusy = false; }
+  };
+}
+runCode = oneAtATime(runCode);
+checkCode = oneAtATime(checkCode);
+debugCode = oneAtATime(debugCode);
 document.getElementById('btn-run').onclick = runCode;
 document.getElementById('btn-check').onclick = checkCode;
 document.getElementById('btn-debug').onclick = debugCode;
