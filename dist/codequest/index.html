@@ -541,6 +541,98 @@
 
   button:disabled{opacity:.5; cursor:not-allowed; transform:none !important;}
 
+  /* ============ MINI-LEZIONE: schermata secondaria con la spiegazione veloce dell'esercizio ============ */
+  .btn-learn{background:#ecfaf8; border-color:#a7e3dc; color:#115e59; font-weight:600;}
+  .btn-learn:hover{background:#d5f3ef; border-color:var(--accent);}
+  .mini-back{
+    position:fixed; inset:0; z-index:380; padding:20px;
+    background:rgba(11,37,48,.45); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mini-back[hidden]{display:none;}
+  .mini{
+    width:min(700px, 100%); height:min(640px, 100%);
+    background:var(--bg-1); border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 30px 80px rgba(11,37,48,.25);
+    display:flex; flex-direction:column; overflow:hidden;
+    animation:miniIn .28s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes miniIn{ from{transform:translateY(14px) scale(.98); opacity:0;} to{transform:none; opacity:1;} }
+  .mini-head{display:flex; align-items:flex-start; gap:12px; padding:18px 22px 12px;}
+  .mini-head-text{flex:1; min-width:0;}
+  .mini-kicker{
+    font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:1px;
+    text-transform:uppercase; color:var(--accent); margin-bottom:5px;
+  }
+  .mini-kicker::before{content:"// "; color:var(--muted);}
+  .mini-title-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .mini-head h2{font-size:20px; letter-spacing:-.02em; line-height:1.25;}
+  .mini-steps{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; padding:0 22px;}
+  .mini-step{
+    display:flex; align-items:center; justify-content:center; gap:6px; min-width:0;
+    padding:8px 6px; border-radius:9px; cursor:pointer; white-space:nowrap;
+    border:1px solid var(--line); background:#f3faf9; color:var(--muted);
+    font-size:12.5px; font-weight:600; transition:all .15s;
+  }
+  .mini-step:hover{border-color:#bcd6d3; color:var(--text);}
+  .mini-step.seen{background:#ecfaf8; border-color:#a7e3dc; color:#115e59;}
+  .mini-step.on{background:var(--accent); border-color:transparent; color:#fff; box-shadow:0 4px 12px rgba(15,118,110,.2);}
+  .mini-step .ico{font-size:14px;}
+  .mini-progress{height:4px; margin:10px 22px 0; background:#d6e8e6; border-radius:3px; overflow:hidden;}
+  .mini-progress div{
+    height:100%; width:25%; border-radius:3px;
+    background:linear-gradient(90deg, var(--accent-3), var(--accent));
+    transition:width .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .mini-body{flex:1; min-height:0; overflow-y:auto; margin-top:12px; padding:18px 22px 20px; border-top:1px solid var(--line);}
+  .mini-slide{animation:miniSlide .25s ease;}
+  .mini-slide.back{animation-name:miniSlideBack;}
+  @keyframes miniSlide{ from{opacity:0; transform:translateX(14px);} to{opacity:1; transform:none;} }
+  @keyframes miniSlideBack{ from{opacity:0; transform:translateX(-14px);} to{opacity:1; transform:none;} }
+  .mini-body h3{font-size:15px; color:var(--accent); margin:0 0 10px;}
+  .mini-body p{font-size:14.5px; line-height:1.7; color:#2b4752; margin-bottom:10px;}
+  .mini-body p:last-child{margin-bottom:0;}
+  .mini-body code{
+    background:#eaf5f3; padding:1px 6px; border-radius:5px; border:1px solid var(--line);
+    font-family:var(--mono); font-size:12.5px; color:#be185d;
+  }
+  .mini-body code, .mini-code pre{font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0;}
+  .mini-goal{background:#ecfaf8; border:1px solid #a7e3dc; border-left:3px solid var(--accent); border-radius:10px; padding:14px 16px; margin-bottom:12px;}
+  .mini-idea{background:#fffbeb; border:1px solid #fde68a; border-left:3px solid #f59e0b; border-radius:10px; padding:14px 16px; margin-bottom:12px;}
+  .mini-idea p{color:#5b3a06;}
+  .mini-next-hint{font-size:12.5px !important; color:var(--muted) !important;}
+  .mini-code{border:1px solid var(--code-line); border-radius:9px; overflow:hidden; margin:2px 0 12px;}
+  .mini-code-head{
+    display:flex; justify-content:space-between; gap:10px; padding:6px 12px;
+    background:var(--code-bg-2); border-bottom:1px solid var(--code-line);
+    color:#94a3b8; font-family:var(--mono); font-size:11px;
+  }
+  .mini-code pre{
+    margin:0; padding:12px 14px; overflow-x:auto;
+    background:var(--code-bg); color:var(--code-text);
+    font-family:var(--mono); font-size:13px; line-height:1.6;
+  }
+  .mini-code pre.out{background:var(--code-bg-2); color:#34d399; border-top:0;}
+  .mini-code .mini-code-head.out-head{border-top:1px solid var(--code-line);}
+  .mini-list{list-style:none; margin:0 0 14px; padding:0; counter-reset:passo;}
+  .mini-list li{
+    counter-increment:passo; display:flex; gap:10px; align-items:flex-start;
+    margin:9px 0; font-size:14.5px; line-height:1.6; color:#2b4752;
+  }
+  .mini-list li::before{
+    content:counter(passo); flex:0 0 22px; height:22px; margin-top:1px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent); color:#fff; font-family:var(--mono); font-size:11.5px; font-weight:700;
+  }
+  .mini-traps{background:#fef2f2; border:1px solid #fecaca; border-left:3px solid var(--bad); border-radius:10px; padding:12px 16px;}
+  .mini-traps h4{font-size:13px; color:#b91c1c; margin-bottom:6px;}
+  .mini-traps ul{margin:0 0 0 18px; color:#7f1d1d; font-size:13.5px;}
+  .mini-traps li{margin:4px 0; line-height:1.55;}
+  .mini-foot{display:flex; align-items:center; gap:10px; padding:12px 22px; border-top:1px solid var(--line); background:#f3faf9;}
+  .mini-count{flex:1; text-align:center; font-family:var(--mono); font-size:12px; color:var(--muted);}
+  .mini-foot .btn{padding:8px 14px;}
+  @media (prefers-reduced-motion: reduce){ .mini, .mini-slide{animation:none !important;} }
+
   @media (max-width: 1100px){ .app{grid-template-columns: 220px 1fr;} }
   /* Telefono e tablet verticale: lezioni in un menu a scomparsa (☰), "Lezione" e "Codice"
      in due schede a tutto schermo, barra in alto su due righe. */
@@ -612,7 +704,7 @@
     .xp-wrap{padding:4px 10px;}
 
     .editor-toolbar{flex-wrap:wrap; gap:5px; padding:6px 8px;}
-    .editor-toolbar .btn{flex:1 1 28%; min-width:0; justify-content:center; padding:7px 4px; font-size:12.5px; white-space:nowrap;}
+    .editor-toolbar .btn{flex:1 1 22%; min-width:0; justify-content:center; padding:7px 4px; font-size:12.5px; white-space:nowrap;}
     .editor-toolbar #btn-run, .editor-toolbar #btn-check{flex-basis:45%; padding:9px 6px; font-size:14px;}
     .pylabel{flex:1 1 100%; margin:0; justify-content:center; font-size:10.5px; line-height:1.2;}
     .CodeMirror{font-size:14px;}
@@ -636,6 +728,23 @@
     .welcome h1{font-size:44px;}
     .welcome p{font-size:15px;}
     .welcome input{width:100%; max-width:320px;}
+
+    /* Mini-lezione a tutto schermo, come le schede Lezione / Codice */
+    .mini-back{padding:0;}
+    .mini{width:100%; height:100%; border:0; border-radius:0; animation-name:miniUp;}
+    @keyframes miniUp{ from{transform:translateY(24px); opacity:0;} to{transform:none; opacity:1;} }
+    .mini-head{padding:12px 12px 10px 16px; align-items:center;}
+    .mini-head h2{font-size:18px;}
+    .mini-steps{padding:0 12px; gap:5px;}
+    .mini-step{flex-direction:column; gap:1px; padding:6px 2px; font-size:11.5px;}
+    .mini-step .ico{font-size:17px;}
+    .mini-progress{margin:8px 12px 0;}
+    .mini-body{margin-top:10px; padding:16px 16px 22px;}
+    .mini-body p, .mini-list li{font-size:15px;}
+    .mini-traps ul{font-size:14px;}
+    .mini-code pre{font-size:12.5px; padding:10px 12px;}
+    .mini-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom, 0px));}
+    .mini-foot .btn{padding:10px 14px; font-size:14px;}
   }
   /* Telefono in orizzontale (schermo basso): barre su una riga sola, così l'editor resta alto */
   @media (max-height: 500px){
@@ -654,6 +763,17 @@
     .welcome{justify-content:flex-start; overflow-y:auto;}
     .welcome .py-icon{font-size:40px;}
     .welcome h1{font-size:34px;}
+    /* Mini-lezione con lo schermo basso: intestazione e schede su una riga, resta spazio per il testo */
+    .mini-head{padding:6px 10px 6px 14px;}
+    .mini-kicker{display:none;}
+    .mini-head h2{font-size:15px;}
+    .mini-head .icon-btn{width:32px; height:32px;}
+    .mini-step{flex-direction:row; gap:5px; padding:5px 4px;}
+    .mini-step .ico{font-size:14px;}
+    .mini-progress{margin-top:6px;}
+    .mini-body{margin-top:6px; padding:10px 16px 14px;}
+    .mini-foot{padding:5px 12px;}
+    .mini-foot .btn{padding:6px 14px; font-size:13px;}
   }
 </style>
 
@@ -718,6 +838,7 @@
           <li>Apri una <b>traccia</b> dalla sidebar<span class="mobile-inline"> (sul telefono: pulsante ☰ in alto)</span> e seleziona la prima lezione.</li>
           <li>Ogni lezione ha <b>teoria</b>, un <b>esercizio</b> e <b>test automatici</b> per validarlo.</li>
           <li>Premi <b>▶ Esegui</b> per lanciare il codice, <b>✅ Verifica</b> per testarlo, <b>🐞 Debug</b> per analizzarlo.</li>
+          <li>Se un esercizio non ti è chiaro, premi <b>🎓 Mini-lezione</b> (o <b>🎓 Spiega</b> sopra l'editor): una spiegazione veloce in 4 schede, con un esempio simile.</li>
           <li>Guadagni <b>XP</b>, sali di <b>livello</b>, ottieni <b>badge</b> e mantieni la tua <b>streak</b> quotidiana.</li>
           <li>Le lezioni si sbloccano in sequenza. Quelle con <span style="color:var(--gold)">⭐</span> sono completate al primo tentativo.</li>
         </ul>
@@ -733,6 +854,7 @@
           <button class="btn btn-primary" id="btn-run">▶ Esegui</button>
           <button class="btn btn-good" id="btn-check">✅ Verifica</button>
           <button class="btn btn-ghost" id="btn-debug" title="Analizza il codice e mostra variabili">🐞 Debug</button>
+          <button class="btn btn-ghost" id="btn-mini" title="Mini-lezione: spiegazione veloce dell'esercizio">🎓 Spiega</button>
           <button class="btn btn-ghost" id="btn-reset" title="Ripristina il codice di partenza">↺ Reset</button>
           <button class="btn btn-ghost" id="btn-ripasso" title="Riapri una lezione completata per ripassare">🔄 Ripasso</button>
           <div class="pylabel"><span class="py-status" id="py-status"></span><span id="py-text">Python in caricamento…</span></div>
@@ -779,7 +901,28 @@
   <div class="modal" id="modal-content"></div>
 </div>
 
+<div class="mini-back" id="mini-back" hidden>
+  <section class="mini" id="mini" role="dialog" aria-modal="true" aria-labelledby="mini-title">
+    <header class="mini-head">
+      <div class="mini-head-text">
+        <div class="mini-kicker">Mini-lezione</div>
+        <div class="mini-title-row"><h2 id="mini-title">Mini-lezione</h2><span class="diff-pill diff-1" id="mini-diff">FACILE</span></div>
+      </div>
+      <button type="button" class="icon-btn" id="mini-close" title="Chiudi (Esc)" aria-label="Chiudi la mini-lezione">✕</button>
+    </header>
+    <nav class="mini-steps" id="mini-steps" aria-label="Parti della mini-lezione"></nav>
+    <div class="mini-progress"><div id="mini-fill"></div></div>
+    <div class="mini-body" id="mini-body"></div>
+    <footer class="mini-foot">
+      <button type="button" class="btn" id="mini-prev">◀ Indietro</button>
+      <span class="mini-count" id="mini-count">1 / 4</span>
+      <button type="button" class="btn btn-primary" id="mini-next">Avanti ▶</button>
+    </footer>
+  </section>
+</div>
+
 <canvas class="confetti" id="confetti"></canvas>
+<script src="mini-lezioni.js?v=1"></script>
 
 <script>
 /* ====================================================================
@@ -2768,6 +2911,7 @@ function loadLesson(id){
     ${l.theory}
     ${doneBefore ? `<div class="hint" style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46;">✅ Hai già completato questa lezione. Ripassala quanto vuoi: guadagni un piccolo bonus XP una volta al giorno.</div>` : ''}
     <div class="lesson-help">
+      ${MINI[l.id] ? `<button class="btn btn-learn" id="btn-open-mini">🎓 Mini-lezione</button>` : ''}
       <button class="btn btn-warn" id="btn-toggle-hint">💡 Mostra suggerimento</button>
       <button class="btn btn-ghost" id="btn-toggle-solution">🔓 Mostra soluzione</button>
     </div>
@@ -2800,6 +2944,8 @@ function loadLesson(id){
   };
   const btnUse = document.getElementById('btn-use-solution');
   if(btnUse) btnUse.onclick = useSolution;
+  const btnMini = document.getElementById('btn-open-mini');
+  if(btnMini) btnMini.onclick = openMini;
 
   const saved = S.progress[l.id]?.bestCode;
   // FIX: guardia se l'editor non e' ancora inizializzato
@@ -2829,6 +2975,125 @@ function showView(view){
 document.getElementById('btn-lessons').onclick = () => showLessons(true);
 document.getElementById('drawer-back').onclick = () => showLessons(false);
 document.querySelectorAll('#view-tabs button').forEach(b=>{ b.onclick = () => showView(b.dataset.view); });
+
+/* ============ MINI-LEZIONE ============
+   Schermata secondaria con una spiegazione veloce dell'esercizio corrente, in 4 schede.
+   I contenuti stanno in mini-lezioni.js (MINI_LESSONS, per id di lezione):
+   goal, idea, example {code, out, note}, steps [...], traps [...]. */
+// window.MINI_LESSONS arriva da mini-lezioni.js; se non si carica, il bottone avvisa e basta
+const MINI = window.MINI_LESSONS || {};
+const MINI_STEPS = [
+  {ico:'🎯', label:'Obiettivo'},
+  {ico:'🧠', label:'Concetto'},
+  {ico:'🔍', label:'Esempio'},
+  {ico:'🪜', label:'Come fare'}
+];
+let miniData = null, miniStep = 0, miniSeen = new Set();
+
+function openMini(){
+  const m = currentLesson && MINI[currentLesson.id];
+  if(!m){ toast('Apri una lezione per vedere la sua mini-lezione', ''); return; }
+  miniData = m;
+  miniSeen = new Set();
+  document.getElementById('mini-title').textContent = currentLesson.title;
+  const diffEl = document.getElementById('mini-diff');
+  diffEl.textContent = ['','FACILE','BASE','MEDIO','DIFFICILE','ESPERTO'][currentLesson.diff] || 'FACILE';
+  diffEl.className = 'diff-pill diff-' + currentLesson.diff;
+  document.getElementById('mini-steps').innerHTML = MINI_STEPS.map((s, i) =>
+    `<button type="button" class="mini-step" data-step="${i}"><span class="ico">${s.ico}</span><span>${s.label}</span></button>`).join('');
+  document.querySelectorAll('#mini-steps .mini-step').forEach(b => { b.onclick = () => showMiniStep(+b.dataset.step); });
+  document.getElementById('mini-back').hidden = false;
+  showMiniStep(0);
+  Sfx.toggle();
+  setTimeout(()=>{ try{ document.getElementById('mini-next').focus(); }catch(_){} }, 50);
+}
+
+function closeMini(){
+  const back = document.getElementById('mini-back');
+  if(back.hidden) return false;
+  back.hidden = true;
+  return true;
+}
+
+function miniSlideHtml(m, i){
+  if(i === 0) return `
+    <h3>🎯 Cosa ti chiede l'esercizio</h3>
+    <div class="mini-goal"><p>${m.goal}</p></div>
+    <p class="mini-next-hint">Nelle prossime schede: il concetto in breve, un esempio simile e i passi da seguire.</p>`;
+  if(i === 1) return `
+    <h3>🧠 Il concetto in breve</h3>
+    <div class="mini-idea"><p>${m.idea}</p></div>`;
+  if(i === 2){
+    const ex = m.example;
+    return `
+    <h3>🔍 Un esempio simile</h3>
+    <div class="mini-code">
+      <div class="mini-code-head"><span>esempio.py</span><span>non è la soluzione 😉</span></div>
+      <pre>${htmlEscape(ex.code)}</pre>
+      <div class="mini-code-head out-head"><span>📤 Output</span></div>
+      <pre class="out">${ex.out ? htmlEscape(ex.out) : '(nessun output)'}</pre>
+    </div>
+    ${ex.note ? `<p>${ex.note}</p>` : ''}`;
+  }
+  return `
+    <h3>🪜 Come procedere</h3>
+    <ol class="mini-list">${m.steps.map(s => `<li><span>${s}</span></li>`).join('')}</ol>
+    ${m.traps && m.traps.length ? `<div class="mini-traps"><h4>⚠️ Errori da evitare</h4><ul>${m.traps.map(t => `<li>${t}</li>`).join('')}</ul></div>` : ''}`;
+}
+
+function showMiniStep(i){
+  if(!miniData) return;
+  const last = MINI_STEPS.length - 1;
+  i = Math.max(0, Math.min(last, i));
+  const back = i < miniStep;
+  miniStep = i;
+  miniSeen.add(i);
+  const body = document.getElementById('mini-body');
+  body.innerHTML = `<div class="mini-slide${back ? ' back' : ''}">${miniSlideHtml(miniData, i)}</div>`;
+  body.scrollTop = 0;
+  document.querySelectorAll('#mini-steps .mini-step').forEach(b => {
+    const n = +b.dataset.step;
+    b.classList.toggle('on', n === i);
+    b.classList.toggle('seen', miniSeen.has(n) && n !== i);
+    b.setAttribute('aria-current', n === i ? 'step' : 'false');
+  });
+  document.getElementById('mini-fill').style.width = `${(i + 1) / MINI_STEPS.length * 100}%`;
+  document.getElementById('mini-count').textContent = `${i + 1} / ${MINI_STEPS.length}`;
+  document.getElementById('mini-prev').disabled = i === 0;
+  document.getElementById('mini-next').textContent = i === last ? '💻 Vai al codice' : 'Avanti ▶';
+}
+
+function miniNext(){
+  if(miniStep < MINI_STEPS.length - 1){ showMiniStep(miniStep + 1); return; }
+  closeMini();
+  showView('code');
+  if(editor) setTimeout(()=>editor.focus(), 60);
+}
+
+document.getElementById('btn-mini').onclick = openMini;
+document.getElementById('mini-close').onclick = closeMini;
+document.getElementById('mini-prev').onclick = () => showMiniStep(miniStep - 1);
+document.getElementById('mini-next').onclick = miniNext;
+document.getElementById('mini-back').onclick = e => { if(e.target.id === 'mini-back') closeMini(); };
+document.addEventListener('keydown', e => {
+  if(document.getElementById('mini-back').hidden) return;
+  if(e.key === 'ArrowRight'){ e.preventDefault(); showMiniStep(miniStep + 1); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); showMiniStep(miniStep - 1); }
+});
+// Sul telefono si cambia scheda anche scorrendo il dito a destra o a sinistra
+(function(){
+  const body = document.getElementById('mini-body');
+  let x0 = null, y0 = 0;
+  body.addEventListener('touchstart', e => { if(e.touches.length === 1){ x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; } }, {passive:true});
+  body.addEventListener('touchend', e => {
+    if(x0 === null) return;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null;
+    // non quando si scorre il codice dell'esempio in orizzontale
+    if(e.target.closest && e.target.closest('pre')) return;
+    if(Math.abs(dx) > 60 && Math.abs(dy) < 45) showMiniStep(miniStep + (dx < 0 ? 1 : -1));
+  }, {passive:true});
+})();
 
 /* ============ AZIONI ============ */
 async function runCode(){
@@ -3717,7 +3982,7 @@ if(S.lastActive){
 // FIX: autofocus sul campo nome (un click in meno per partire)
 setTimeout(()=>{ try{ document.getElementById('welcome-name').focus(); }catch(_){} }, 100);
 
-document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape'){ if(!closeMini()) closeModal(); } });
 </script>
 </body>
 </html>
