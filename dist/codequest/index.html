@@ -793,7 +793,7 @@
   <h1>CodeQuest</h1>
   <div class="subtitle">PYTHON EDITION</div>
   <p>Da zero a programmatore professionista in Python.<br>
-     50 lezioni con Python <b>vero</b> nel browser, gamification e progressi salvati.</p>
+     75 lezioni con Python <b>vero</b> nel browser, gamification e progressi salvati.</p>
   <input id="welcome-name" type="text" placeholder="Come ti chiami?" maxlength="20">
   <button class="start-btn" id="welcome-start">Inizia l'avventura 🚀</button>
   <p class="tiny" style="margin-top:24px;">I tuoi progressi vengono salvati automaticamente.</p>
@@ -922,7 +922,7 @@
 </div>
 
 <canvas class="confetti" id="confetti"></canvas>
-<script src="mini-lezioni.js?v=1"></script>
+<script src="mini-lezioni.js?v=2"></script>
 
 <script>
 /* ====================================================================
@@ -1160,6 +1160,57 @@ else:
     print("caldo")`
     },
     {
+      id:'fond-11', track:'fond', title:'Operatore ternario, None e pass', diff:2, xp:40,
+      theory:`<h2>❓ Operatore ternario, None e pass</h2>
+<p>L'<b>operatore ternario</b> sceglie tra due valori in una riga sola: <code>valore_se_vero if condizione else valore_se_falso</code>.</p>
+<pre><code>eta = 20
+tipo = "adulto" if eta &gt;= 18 else "minore"
+print(tipo)   # adulto</code></pre>
+<p><code>None</code> vuol dire «nessun valore»: si usa per una variabile che per ora è vuota. Per controllarlo si usa <code>is</code>, non <code>==</code>: <code>x is None</code>.</p>
+<p><code>pass</code> non fa niente: serve dove Python vuole per forza almeno una riga (dentro un if, un ciclo, una funzione) ma tu non hai ancora niente da scrivere.</p>
+<pre><code>regalo = None          # per ora nessun regalo
+if regalo is None:
+    pass               # da completare più avanti
+print(regalo is None)  # True</code></pre>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Dato <code>voto = 7</code>:</p>
+<ul><li>crea <code>esito</code> con l'operatore ternario: <code>"promosso"</code> se voto &gt;= 6, altrimenti <code>"bocciato"</code>;</li>
+<li>crea <code>lode = None</code> e, solo se voto == 10, assegna <code>lode = "con lode"</code>;</li>
+<li>stampa <code>esito</code> e poi <code>lode is None</code>.</li></ul>
+<p>Output atteso:</p><pre><code>promosso
+True</code></pre>
+</div>`,
+      starter:`voto = 7
+# esito con l'operatore ternario
+
+# lode: None, oppure "con lode" se voto == 10
+
+print(esito)
+print(lode is None)
+`,
+      tests:[OUT('promosso\nTrue'),
+        USA('Usa l\'operatore ternario', i=>i.nodes.includes('IfExp'), 'Scrivi esito in una riga sola: esito = "promosso" if voto >= 6 else "bocciato".'),
+        USA('Crea la variabile lode', i=>i.assigned.includes('lode'), 'Crea lode = None e sotto un if voto == 10: che assegna lode = "con lode".'),
+        VARIANTE(/voto\s*=\s*7\b/, 'voto = 10', 'promosso\nFalse'),
+        VARIANTE(/voto\s*=\s*7\b/, 'voto = 4', 'bocciato\nTrue'),
+        VARIANTE(/voto\s*=\s*7\b/, 'voto = 6', 'promosso\nTrue')],
+      hint:`esito = "promosso" if voto >= 6 else "bocciato" — poi lode = None e if voto == 10: lode = "con lode"`,
+      solution:`voto = 7
+
+# operatore ternario: un valore se la
+# condizione è vera, l'altro se no
+esito = "promosso" if voto >= 6 else "bocciato"
+
+# None = "nessun valore", per ora
+lode = None
+if voto == 10:
+    lode = "con lode"
+
+print(esito)
+# None si controlla con is
+print(lode is None)`
+    },
+    {
       id:'fond-7', track:'fond', title:'Cicli for e range', diff:2, xp:50,
       theory:`<h2>🔁 Ripetere con for</h2>
         <p><code>range(n)</code> genera 0, 1, 2, ..., n-1. <code>range(a,b)</code> genera a, a+1, ..., b-1.</p>
@@ -1216,6 +1267,61 @@ while n >= 1:
     count += 1
 
 print(count)`
+    },
+    {
+      id:'fond-12', track:'fond', title:'break e continue', diff:2, xp:45,
+      theory:`<h2>⏭️ break e continue</h2>
+<p>Dentro un ciclo (<code>for</code> o <code>while</code>):</p>
+<ul><li><code>break</code> <b>esce subito</b> dal ciclo;</li>
+<li><code>continue</code> <b>salta il resto del giro</b> e passa al successivo.</li></ul>
+<pre><code>for n in [3, 0, 5, -1, 8]:
+    if n == 0:
+        continue      # salta lo zero
+    if n &lt; 0:
+        break         # esce dal ciclo
+    print(n)
+# stampa 3 e 5: l'8 non arriva mai</code></pre>
+<p>Un ciclo può avere anche un <code>else</code>: viene eseguito solo se il ciclo arriva in fondo <b>senza</b> incontrare un break. È comodo nelle ricerche:</p>
+<pre><code>for n in [2, 4, 6]:
+    if n % 2 == 1:
+        print("trovato un dispari")
+        break
+else:
+    print("nessun dispari")</code></pre>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Data <code>numeri = [4, -2, 9, 15, -7, 21, 8]</code>, somma i numeri così:</p>
+<ul><li>salta i negativi con <code>continue</code>;</li>
+<li>fermati con <code>break</code> al primo numero maggiore di 20 (senza sommarlo).</li></ul>
+<p>Stampa la somma. Output atteso: <code>28</code></p>
+</div>`,
+      starter:`numeri = [4, -2, 9, 15, -7, 21, 8]
+somma = 0
+for n in numeri:
+    # continue per i negativi
+    # break sopra il 20
+    somma += n
+print(somma)
+`,
+      tests:[OUT('28'),
+        USA('Usa break e continue', i=>i.nodes.includes('Break') && i.nodes.includes('Continue'), 'Dentro il ciclo, prima di somma += n: if n < 0: continue e if n > 20: break.'),
+        USA('Niente risultato scritto a mano', i=>senzaNumeri(i, 28), 'Il 28 deve venire dal ciclo, non essere scritto nel codice.'),
+        VARIANTE(/numeri\s*=\s*\[[^\]]*\]/, 'numeri = [1, -1, 2, 30, 5]', '3'),
+        VARIANTE(/numeri\s*=\s*\[[^\]]*\]/, 'numeri = [5, -5, 6]', '11'),
+        VARIANTE(/numeri\s*=\s*\[[^\]]*\]/, 'numeri = [4, -2, 20, 21, 8]', '24')],
+      hint:`if n < 0: continue — if n > 20: break (tutti e due prima di somma += n)`,
+      solution:`numeri = [4, -2, 9, 15, -7, 21, 8]
+somma = 0
+for n in numeri:
+    # negativo: salta al numero dopo
+    if n < 0:
+        continue
+    # oltre 20: il ciclo finisce qui
+    if n > 20:
+        break
+    somma += n
+
+# 4 + 9 + 15 = 28
+print(somma)`
     },
     {
       id:'fond-9', track:'fond', title:'Liste base', diff:2, xp:50,
@@ -1348,6 +1454,100 @@ coppia = (b, a)
 print(coppia)`
     },
     {
+      id:'dati-11', track:'dati', title:'Riferimenti e copie', diff:3, xp:55,
+      theory:`<h2>🔗 Riferimenti e copie</h2>
+<p>Una variabile non «contiene» una lista: è un'<b>etichetta</b> attaccata alla lista. Con <code>b = a</code> non nasce una seconda lista: la stessa lista ha due nomi.</p>
+<pre><code>a = [1, 2]
+b = a          # stesso oggetto, due nomi
+b.append(3)
+print(a)       # [1, 2, 3]: è cambiata anche a!</code></pre>
+<p>Liste, dizionari e set sono <b>mutabili</b> (si possono modificare). Numeri, stringhe e tuple sono <b>immutabili</b>: ogni «modifica» crea un valore nuovo, quindi il problema non si pone.</p>
+<p>Per una vera copia: <code>a.copy()</code>, <code>list(a)</code> oppure <code>a[:]</code>. Se la lista contiene altre liste serve <code>copy.deepcopy(a)</code> (modulo <code>copy</code>), che copia anche quelle interne.</p>
+<p><code>==</code> chiede «hanno lo stesso valore?», <code>is</code> chiede «sono lo stesso oggetto?».</p>
+<pre><code>a = [1, 2, 3]
+c = a.copy()
+print(c == a)  # True: stessi elementi
+print(c is a)  # False: due liste diverse</code></pre>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Nel codice ci sono <code>spesa = ["pane", "latte"]</code> e <code>stessa = spesa</code>. Crea <code>copia</code> come <b>vera copia</b> di spesa: così <code>"uova"</code> finisce solo in copia. Poi il codice stampa spesa, copia, <code>stessa is spesa</code> e <code>copia is spesa</code>.</p>
+<p>Output atteso:</p><pre><code>['pane', 'latte']
+['pane', 'latte', 'uova']
+True
+False</code></pre>
+</div>`,
+      starter:`spesa = ["pane", "latte"]
+stessa = spesa
+# crea copia: una vera copia di spesa
+
+copia.append("uova")
+print(spesa)
+print(copia)
+print(stessa is spesa)
+print(copia is spesa)
+`,
+      tests:[OUT("['pane', 'latte']\n['pane', 'latte', 'uova']\nTrue\nFalse"),
+        USA('Crea una vera copia', i=>i.calls.copy || i.calls.list || i.calls.deepcopy || i.nodes.includes('Slice') || i.nodes.includes('ListComp') || i.nodes.includes('Starred'), 'Crea la copia con copia = spesa.copy() (oppure list(spesa) o spesa[:]): con copia = spesa avresti solo un secondo nome per la stessa lista.'),
+        PROVA('copia.append("sale")\nprint(len(spesa), len(copia))', '2 4'),
+        VARIANTE(/spesa\s*=\s*\[[^\]]*\]/, 'spesa = ["riso"]', "['riso']\n['riso', 'uova']\nTrue\nFalse")],
+      hint:`copia = spesa.copy()`,
+      solution:`spesa = ["pane", "latte"]
+# stessa lista, secondo nome
+stessa = spesa
+
+# copy() crea una lista nuova con gli
+# stessi elementi
+copia = spesa.copy()
+
+# cambia solo la copia
+copia.append("uova")
+print(spesa)
+print(copia)
+# is: stesso oggetto?
+print(stessa is spesa)
+print(copia is spesa)`
+    },
+    {
+      id:'dati-12', track:'dati', title:'Unpacking con l\'asterisco', diff:2, xp:50,
+      theory:`<h2>✳️ Unpacking con l'asterisco</h2>
+<p>Hai già visto <code>a, b = (1, 2)</code>. Con un <code>*</code> davanti a un nome, quel nome raccoglie <b>tutto quello che avanza</b>, in una lista:</p>
+<pre><code>primo, *resto = [10, 20, 30, 40]
+print(primo)   # 10
+print(resto)   # [20, 30, 40]
+
+*inizio, ultima = "ciao"
+print(inizio, ultima)   # ['c', 'i', 'a'] o</code></pre>
+<p>L'asterisco funziona anche al contrario: «spacchetta» una lista negli argomenti di una funzione.</p>
+<pre><code>nums = [3, 1, 2]
+print(*nums)            # come print(3, 1, 2): 3 1 2
+print(*nums, sep="-")   # 3-1-2</code></pre>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Data <code>classifica = ["Lara", "Anna", "Marco", "Tom", "Ugo"]</code>, con <b>una sola assegnazione</b> <code>primo, *centro, ultimo = classifica</code> separa il primo, l'ultimo e quelli in mezzo. Stampa <code>primo</code> e <code>ultimo</code> sulla stessa riga, poi quelli in mezzo con <code>print(*centro, sep=", ")</code>.</p>
+<p>Output atteso:</p><pre><code>Lara Ugo
+Anna, Marco, Tom</code></pre>
+</div>`,
+      starter:`classifica = ["Lara", "Anna", "Marco", "Tom", "Ugo"]
+# primo, *centro, ultimo = ...
+
+print(primo, ultimo)
+# stampa centro con print(*...)
+`,
+      tests:[OUT('Lara Ugo\nAnna, Marco, Tom'),
+        USA('Assegnazione con l\'asterisco', i=>i.nodes.includes('StarAssign'), 'Scrivi primo, *centro, ultimo = classifica: l\'asterisco raccoglie in una lista tutto quello che sta in mezzo.'),
+        USA('Niente indici scritti a mano', i=>!i.nodes.includes('Subscript'), 'Qui non servono classifica[0] o classifica[1:-1]: lascia fare all\'unpacking.'),
+        VARIANTE(/classifica\s*=\s*\[[^\]]*\]/, 'classifica = ["A", "B", "C"]', 'A C\nB')],
+      hint:`primo, *centro, ultimo = classifica — poi print(*centro, sep=", ")`,
+      solution:`classifica = ["Lara", "Anna", "Marco", "Tom", "Ugo"]
+
+# *centro prende tutto quello che sta
+# tra il primo e l'ultimo
+primo, *centro, ultimo = classifica
+
+print(primo, ultimo)
+# *centro spacchetta la lista:
+# print("Anna", "Marco", "Tom", ...)
+print(*centro, sep=", ")`
+    },
+    {
       id:'dati-3', track:'dati', title:'Set: insiemi', diff:3, xp:55,
       theory:`<h2>🎲 Set</h2>
         <p>I set contengono elementi <b>unici</b> non ordinati. Utili per de-duplicare e operazioni insiemistiche.</p>
@@ -1450,6 +1650,61 @@ print(cubi)`
 # parola, il valore è la sua lunghezza
 lunghezze = {p: len(p) for p in parole}
 print(lunghezze)`
+    },
+    {
+      id:'dati-13', track:'dati', title:'any, all e generator expression', diff:3, xp:60,
+      theory:`<h2>✅ any, all e generator expression</h2>
+<p>Una <b>generator expression</b> è come una list comprehension ma con le parentesi <b>tonde</b>: produce i valori uno alla volta, senza costruire la lista in memoria. Dentro una funzione basta una coppia di parentesi:</p>
+<pre><code>nums = [1, 2, 3, 4]
+print(sum(x * x for x in nums))   # 30</code></pre>
+<ul><li><code>any(...)</code> è True se <b>almeno un</b> valore è vero;</li>
+<li><code>all(...)</code> è True se <b>tutti</b> i valori sono veri;</li>
+<li><code>round(x, n)</code> arrotonda a n decimali.</li></ul>
+<pre><code>temperature = [18, 22, 25, 19]
+print(any(t &gt; 24 for t in temperature))   # True
+print(all(t &gt; 15 for t in temperature))   # True
+print(sum(1 for t in temperature if t &gt; 20))  # 2: le conta
+print(round(21.456, 1))                   # 21.5</code></pre>
+<p>Curiosità: <code>round(2.5)</code> dà 2 e <code>round(3.5)</code> dà 4: a metà strada Python arrotonda verso il numero pari.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Data <code>voti = [7, 8, 6, 9, 10, 6]</code> stampa, su quattro righe:</p>
+<ol><li>se <b>tutti</b> i voti sono almeno 6 (<code>all</code>);</li>
+<li>se c'è <b>almeno un</b> 10 (<code>any</code>);</li>
+<li>la media arrotondata a 1 decimale (<code>round</code>);</li>
+<li>quanti voti sono &gt;= 8, con <code>sum(1 for ...)</code>.</li></ol>
+<p>Output atteso:</p><pre><code>True
+True
+7.7
+3</code></pre>
+</div>`,
+      starter:`voti = [7, 8, 6, 9, 10, 6]
+# 1) tutti almeno 6? (all)
+
+# 2) almeno un 10? (any)
+
+# 3) media con 1 decimale (round)
+
+# 4) quanti voti >= 8? (sum)
+`,
+      tests:[OUT('True\nTrue\n7.7\n3'),
+        USA('Usa any, all e round', i=>i.calls.any && i.calls.all && i.calls.round, 'Servono all(...) per il punto 1, any(...) per il 2 e round(media, 1) per il 3.'),
+        USA('Conta con una generator expression', i=>(i.genCalls || []).includes('sum') || (i.nodes.includes('GeneratorExp') && i.calls.sum && !i.nodes.includes('ListComp')), 'Conta i voti alti con sum(1 for v in voti if v >= 8): parentesi tonde, nessuna lista.'),
+        VARIANTE(/voti\s*=\s*\[[^\]]*\]/, 'voti = [5, 9, 8]', 'False\nFalse\n7.3\n2')],
+      hint:`all(v >= 6 for v in voti) · any(v == 10 for v in voti) · round(sum(voti) / len(voti), 1) · sum(1 for v in voti if v >= 8)`,
+      solution:`voti = [7, 8, 6, 9, 10, 6]
+
+# all: vero se TUTTI sono veri
+print(all(v >= 6 for v in voti))
+# any: vero se ALMENO UNO è vero
+print(any(v == 10 for v in voti))
+
+media = sum(voti) / len(voti)
+# 7.666... arrotondato a 1 decimale
+print(round(media, 1))
+
+# un 1 per ogni voto alto: la somma li
+# conta
+print(sum(1 for v in voti if v >= 8))`
     },
     {
       id:'dati-7', track:'dati', title:'Stringhe avanzate', diff:3, xp:60,
@@ -1557,6 +1812,71 @@ conteggi = Counter(frase.split())
 parola, volte = conteggi.most_common(1)[0]
 print(parola)`
     },
+    {
+      id:'dati-14', track:'dati', title:'defaultdict e namedtuple', diff:4, xp:80,
+      theory:`<h2>🧺 defaultdict, namedtuple e deque</h2>
+<p>Il modulo <code>collections</code> ha altre strutture utili oltre a Counter.</p>
+<p><b>namedtuple</b>: una tupla con i nomi dei campi. Si legge <code>p.x</code> invece di <code>p[0]</code> e resta una tupla (immutabile, si può spacchettare).</p>
+<pre><code>from collections import namedtuple
+Punto = namedtuple("Punto", ["x", "y"])
+p = Punto(3, 4)
+print(p.x + p.y)   # 7
+print(p)           # Punto(x=3, y=4)</code></pre>
+<p><b>defaultdict</b>: un dizionario che, se una chiave manca, crea da solo il valore iniziale. Niente più <code>if chiave not in d</code>.</p>
+<pre><code>from collections import defaultdict
+gruppi = defaultdict(list)     # valore iniziale: []
+gruppi["a"].append("ape")      # niente KeyError
+gruppi["a"].append("ago")
+conta = defaultdict(int)       # valore iniziale: 0
+conta["x"] += 1
+print(dict(gruppi), dict(conta))</code></pre>
+<p><b>deque</b>: una lista fatta per aggiungere e togliere velocemente ai due capi (<code>append</code>, <code>appendleft</code>, <code>pop</code>, <code>popleft</code>). La userai per le code negli Algoritmi.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Definisci <code>Frutto = namedtuple("Frutto", ["nome", "colore"])</code> (la lista <code>frutti</code> lo usa già). Poi, con <code>defaultdict(list)</code>, raggruppa i nomi dei frutti per colore, usando <code>f.colore</code> e <code>f.nome</code>, e stampa <code>dict(per_colore)</code>.</p>
+<p>Output atteso:</p><pre><code>{'rosso': ['mela', 'fragola'], 'giallo': ['banana', 'limone'], 'verde': ['kiwi']}</code></pre>
+</div>`,
+      starter:`from collections import defaultdict, namedtuple
+
+# Frutto = namedtuple(...) con i campi nome e colore
+
+frutti = [
+    Frutto("mela", "rosso"),
+    Frutto("banana", "giallo"),
+    Frutto("fragola", "rosso"),
+    Frutto("limone", "giallo"),
+    Frutto("kiwi", "verde"),
+]
+
+# per_colore = defaultdict(list), poi un ciclo
+
+print(dict(per_colore))
+`,
+      tests:[OUT("{'rosso': ['mela', 'fragola'], 'giallo': ['banana', 'limone'], 'verde': ['kiwi']}"),
+        USA('Usa namedtuple e defaultdict', i=>i.calls.namedtuple && i.calls.defaultdict, 'Crea Frutto con namedtuple("Frutto", ["nome", "colore"]) e il raggruppamento con per_colore = defaultdict(list).'),
+        USA('Legge i campi per nome', i=>i.attrs.includes('colore') && i.attrs.includes('nome'), 'Nel ciclo usa f.colore e f.nome invece di f[0] e f[1]: è il vantaggio della namedtuple.'),
+        VARIANTE(/frutti\s*=\s*\[[^\]]*\]/, 'frutti = [Frutto("uva", "viola"), Frutto("prugna", "viola")]', "{'viola': ['uva', 'prugna']}")],
+      hint:`for f in frutti: per_colore[f.colore].append(f.nome)`,
+      solution:`from collections import defaultdict, namedtuple
+
+# una tupla con i campi nome e colore
+Frutto = namedtuple("Frutto", ["nome", "colore"])
+
+frutti = [
+    Frutto("mela", "rosso"),
+    Frutto("banana", "giallo"),
+    Frutto("fragola", "rosso"),
+    Frutto("limone", "giallo"),
+    Frutto("kiwi", "verde"),
+]
+
+# se un colore non c'è ancora, parte
+# da una lista vuota
+per_colore = defaultdict(list)
+for f in frutti:
+    per_colore[f.colore].append(f.nome)
+
+print(dict(per_colore))`
+    },
   ];
 
   const func = [
@@ -1614,6 +1934,75 @@ print(potenza(5))
 # esp passato per nome → 2 ** 10 =
 # 1024
 print(potenza(2, esp=10))`
+    },
+    {
+      id:'func-11', track:'func', title:'Scope: variabili locali e globali', diff:3, xp:60,
+      theory:`<h2>🔭 Scope: dove vive una variabile</h2>
+<p>Una variabile creata <b>dentro</b> una funzione è <b>locale</b>: esiste solo lì e sparisce quando la funzione finisce. Una variabile creata fuori da tutte le funzioni è <b>globale</b>.</p>
+<pre><code>x = 10            # globale
+def f():
+    x = 99        # locale: un'altra x!
+    return x
+print(f(), x)     # 99 10</code></pre>
+<p>Dentro una funzione puoi <b>leggere</b> una globale, ma se le <b>assegni</b> un valore Python crea una nuova variabile locale. Per modificare davvero la globale serve <code>global</code>:</p>
+<pre><code>punti = 0
+def segna():
+    global punti
+    punti += 1
+segna()
+print(punti)      # 1</code></pre>
+<p>Senza <code>global</code>, <code>punti += 1</code> dà <i>UnboundLocalError</i>: Python considera <code>punti</code> locale, ma non ha ancora un valore.</p>
+<p><code>global</code> serve solo per <b>riassegnare</b> il nome. Per cambiare il <b>contenuto</b> di una lista o di un dizionario globale (<code>spesa.append("pane")</code>) non serve: il nome resta attaccato allo stesso oggetto.</p>
+<p>Ordine in cui Python cerca un nome (regola <b>LEGB</b>): <b>L</b>ocale, funzione che la contiene (<b>E</b>nclosing), <b>G</b>lobale, <b>B</b>uilt-in (print, len...).</p>
+<p>Nei programmi veri <code>global</code> si usa poco: è meglio passare i valori come argomenti e restituirli con return.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Completa <code>incrementa()</code>: con <code>global</code> aumenta di 1 la variabile globale <code>contatore</code>. Il codice la chiama 3 volte e stampa contatore.</li>
+<li>Completa <code>prova()</code>: crea una variabile <b>locale</b> <code>contatore = 100</code> e restituiscila. La globale non deve cambiare.</li></ol>
+<p>Output atteso:</p><pre><code>3
+100 3</code></pre>
+</div>`,
+      starter:`contatore = 0
+
+def incrementa():
+    # global, poi aumenta contatore di 1
+    pass
+
+incrementa()
+incrementa()
+incrementa()
+print(contatore)
+
+def prova():
+    # variabile LOCALE contatore = 100
+    pass
+
+print(prova(), contatore)
+`,
+      tests:[OUT('3\n100 3'),
+        USA('Usa global in incrementa', i=>i.nodes.includes('Global'), 'In incrementa scrivi global contatore prima di contatore += 1.'),
+        USA('prova crea una variabile locale', i=>((i.funcs.prova || {}).assigned || []).includes('contatore'), 'Dentro prova scrivi contatore = 100 (senza global) e poi return contatore.'),
+        PROVA('incrementa()\nprint(contatore)', '4')],
+      hint:`In incrementa: global contatore e poi contatore += 1. In prova: contatore = 100 e return contatore (senza global).`,
+      solution:`contatore = 0
+
+def incrementa():
+    # global: qui contatore è quella
+    # di fuori, non una nuova locale
+    global contatore
+    contatore += 1
+
+incrementa()
+incrementa()
+incrementa()
+print(contatore)
+
+def prova():
+    # senza global: variabile locale,
+    # la globale non cambia
+    contatore = 100
+    return contatore
+
+print(prova(), contatore)`
     },
     {
       id:'func-3', track:'func', title:'*args e **kwargs', diff:4, xp:75,
@@ -1709,6 +2098,48 @@ quadrati = map(lambda x: x * x, pari)
 print(sum(quadrati))`
     },
     {
+      id:'func-12', track:'func', title:'Ricorsione', diff:4, xp:85,
+      theory:`<h2>🪆 Ricorsione</h2>
+<p>Una funzione <b>ricorsiva</b> richiama sé stessa su un problema più piccolo, come le matrioske: apri una bambola e dentro trovi la stessa bambola, più piccola, fino all'ultima.</p>
+<p>Ogni funzione ricorsiva ha due parti:</p>
+<ul><li><b>caso base</b>: il problema è così piccolo che la risposta è immediata, e ci si ferma;</li>
+<li><b>passo ricorsivo</b>: si riduce il problema e si richiama la funzione.</li></ul>
+<pre><code>def fattoriale(n):
+    if n &lt;= 1:                    # caso base
+        return 1
+    return n * fattoriale(n - 1)  # passo ricorsivo
+
+print(fattoriale(5))  # 5*4*3*2*1 = 120</code></pre>
+<p>Senza caso base la funzione si richiama all'infinito e Python si ferma con <i>RecursionError</i> (il limite è di circa 1000 chiamate una dentro l'altra).</p>
+<p>Tutto quello che fa la ricorsione si può fare anche con un ciclo: la ricorsione è comoda quando i dati sono «annidati», come cartelle dentro cartelle o alberi.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Scrivi <code>somma_cifre(n)</code> <b>ricorsiva</b>, senza cicli (n è un intero non negativo): se n &lt; 10 restituisce n, altrimenti l'ultima cifra (<code>n % 10</code>) più <code>somma_cifre</code> del resto (<code>n // 10</code>). Stampa <code>somma_cifre(1234)</code>.</p>
+<p>Output atteso: <code>10</code></p>
+</div>`,
+      starter:`def somma_cifre(n):
+    # caso base: una sola cifra
+    # passo: ultima cifra + il resto
+    pass
+
+print(somma_cifre(1234))
+`,
+      tests:[OUT('10'),
+        USA('La funzione richiama sé stessa', i=>i.funcs.somma_cifre && i.funcs.somma_cifre.recursive && !i.nodes.includes('For') && !i.nodes.includes('While'), 'Dentro somma_cifre richiama somma_cifre(n // 10), senza cicli for o while.'),
+        PROVA('print(somma_cifre(9))', '9'),
+        PROVA('print(somma_cifre(99999))', '45'),
+        PROVA('print(somma_cifre(10), somma_cifre(105))', '1 6')],
+      hint:`if n < 10: return n — altrimenti return n % 10 + somma_cifre(n // 10)`,
+      solution:`def somma_cifre(n):
+    # caso base: una cifra sola
+    if n < 10:
+        return n
+    # 1234 → 4 + somma_cifre(123)
+    return n % 10 + somma_cifre(n // 10)
+
+# 4 + 3 + 2 + 1 = 10
+print(somma_cifre(1234))`
+    },
+    {
       id:'func-6', track:'func', title:'Classi e oggetti', diff:4, xp:90,
       theory:`<h2>🏛️ Programmazione Object-Oriented</h2>
         <pre><code>class Cane:
@@ -1756,6 +2187,106 @@ c.preleva(20)
 print(c.saldo)`
     },
     {
+      id:'func-13', track:'func', title:'Attributi di classe, @classmethod e @staticmethod', diff:4, xp:100,
+      theory:`<h2>🏷️ Attributi di classe, @classmethod e @staticmethod</h2>
+<p>Gli attributi creati con <code>self.x</code> sono <b>di istanza</b>: ogni oggetto ha il suo. Quelli scritti direttamente nella classe sono <b>di classe</b>: uno solo, condiviso da tutti gli oggetti.</p>
+<p><b>@classmethod</b>: il metodo riceve la classe (<code>cls</code>) invece dell'oggetto. Si usa soprattutto per costruttori alternativi.</p>
+<p><b>@staticmethod</b>: una funzione normale messa nella classe perché riguarda la classe; non riceve né self né cls.</p>
+<pre><code>class Cane:
+    specie = "canis familiaris"   # di classe
+    contati = 0                   # di classe
+
+    def __init__(self, nome):
+        self.nome = nome          # di istanza
+        Cane.contati += 1
+
+    @classmethod
+    def da_testo(cls, testo):     # " Rex "
+        return cls(testo.strip())
+
+    @staticmethod
+    def nome_valido(nome):
+        return len(nome) &gt; 0
+
+a = Cane("Fido")
+b = Cane.da_testo(" Rex ")
+print(b.nome, Cane.contati)   # Rex 2
+print(Cane.nome_valido(""))   # False</code></pre>
+<p>Attenzione: per cambiare un attributo di classe scrivi <code>Cane.contati += 1</code>. Con <code>self.contati += 1</code> creeresti un attributo nuovo solo per quell'oggetto.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Completa la classe <code>Prodotto</code>:</p>
+<ul><li>l'attributo di classe <code>creati</code> aumenta di 1 a ogni prodotto creato;</li>
+<li><code>@classmethod da_testo(cls, testo)</code>: da <code>"penna:2.5"</code> crea <code>Prodotto("penna", 2.5)</code> (prezzo come float);</li>
+<li><code>@staticmethod valido(prezzo)</code>: True se prezzo &gt; 0.</li></ul>
+<p>Output atteso:</p><pre><code>penna 3.05
+False
+2</code></pre>
+</div>`,
+      starter:`class Prodotto:
+    IVA = 0.22
+    creati = 0
+
+    def __init__(self, nome, prezzo):
+        self.nome = nome
+        self.prezzo = prezzo
+        # aumenta il contatore di classe
+
+    def prezzo_ivato(self):
+        return round(self.prezzo * (1 + Prodotto.IVA), 2)
+
+    # @classmethod da_testo(cls, testo)
+
+    # @staticmethod valido(prezzo)
+
+p = Prodotto.da_testo("penna:2.5")
+q = Prodotto("quaderno", 4)
+print(p.nome, p.prezzo_ivato())
+print(Prodotto.valido(-1))
+print(Prodotto.creati)
+`,
+      tests:[OUT('penna 3.05\nFalse\n2'),
+        USA('da_testo è un @classmethod', i=>(((i.classes.Prodotto || {}).methods || {}).da_testo || []).includes('classmethod'), 'Sopra def da_testo(cls, testo): scrivi @classmethod, e dentro restituisci cls(nome, float(prezzo)).'),
+        USA('valido è uno @staticmethod', i=>(((i.classes.Prodotto || {}).methods || {}).valido || []).includes('staticmethod'), 'Sopra def valido(prezzo): scrivi @staticmethod (niente self).'),
+        PROVA('x = Prodotto.da_testo("gomma:1")\nprint(x.nome, x.prezzo, Prodotto.creati)', 'gomma 1.0 3'),
+        PROVA('print(Prodotto.valido(0), Prodotto.valido(3))', 'False True')],
+      hint:`In __init__: Prodotto.creati += 1. In da_testo: nome, prezzo = testo.split(":") e return cls(nome, float(prezzo)).`,
+      solution:`class Prodotto:
+    # attributi di classe: uno solo,
+    # condiviso da tutti i prodotti
+    IVA = 0.22
+    creati = 0
+
+    def __init__(self, nome, prezzo):
+        self.nome = nome
+        self.prezzo = prezzo
+        # Prodotto.creati, non
+        # self.creati
+        Prodotto.creati += 1
+
+    def prezzo_ivato(self):
+        return round(self.prezzo * (1 + Prodotto.IVA), 2)
+
+    # riceve la classe (cls): è un
+    # costruttore alternativo, qui
+    # partendo da un testo
+    @classmethod
+    def da_testo(cls, testo):
+        nome, prezzo = testo.split(":")
+        return cls(nome, float(prezzo))
+
+    # niente self né cls: una funzione
+    # che sta nella classe
+    @staticmethod
+    def valido(prezzo):
+        return prezzo > 0
+
+p = Prodotto.da_testo("penna:2.5")
+q = Prodotto("quaderno", 4)
+print(p.nome, p.prezzo_ivato())
+print(Prodotto.valido(-1))
+print(Prodotto.creati)`
+    },
+    {
       id:'func-7', track:'func', title:'Ereditarietà', diff:4, xp:100,
       theory:`<h2>🧬 Ereditarietà</h2>
         <pre><code>class Animale:
@@ -1794,6 +2325,115 @@ class Auto(Veicolo):
 print(Veicolo().descrivi())
 # usa il metodo di Auto
 print(Auto().descrivi())`
+    },
+    {
+      id:'func-14', track:'func', title:'Classi astratte e super()', diff:4, xp:105,
+      theory:`<h2>📐 Classi astratte e super()</h2>
+<p>Una <b>classe astratta</b> è un modello che non si usa da solo: dice quali metodi le classi figlie <b>devono</b> avere. In Python si fa con il modulo <code>abc</code>.</p>
+<pre><code>from abc import ABC, abstractmethod
+
+class Animale(ABC):
+    def __init__(self, nome):
+        self.nome = nome
+
+    @abstractmethod
+    def verso(self):
+        ...
+
+class Cane(Animale):
+    def __init__(self, nome, razza):
+        super().__init__(nome)   # la parte del genitore
+        self.razza = razza       # quello che ha in più
+
+    def verso(self):
+        return "bau"
+
+print(Cane("Fido", "bassotto").verso())   # bau</code></pre>
+<p><code>Animale("x")</code> dà <i>TypeError</i>: non si può creare un oggetto da una classe astratta, e nemmeno da una figlia che ha dimenticato un metodo astratto.</p>
+<p><code>super().__init__(nome)</code> esegue l'<code>__init__</code> del genitore: la figlia non ricopia il suo codice, aggiunge solo quello che ha in più.</p>
+<p>Il vantaggio: oggetti diversi si usano allo stesso modo (<b>polimorfismo</b>): <code>for a in animali: print(a.verso())</code> funziona con ogni figlia.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p><code>Forma</code> (astratta) e <code>Quadrato</code> sono già scritti. Scrivi <code>Rettangolo(b, h)</code> come Quadrato: <code>super().__init__("rettangolo")</code> e <code>area()</code> = b × h. Poi, con <code>try</code> / <code>except TypeError</code>, prova a creare <code>Forma("x")</code> e stampa <code>Forma è astratta</code>.</p>
+<p>Output atteso:</p><pre><code>quadrato: area 9
+rettangolo: area 10
+Forma è astratta</code></pre>
+</div>`,
+      starter:`from abc import ABC, abstractmethod
+
+class Forma(ABC):
+    def __init__(self, nome):
+        self.nome = nome
+
+    @abstractmethod
+    def area(self):
+        ...
+
+    def descrivi(self):
+        return f"{self.nome}: area {self.area()}"
+
+class Quadrato(Forma):
+    def __init__(self, lato):
+        super().__init__("quadrato")
+        self.lato = lato
+
+    def area(self):
+        return self.lato ** 2
+
+# class Rettangolo(Forma): ...
+
+for f in [Quadrato(3), Rettangolo(2, 5)]:
+    print(f.descrivi())
+
+# try: Forma("x") ... except TypeError: ...
+`,
+      tests:[OUT('quadrato: area 9\nrettangolo: area 10\nForma è astratta'),
+        USA('Rettangolo eredita da Forma e usa super()', i=>{const r = i.classes.Rettangolo; return !!r && r.bases.includes('Forma') && '__init__' in r.methods && 'area' in r.methods && (i.calls.super || 0) >= 2;}, 'Scrivi class Rettangolo(Forma): con __init__(self, b, h) che chiama super().__init__("rettangolo"), e il metodo area.'),
+        USA('Gestisci il TypeError', i=>i.excepts.includes('TypeError'), 'Metti Forma("x") dentro try: e stampa il messaggio in except TypeError:.'),
+        PROVA('print(Rettangolo(4, 4).descrivi())', 'rettangolo: area 16'),
+        PROVA('import inspect\nprint(inspect.isabstract(Forma))', 'True')],
+      hint:`def __init__(self, b, h): super().__init__("rettangolo"); self.b = b; self.h = h — e def area(self): return self.b * self.h`,
+      solution:`from abc import ABC, abstractmethod
+
+class Forma(ABC):
+    def __init__(self, nome):
+        self.nome = nome
+
+    # ogni figlia DEVE avere area
+    @abstractmethod
+    def area(self):
+        ...
+
+    def descrivi(self):
+        return f"{self.nome}: area {self.area()}"
+
+class Quadrato(Forma):
+    def __init__(self, lato):
+        super().__init__("quadrato")
+        self.lato = lato
+
+    def area(self):
+        return self.lato ** 2
+
+class Rettangolo(Forma):
+    def __init__(self, b, h):
+        # il nome lo salva il genitore
+        super().__init__("rettangolo")
+        self.b = b
+        self.h = h
+
+    def area(self):
+        return self.b * self.h
+
+# stesso metodo, forme diverse
+for f in [Quadrato(3), Rettangolo(2, 5)]:
+    print(f.descrivi())
+
+try:
+    # una classe astratta non si
+    # può usare da sola
+    Forma("x")
+except TypeError:
+    print("Forma è astratta")`
     },
     {
       id:'func-8', track:'func', title:'Dunder __str__ e __eq__', diff:4, xp:95,
@@ -1835,6 +2475,80 @@ print(Moneta(2) == Moneta(2))   # True (senza __eq__ sarebbe False)</code></pre>
 print(Punto(3, 4))`
     },
     {
+      id:'func-15', track:'func', title:'__repr__ e @dataclass', diff:4, xp:95,
+      theory:`<h2>🗂️ __repr__ e @dataclass</h2>
+<p><code>__str__</code> è il testo «per le persone» e lo usa <code>print</code>. <code>__repr__</code> è il testo «per i programmatori»: lo usano la console, il debug e le liste quando mostrano i loro elementi. Di solito somiglia al codice che ricrea l'oggetto.</p>
+<pre><code>class Colore:
+    def __init__(self, nome):
+        self.nome = nome
+    def __repr__(self):
+        return f"Colore({self.nome!r})"
+
+print([Colore("rosso")])   # [Colore('rosso')]</code></pre>
+<p><code>!r</code> nella f-string usa il repr del valore (le stringhe compaiono tra apici). Se una classe ha solo <code>__repr__</code>, anche <code>print</code> usa quello.</p>
+<p>Per le classi che servono soprattutto a <b>contenere dati</b>, <code>@dataclass</code> scrive da solo <code>__init__</code>, <code>__repr__</code> e <code>__eq__</code>, partendo dai campi con il tipo:</p>
+<pre><code>from dataclasses import dataclass
+
+@dataclass
+class Studente:
+    nome: str
+    voto: int = 6        # valore predefinito
+
+s = Studente("Ada", 9)
+print(s)                          # Studente(nome='Ada', voto=9)
+print(s == Studente("Ada", 9))    # True</code></pre>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Aggiungi a <code>Punto</code> un <code>__repr__</code> che restituisce <code>Punto(x=1, y=2)</code>: il codice stampa una lista di punti.</li>
+<li>Trasforma <code>Libro</code> in una <code>@dataclass</code> con i campi <code>titolo: str</code> e <code>pagine: int</code>, senza scrivere <code>__init__</code>.</li></ol>
+<p>Output atteso:</p><pre><code>[Punto(x=1, y=2), Punto(x=3, y=4)]
+Libro(titolo='Dune', pagine=412)
+True</code></pre>
+</div>`,
+      starter:`from dataclasses import dataclass
+
+class Punto:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+    # __repr__
+
+print([Punto(1, 2), Punto(3, 4)])
+
+# @dataclass class Libro con titolo e pagine
+
+print(Libro("Dune", 412))
+print(Libro("Dune", 412) == Libro("Dune", 412))
+`,
+      tests:[OUT("[Punto(x=1, y=2), Punto(x=3, y=4)]\nLibro(titolo='Dune', pagine=412)\nTrue"),
+        USA('Punto ha __repr__', i=>'__repr__' in ((i.classes.Punto || {}).methods || {}), 'Aggiungi a Punto def __repr__(self): con return f"Punto(x={self.x}, y={self.y})". Le liste mostrano i loro elementi con __repr__, non con __str__.'),
+        USA('Libro è una dataclass', i=>{const l = i.classes.Libro; return !!l && (l.decorators || []).some(d => d.includes('dataclass')) && !('__init__' in l.methods);}, 'Metti @dataclass sopra class Libro: e scrivi solo i campi titolo: str e pagine: int, senza __init__.'),
+        PROVA('print([Punto(0, -5)])', '[Punto(x=0, y=-5)]'),
+        PROVA('print(Libro("Emma", 300) == Libro("Emma", 301))', 'False')],
+      hint:`def __repr__(self): return f"Punto(x={self.x}, y={self.y})" — e sopra class Libro: @dataclass, con titolo: str e pagine: int`,
+      solution:`from dataclasses import dataclass
+
+class Punto:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    # la lista mostra i suoi elementi
+    # con __repr__
+    def __repr__(self):
+        return f"Punto(x={self.x}, y={self.y})"
+
+print([Punto(1, 2), Punto(3, 4)])
+
+# @dataclass scrive da solo __init__,
+# __repr__ e __eq__ partendo dai campi
+@dataclass
+class Libro:
+    titolo: str
+    pagine: int
+
+print(Libro("Dune", 412))
+# __eq__: stessi campi = uguali
+print(Libro("Dune", 412) == Libro("Dune", 412))`
+    },
+    {
       id:'func-9', track:'func', title:'Property (getter/setter)', diff:5, xp:115,
       theory:`<h2>🎛️ Property</h2>
         <p>Con <code>@property</code> trasformi un metodo in attributo. Con <code>@xxx.setter</code> permetti l'assegnazione con validazione.</p>
@@ -1870,6 +2584,76 @@ print(c.area)  # niente parentesi!</code></pre>
 t = Temperatura(25)
 # 25 * 9 / 5 + 32 = 77.0
 print(t.fahrenheit)`
+    },
+    {
+      id:'func-16', track:'func', title:'Closure e nonlocal', diff:5, xp:115,
+      theory:`<h2>🎒 Closure e nonlocal</h2>
+<p>Una funzione può essere definita <b>dentro</b> un'altra, e anche <b>restituita</b>. La funzione interna si porta dietro, come in uno zaino, le variabili della funzione esterna: questa è una <b>closure</b>.</p>
+<pre><code>def moltiplicatore(k):
+    def per(x):
+        return x * k   # k viene dalla funzione esterna
+    return per         # senza parentesi: la funzione
+
+doppio = moltiplicatore(2)
+triplo = moltiplicatore(3)
+print(doppio(5), triplo(5))   # 10 15</code></pre>
+<p>La funzione interna può leggere quelle variabili; per <b>cambiarle</b> serve <code>nonlocal</code> (come <code>global</code>, ma per la funzione che la contiene):</p>
+<pre><code>def crea_saluti():
+    quanti = 0
+    def saluta():
+        nonlocal quanti
+        quanti += 1
+        return f"ciao n. {quanti}"
+    return saluta
+
+s = crea_saluti()
+s()
+print(s())   # ciao n. 2</code></pre>
+<p>Ogni chiamata di <code>crea_saluti()</code> prepara uno zaino nuovo, con il suo contatore. È il meccanismo su cui si basano i <b>decoratori</b>.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Completa la funzione interna <code>conta()</code> di <code>crea_contatore(passo)</code>: con <code>nonlocal</code> aumenta <code>totale</code> di <code>passo</code> e lo restituisce. Ogni contatore creato deve avere il suo totale.</p>
+<p>Output atteso:</p><pre><code>15
+1 20</code></pre>
+</div>`,
+      starter:`def crea_contatore(passo):
+    totale = 0
+    def conta():
+        # nonlocal, poi totale += passo
+        # e restituisci totale
+        pass
+    return conta
+
+c = crea_contatore(5)
+c()
+c()
+print(c())
+d = crea_contatore(1)
+print(d(), c())
+`,
+      tests:[OUT('15\n1 20'),
+        USA('Usa nonlocal', i=>i.nodes.includes('Nonlocal'), 'Nella funzione conta scrivi nonlocal totale prima di totale += passo.'),
+        PROVA('z = crea_contatore(10)\nprint(z(), z())', '10 20'),
+        PROVA('m = crea_contatore(-2)\nprint(m(), m())', '-2 -4')],
+      hint:`nonlocal totale — totale += passo — return totale`,
+      solution:`def crea_contatore(passo):
+    totale = 0
+    def conta():
+        # nonlocal: totale è quella
+        # di crea_contatore
+        nonlocal totale
+        totale += passo
+        return totale
+    # la funzione, senza chiamarla
+    return conta
+
+c = crea_contatore(5)
+c()
+c()
+# terza chiamata: 5 + 5 + 5
+print(c())
+# d ha il suo totale, separato da c
+d = crea_contatore(1)
+print(d(), c())`
     },
     {
       id:'func-10', track:'func', title:'Decoratori', diff:5, xp:130,
@@ -1951,6 +2735,126 @@ finally:
 print(safe_div(10, 0))`
     },
     {
+      id:'avan-11', track:'avan', title:'raise ed eccezioni personalizzate', diff:4, xp:85,
+      theory:`<h2>🚨 raise ed eccezioni personalizzate</h2>
+<p>Con <code>raise</code> sei tu a segnalare un errore, quando i dati non vanno bene:</p>
+<pre><code>def imposta_eta(eta):
+    if eta &lt; 0:
+        raise ValueError("l'età non può essere negativa")
+    return eta</code></pre>
+<p>Puoi creare le tue eccezioni ereditando da <code>Exception</code>: il nome spiega il problema e chi chiama la funzione può intercettare proprio quella.</p>
+<pre><code>class TroppoFreddo(Exception):
+    pass</code></pre>
+<p>Il blocco completo:</p>
+<pre><code>try:
+    valore = imposta_eta(-3)
+except ValueError as e:     # e è l'errore; print(e) ne mostra il messaggio
+    print("Errore:", e)
+else:                       # solo se NON c'è stato errore
+    print("Età salvata:", valore)
+finally:                    # sempre, in ogni caso
+    print("Fine controllo")</code></pre>
+<p>Nel <code>try</code> metti solo le righe che possono fallire; quello che va fatto se tutto è andato bene sta in <code>else</code>.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>In <code>preleva(saldo, importo)</code>: se l'importo supera il saldo, <code>raise SaldoInsufficiente(f"mancano {importo - saldo} euro")</code>; altrimenti restituisci quello che resta.</li>
+<li>Nel ciclo, per ogni importo, chiama <code>preleva(50, importo)</code> con <code>try</code> / <code>except SaldoInsufficiente as e</code> / <code>else</code> / <code>finally</code>: except stampa <code>Errore: ...</code>, else stampa <code>Rimasti ...</code>, finally stampa <code>Operazione chiusa</code>.</li></ol>
+<p>Output atteso:</p><pre><code>Rimasti 20
+Operazione chiusa
+Errore: mancano 30 euro
+Operazione chiusa</code></pre>
+</div>`,
+      starter:`class SaldoInsufficiente(Exception):
+    pass
+
+def preleva(saldo, importo):
+    # se importo > saldo: raise ...
+    return saldo - importo
+
+for importo in [30, 80]:
+    # try / except ... as e / else / finally
+    pass
+`,
+      tests:[OUT('Rimasti 20\nOperazione chiusa\nErrore: mancano 30 euro\nOperazione chiusa'),
+        USA('raise di una tua eccezione', i=>i.nodes.includes('Raise') && ((i.classes.SaldoInsufficiente || {}).bases || []).includes('Exception'), 'In preleva: if importo > saldo: raise SaldoInsufficiente(f"mancano {importo - saldo} euro").'),
+        USA('try con except, else e finally', i=>i.excepts.includes('SaldoInsufficiente') && i.nodes.includes('TryElse') && i.nodes.includes('TryFinally'), 'Nel ciclo usa tutti e quattro i blocchi: try:, except SaldoInsufficiente as e:, else: e finally:.'),
+        PROVA('print(preleva(100, 40), preleva(80, 80))', '60 0'),
+        PROVA('try: preleva(1, 2)\nexcept SaldoInsufficiente as e: print(e)', 'mancano 1 euro')],
+      hint:`try: rimasti = preleva(50, importo) — except SaldoInsufficiente as e: print("Errore:", e) — else: print("Rimasti", rimasti) — finally: print("Operazione chiusa")`,
+      solution:`class SaldoInsufficiente(Exception):
+    pass
+
+def preleva(saldo, importo):
+    if importo > saldo:
+        # segnala il problema a chi ha
+        # chiamato la funzione
+        raise SaldoInsufficiente(f"mancano {importo - saldo} euro")
+    return saldo - importo
+
+for importo in [30, 80]:
+    try:
+        rimasti = preleva(50, importo)
+    except SaldoInsufficiente as e:
+        # e è l'errore: stampato,
+        # mostra il suo messaggio
+        print("Errore:", e)
+    else:
+        # solo se non c'è stato errore
+        print("Rimasti", rimasti)
+    finally:
+        # sempre, in ogni caso
+        print("Operazione chiusa")`
+    },
+    {
+      id:'avan-12', track:'avan', title:'Test con assert', diff:3, xp:75,
+      theory:`<h2>🧪 Test automatici con assert</h2>
+<p>Un <b>test</b> è un pezzo di codice che controlla un altro pezzo di codice. Il più semplice è <code>assert condizione</code>: se la condizione è vera non succede niente, se è falsa Python si ferma con <i>AssertionError</i>.</p>
+<pre><code>def doppio(x):
+    return x * 2
+
+assert doppio(3) == 6
+assert doppio(0) == 0
+assert doppio(-1) == -2, "i negativi non funzionano"
+print("ok")</code></pre>
+<p>Il testo dopo la virgola compare nell'errore e dice quale test è fallito. Prova sempre anche i <b>casi limite</b>: zero, lista vuota, numeri negativi, testo vuoto. È lì che si nascondono i bug.</p>
+<p>Nei progetti veri i test stanno in file a parte e si lanciano tutti insieme con <b>pytest</b> (sul PC: <code>pip install pytest</code> e poi il comando <code>pytest</code>) oppure con il modulo <code>unittest</code>, già incluso in Python:</p>
+<pre><code>import unittest
+
+class TestDoppio(unittest.TestCase):
+    def test_positivi(self):
+        self.assertEqual(doppio(3), 6)</code></pre>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Scrivi almeno 3 <code>assert</code> per <code>media</code>: <code>media([2, 4]) == 3</code>, <code>media([5]) == 5</code> e <code>media([]) == 0</code>. Il terzo fa fallire il programma con <i>ZeroDivisionError</i>, già dentro la chiamata <code>media([])</code>: <b>correggi</b> <code>media</code> perché con una lista vuota restituisca 0. Alla fine il programma stampa la frase finale.</p>
+<p>Output atteso: <code>Tutti i test passati</code></p>
+</div>`,
+      starter:`def media(numeri):
+    return sum(numeri) / len(numeri)
+
+# scrivi qui i tuoi assert
+
+print("Tutti i test passati")
+`,
+      tests:[OUT('Tutti i test passati'),
+        USA('Almeno 3 assert', i=>(i.asserts || 0) >= 3, 'Scrivi tre righe assert, una per ogni caso: assert media([2, 4]) == 3 e così via.'),
+        PROVA('print(media([]) == 0, media([1, 2, 3]))', 'True 2.0'),
+        PROVA('print(media([0, 9, 0]))', '3.0')],
+      hint:`In media, prima della divisione: if not numeri: return 0`,
+      solution:`def media(numeri):
+    # caso limite: lista vuota (len 0)
+    # sarebbe una divisione per zero
+    if not numeri:
+        return 0
+    return sum(numeri) / len(numeri)
+
+# se una condizione è falsa il
+# programma si ferma con
+# AssertionError
+assert media([2, 4]) == 3
+assert media([5]) == 5
+assert media([]) == 0
+
+print("Tutti i test passati")`
+    },
+    {
       id:'avan-2', track:'avan', title:'Context manager (with)', diff:4, xp:85,
       theory:`<h2>🔐 Context manager</h2>
         <p>Lo statement <code>with</code> garantisce che le risorse vengano rilasciate (file chiusi, lock liberati...).</p>
@@ -1991,6 +2895,191 @@ fine</code></pre>
 
 with Stampante():
     print("in mezzo")`
+    },
+    {
+      id:'avan-13', track:'avan', title:'Leggere e scrivere file', diff:3, xp:75,
+      theory:`<h2>📄 Leggere e scrivere file</h2>
+<p><code>open(nome, modo)</code> apre un file. I modi principali: <code>"r"</code> lettura (è il predefinito), <code>"w"</code> scrittura (crea il file o lo <b>svuota</b>), <code>"a"</code> aggiunta in fondo.</p>
+<p>Si usa sempre con <code>with</code>, che chiude il file anche in caso di errore. Indica <code>encoding="utf-8"</code> per le lettere accentate.</p>
+<pre><code>with open("note.txt", "w", encoding="utf-8") as f:
+    f.write("prima riga\\n")
+    f.write("seconda riga\\n")
+
+with open("note.txt", encoding="utf-8") as f:
+    for riga in f:
+        print(riga.strip())   # strip toglie a capo e spazi ai bordi</code></pre>
+<p><code>write</code> non va a capo da solo: aggiungi tu <code>"\\n"</code>. Per leggere tutto insieme: <code>f.read()</code> (un unico testo) oppure <code>f.readlines()</code> (lista di righe).</p>
+<p>In CodeQuest i file stanno in una memoria del browser e restano finché non ricarichi la pagina. Sul PC finiscono nella cartella da cui lanci il programma.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Scrivi ogni elemento di <code>righe</code> nel file <code>spesa.txt</code>, uno per riga.</li>
+<li>Riapri il file, leggilo riga per riga e somma i prezzi (il numero dopo lo spazio: <code>split()</code> e <code>float()</code>).</li></ol>
+<p>Output atteso: <code>Totale: 6.5</code></p>
+</div>`,
+      starter:`righe = ["pane 2", "latte 1.5", "uova 3"]
+
+# 1) scrivi le righe in spesa.txt
+
+# 2) rileggi spesa.txt e somma i prezzi
+totale = 0
+
+print(f"Totale: {totale}")
+`,
+      tests:[OUT('Totale: 6.5'),
+        USA('Scrive e rilegge il file con with', i=>(i.calls.open || 0) >= 2 && i.nodes.includes('With') && (i.calls.write || i.calls.writelines), 'Usa due blocchi with open(...): il primo in modo "w" con f.write(riga + "\\n"), il secondo in lettura.'),
+        USA('Somma i prezzi letti dal file', i=>i.calls.read || i.calls.readlines || i.calls.readline || (i.forIterNames || []).some(n => (i.withNames || []).includes(n)), 'Il totale va calcolato leggendo spesa.txt (for riga in f: ...), non dalla lista righe.'),
+        USA('Niente totale scritto a mano', i=>senzaNumeri(i, 6.5), 'Il 6.5 deve venire dalla somma letta nel file.'),
+        VARIANTE(/righe\s*=\s*\[[^\]]*\]/, 'righe = ["caffè 4", "zucchero 1"]', 'Totale: 5.0')],
+      hint:`with open("spesa.txt", "w", encoding="utf-8") as f: for r in righe: f.write(r + "\\n") — poi with open("spesa.txt", encoding="utf-8") as f: for riga in f: totale += float(riga.split()[1])`,
+      solution:`righe = ["pane 2", "latte 1.5", "uova 3"]
+
+# "w": crea il file (o lo svuota)
+with open("spesa.txt", "w", encoding="utf-8") as f:
+    for r in righe:
+        # write non va a capo da solo
+        f.write(r + "\\n")
+
+totale = 0
+# senza modo: lettura
+with open("spesa.txt", encoding="utf-8") as f:
+    for riga in f:
+        # "latte 1.5" → "latte", "1.5"
+        nome, prezzo = riga.split()
+        totale += float(prezzo)
+
+print(f"Totale: {totale}")`
+    },
+    {
+      id:'avan-14', track:'avan', title:'File CSV', diff:4, xp:85,
+      theory:`<h2>📊 File CSV</h2>
+<p>Un file <b>CSV</b> è una tabella scritta come testo: una riga per record, i valori separati da un carattere. In Italia (e in Excel italiano) si usa il punto e virgola <code>;</code>, perché la virgola serve per i decimali.</p>
+<p>Il modulo <code>csv</code> legge e scrive questi file e gestisce da solo virgolette e separatori:</p>
+<pre><code>import csv
+
+with open("voti.csv", "w", newline="", encoding="utf-8") as f:
+    w = csv.writer(f, delimiter=";")
+    w.writerow(["nome", "voto"])
+    w.writerow(["Ada", 9])
+
+with open("voti.csv", newline="", encoding="utf-8") as f:
+    for r in csv.DictReader(f, delimiter=";"):
+        print(r["nome"], int(r["voto"]))   # Ada 9</code></pre>
+<p><code>DictReader</code> usa la prima riga come intestazione: ogni riga diventa un dizionario. I valori arrivano sempre come <b>testo</b>: convertili con <code>int()</code> o <code>float()</code>. <code>newline=""</code> evita righe vuote in più su Windows.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Le prime righe del codice creano <code>vendite.csv</code>. Leggilo con <code>csv.DictReader</code> (<code>delimiter=";"</code>), conta le righe di dati e somma quantita × prezzo di ogni riga.</p>
+<p>Output atteso:</p><pre><code>Righe: 3
+Totale: 42.0</code></pre>
+</div>`,
+      starter:`import csv
+
+testo = "prodotto;quantita;prezzo\\npenna;3;1.5\\nquaderno;2;4\\nzaino;1;29.5\\n"
+with open("vendite.csv", "w", encoding="utf-8") as f:
+    f.write(testo)
+
+righe = 0
+totale = 0
+# leggi vendite.csv con csv.DictReader
+
+print(f"Righe: {righe}")
+print(f"Totale: {totale}")
+`,
+      tests:[OUT('Righe: 3\nTotale: 42.0'),
+        USA('Usa csv.DictReader con delimiter', i=>(i.calls.DictReader || i.calls.reader) && i.kw.includes('delimiter'), 'Leggi il file con csv.DictReader(f, delimiter=";"): senza delimiter il modulo cerca le virgole.'),
+        USA('Legge il file aperto', i=>['DictReader', 'reader'].some(k => ((i.firstArg || {})[k] || []).some(n => (i.withNames || []).includes(n))), 'Passa a csv.DictReader il file aperto con with open("vendite.csv", ...) as f, non il testo che sta in memoria.'),
+        USA('Niente totale scritto a mano', i=>senzaNumeri(i, 42), 'Il totale deve venire dal calcolo sulle righe del file.'),
+        VARIANTE(/testo\s*=\s*"[^"]*"/, 'testo = "prodotto;quantita;prezzo\\nlibro;2;10\\n"', 'Righe: 1\nTotale: 20.0')],
+      hint:`with open("vendite.csv", newline="", encoding="utf-8") as f: for r in csv.DictReader(f, delimiter=";"): righe += 1; totale += int(r["quantita"]) * float(r["prezzo"])`,
+      solution:`import csv
+
+testo = "prodotto;quantita;prezzo\\npenna;3;1.5\\nquaderno;2;4\\nzaino;1;29.5\\n"
+with open("vendite.csv", "w", encoding="utf-8") as f:
+    f.write(testo)
+
+righe = 0
+totale = 0
+with open("vendite.csv", newline="", encoding="utf-8") as f:
+    # la prima riga è l'intestazione:
+    # r["prezzo"], r["quantita"], ...
+    for r in csv.DictReader(f, delimiter=";"):
+        righe += 1
+        # i valori arrivano come testo
+        totale += int(r["quantita"]) * float(r["prezzo"])
+
+print(f"Righe: {righe}")
+print(f"Totale: {totale}")`
+    },
+    {
+      id:'avan-15', track:'avan', title:'Iteratori: __iter__ e __next__', diff:4, xp:95,
+      theory:`<h2>🔁 Iteratori: __iter__ e __next__</h2>
+<p>Cosa fa davvero un <code>for</code>? Chiede all'oggetto un <b>iteratore</b> con <code>iter()</code>, poi chiama <code>next()</code> finché arriva l'eccezione <i>StopIteration</i>, che vuol dire «finito».</p>
+<pre><code>it = iter([10, 20])
+print(next(it))   # 10
+print(next(it))   # 20
+next(it)          # StopIteration</code></pre>
+<p>Una classe diventa iterabile (si può usare in un <code>for</code>, in <code>list()</code>, in <code>sum()</code>...) se ha due metodi:</p>
+<pre><code>class Dadi:
+    def __init__(self, quanti):
+        self.quanti = quanti
+    def __iter__(self):
+        return self              # l'iteratore è l'oggetto stesso
+    def __next__(self):
+        if self.quanti &lt;= 0:
+            raise StopIteration  # finito
+        self.quanti -= 1
+        return 6
+
+print(list(Dadi(3)))   # [6, 6, 6]</code></pre>
+<p>Attenzione: se <code>__next__</code> non arriva mai a <code>raise StopIteration</code>, il ciclo non finisce più. I <b>generatori</b> (prossima lezione) sono un modo molto più breve per ottenere la stessa cosa.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Completa <code>__next__</code> di <code>Rovescia(n)</code>: deve dare n, n-1, ..., 1 e poi fermarsi con <code>raise StopIteration</code>.</li>
+<li>Poi crea <code>it = iter(["a", "b"])</code> e stampa <code>next(it)</code> due volte sulla stessa riga.</li></ol>
+<p>Output atteso:</p><pre><code>[5, 4, 3, 2, 1]
+a b</code></pre>
+</div>`,
+      starter:`class Rovescia:
+    def __init__(self, n):
+        self.n = n
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        # finito (self.n <= 0)? StopIteration
+        # se no: restituisci self.n e
+        # diminuiscilo di 1
+        raise StopIteration
+
+print(list(Rovescia(5)))
+# it = iter(["a", "b"]) e due next(it)
+`,
+      tests:[OUT('[5, 4, 3, 2, 1]\na b'),
+        USA('__next__ che finisce con raise StopIteration', i=>{const m = (i.classes.Rovescia || {}).methods || {}; return '__iter__' in m && '__next__' in m && i.nodes.includes('Raise') && !i.nodes.includes('Yield') && !i.nodes.includes('YieldFrom');}, 'In __next__: if self.n == 0: raise StopIteration, altrimenti diminuisci self.n e restituisci il valore (qui niente yield).'),
+        USA('Usa iter() e next()', i=>i.calls.iter && i.calls.next, 'Crea it = iter(["a", "b"]) e stampa print(next(it), next(it)).'),
+        PROVA('print(list(Rovescia(2)), list(Rovescia(0)), list(Rovescia(-1)))', '[2, 1] [] []')],
+      hint:`if self.n <= 0: raise StopIteration — poi self.n -= 1 e return self.n + 1`,
+      solution:`class Rovescia:
+    def __init__(self, n):
+        self.n = n
+
+    # l'iteratore è l'oggetto stesso
+    def __iter__(self):
+        return self
+
+    # chiamato a ogni giro del ciclo
+    def __next__(self):
+        # <= e non ==: si ferma anche
+        # se n parte negativo
+        if self.n <= 0:
+            # segnale di fine
+            raise StopIteration
+        self.n -= 1
+        return self.n + 1
+
+print(list(Rovescia(5)))
+
+# è quello che fa un for: iter() una
+# volta, poi next() a ogni giro
+it = iter(["a", "b"])
+print(next(it), next(it))`
     },
     {
       id:'avan-3', track:'avan', title:'Generatori (yield)', diff:4, xp:95,
@@ -2116,6 +3205,61 @@ differenza = b - a
 print(differenza.days)`
     },
     {
+      id:'avan-16', track:'avan', title:'math e random', diff:3, xp:70,
+      theory:`<h2>🎲 math e random</h2>
+<p>La <b>libreria standard</b> è l'insieme dei moduli già inclusi in Python: basta un <code>import</code>. Due dei più usati:</p>
+<p><b>math</b>, funzioni matematiche:</p>
+<pre><code>import math
+print(math.sqrt(16))               # 4.0 radice quadrata
+print(math.pi)                     # 3.141592653589793
+print(math.ceil(4.1))              # 5 per eccesso
+print(math.floor(4.9))             # 4 per difetto
+print(math.dist((0, 0), (3, 4)))   # 5.0 distanza tra punti</code></pre>
+<p><b>random</b>, numeri casuali per giochi, simulazioni e campioni di dati:</p>
+<pre><code>import random
+print(random.randint(1, 6))         # intero da 1 a 6, inclusi
+print(random.choice(["a", "b"]))    # un elemento a caso
+carte = [1, 2, 3]
+random.shuffle(carte)               # mescola la lista
+random.seed(42)   # stesso seme = stessa sequenza</code></pre>
+<p>Per vedere cosa contiene un modulo: <code>dir(math)</code> oppure <code>help(math.ceil)</code>.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Stampa la distanza tra i punti (1, 2) e (4, 6) con <code>math.dist</code> (o <code>math.sqrt</code>).</li>
+<li>17 bottiglie, casse da 6: stampa quante casse servono con <code>math.ceil</code>.</li>
+<li>Lancia un dado 1000 volte con <code>random.randint(1, 6)</code>, calcola la media e stampa <code>3 &lt; media &lt; 4</code>.</li></ol>
+<p>Output atteso:</p><pre><code>5.0
+3
+True</code></pre>
+</div>`,
+      starter:`import math
+import random
+
+# 1) distanza tra (1, 2) e (4, 6)
+
+# 2) casse da 6 per 17 bottiglie
+
+# 3) media di 1000 lanci di dado
+`,
+      tests:[OUT('5.0\n3\nTrue'),
+        USA('Usa math.dist (o sqrt) e math.ceil', i=>(i.calls.dist || i.calls.sqrt || i.calls.hypot) && i.calls.ceil, 'Calcola la distanza con math.dist((1, 2), (4, 6)) e le casse con math.ceil(17 / 6).'),
+        USA('Lancia davvero il dado', i=>i.calls.randint && ['For', 'While', 'GeneratorExp', 'ListComp'].some(x => i.nodes.includes(x)), 'Somma 1000 lanci di random.randint(1, 6) con un ciclo, poi dividi per 1000.')],
+      hint:`math.dist((1, 2), (4, 6)) · math.ceil(17 / 6) · media = sum(random.randint(1, 6) for _ in range(1000)) / 1000`,
+      solution:`import math
+import random
+
+# distanza in linea retta
+print(math.dist((1, 2), (4, 6)))
+
+# 17 / 6 = 2.83...: per eccesso, 3
+print(math.ceil(17 / 6))
+
+# 1000 lanci: la media si avvicina a
+# 3.5
+lanci = [random.randint(1, 6) for _ in range(1000)]
+media = sum(lanci) / len(lanci)
+print(3 < media < 4)`
+    },
+    {
       id:'avan-7', track:'avan', title:'JSON', diff:3, xp:70,
       theory:`<h2>🔄 JSON: scambiare dati</h2>
         <pre><code>import json
@@ -2143,6 +3287,82 @@ for prodotto in dati["prodotti"]:
     totale += prodotto["prezzo"]
 
 print(totale)`
+    },
+    {
+      id:'avan-17', track:'avan', title:'Moduli e pacchetti', diff:4, xp:90,
+      theory:`<h2>📦 Moduli e pacchetti</h2>
+<p>Quando un programma cresce lo si divide in più file. Ogni file <code>.py</code> è un <b>modulo</b>: con <code>import</code> usi le sue funzioni da un altro file.</p>
+<pre><code># file utili.py
+def saluta(nome):
+    return f"Ciao {nome}"
+
+# file main.py, nella stessa cartella
+import utili
+print(utili.saluta("Ada"))
+
+from utili import saluta   # solo un nome
+print(saluta("Bob"))
+
+import utili as u          # con un soprannome</code></pre>
+<p>Un <b>pacchetto</b> è una cartella di moduli con dentro un file <code>__init__.py</code>: <code>from negozio.carrello import totale</code>.</p>
+<p>Ogni modulo ha la variabile <code>__name__</code>: vale <code>"__main__"</code> nel file che lanci e il nome del modulo quando viene importato. Per questo si scrive:</p>
+<pre><code>if __name__ == "__main__":
+    # solo se lanci questo file,
+    # non quando viene importato
+    print(saluta("prova"))</code></pre>
+<p><b>Librerie esterne.</b> Sul PC si installano da PyPI con <code>pip install nome</code> (per esempio <code>pip install requests</code>). Per tenere separate le librerie di ogni progetto si crea un <b>ambiente virtuale</b> con <code>python -m venv .venv</code> e lo si attiva. In CodeQuest non si installa niente: qui il modulo lo creiamo scrivendo un file, come nella lezione sui file.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Nella stringa <code>codice</code> (il testo del modulo) aggiungi la funzione <code>perimetro_quadrato(l)</code> che restituisce <code>4 * l</code>.</li>
+<li>Scrivi <code>codice</code> nel file <code>geometria.py</code>.</li>
+<li>Importa: <code>import geometria</code> e <code>from geometria import perimetro_quadrato</code>.</li></ol>
+<p>Output atteso:</p><pre><code>12.57
+20
+geometria __main__</code></pre>
+</div>`,
+      starter:`codice = """PI = 3.14159
+
+def area_cerchio(r):
+    return PI * r ** 2
+
+# aggiungi perimetro_quadrato(l)
+"""
+
+# scrivi codice nel file geometria.py
+
+# importa il modulo e perimetro_quadrato
+
+print(round(geometria.area_cerchio(2), 2))
+print(perimetro_quadrato(5))
+print(geometria.__name__, __name__)
+`,
+      tests:[OUT('12.57\n20\ngeometria __main__'),
+        USA('Scrive il modulo e lo importa', i=>(i.calls.open || i.calls.write_text) && i.imports.includes('geometria') && i.nodes.includes('ImportFrom'), 'Scrivi il file con with open("geometria.py", "w") as f: f.write(codice), poi import geometria e from geometria import perimetro_quadrato.'),
+        PROVA('print(geometria.perimetro_quadrato(1.5))', '6.0'),
+        PROVA('print(round(geometria.area_cerchio(1), 2), perimetro_quadrato(3))', '3.14 12')],
+      hint:`Nella stringa: def perimetro_quadrato(l): / return 4 * l — poi with open("geometria.py", "w") as f: f.write(codice)`,
+      solution:`codice = """PI = 3.14159
+
+def area_cerchio(r):
+    return PI * r ** 2
+
+def perimetro_quadrato(l):
+    return 4 * l
+"""
+
+# un modulo è solo un file .py
+with open("geometria.py", "w") as f:
+    f.write(codice)
+
+# tutto il modulo...
+import geometria
+# ...o un solo nome
+from geometria import perimetro_quadrato
+
+print(round(geometria.area_cerchio(2), 2))
+print(perimetro_quadrato(5))
+# importato: il suo nome; il file che
+# lanci: "__main__"
+print(geometria.__name__, __name__)`
     },
     {
       id:'avan-8', track:'avan', title:'itertools', diff:5, xp:120,
@@ -2253,6 +3473,76 @@ vado a (3,7)</code></pre>
 print(classifica(["go", "nord"]))
 print(classifica(["go", 3, 7]))`
     },
+    {
+      id:'avan-18', track:'avan', title:'async e await', diff:5, xp:120,
+      theory:`<h2>⚡ async e await</h2>
+<p>Molti programmi passano il tempo ad <b>aspettare</b>: una pagina web, un file, un database. Con l'<b>asincronia</b>, mentre un compito aspetta Python ne porta avanti un altro, come un cuoco che taglia le verdure mentre l'acqua bolle.</p>
+<ul><li><code>async def</code> crea una <b>coroutine</b>: una funzione che può fermarsi e riprendere;</li>
+<li><code>await</code> vuol dire «aspetta questo risultato e intanto lascia lavorare gli altri»;</li>
+<li><code>asyncio.gather(...)</code> fa partire più coroutine insieme e restituisce i risultati in una lista, nell'ordine in cui le hai passate;</li>
+<li><code>asyncio.run(main())</code> avvia il tutto.</li></ul>
+<pre><code>import asyncio
+
+async def scarica(nome, secondi):
+    await asyncio.sleep(secondi)   # finta attesa
+    return f"{nome} ok"
+
+async def main():
+    r = await asyncio.gather(scarica("a", 0.2), scarica("b", 0.1))
+    print(r)   # ['a ok', 'b ok']
+
+asyncio.run(main())</code></pre>
+<p>Le due attese si sovrappongono: il tutto dura circa 0,2 secondi, non 0,3. Dentro una coroutine non usare <code>time.sleep</code>, che blocca tutto: si usa <code>await asyncio.sleep</code>. Una coroutine chiamata senza <code>await</code> non viene eseguita.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<ol><li>Completa <code>prepara(cosa, secondi)</code>: dopo «inizio», aspetta con <code>await asyncio.sleep(secondi)</code>, stampa <code>pronto ...</code> e restituisce <code>cosa</code>.</li>
+<li>In <code>main</code> fai partire insieme <code>prepara("caffè", 0.2)</code> e <code>prepara("toast", 0.1)</code> con <code>asyncio.gather</code> e stampa la lista dei risultati.</li></ol>
+<p>Output atteso:</p><pre><code>inizio caffè
+inizio toast
+pronto toast
+pronto caffè
+['caffè', 'toast']</code></pre>
+</div>`,
+      starter:`import asyncio
+
+async def prepara(cosa, secondi):
+    print(f"inizio {cosa}")
+    # aspetta, stampa "pronto ..." e
+    # restituisci cosa
+
+async def main():
+    # risultati = await asyncio.gather(...)
+    pass
+
+asyncio.run(main())
+`,
+      tests:[OUT("inizio caffè\ninizio toast\npronto toast\npronto caffè\n['caffè', 'toast']"),
+        USA('Coroutine con await, sleep e gather', i=>i.nodes.includes('AsyncFunctionDef') && i.nodes.includes('Await') && i.calls.gather && i.calls.sleep, 'In prepara usa await asyncio.sleep(secondi); in main risultati = await asyncio.gather(prepara("caffè", 0.2), prepara("toast", 0.1)).'),
+        PROVA('print(asyncio.run(prepara("tè", 0)))', 'inizio tè\npronto tè\ntè')],
+      hint:`await asyncio.sleep(secondi) · print(f"pronto {cosa}") · return cosa — in main: print(await asyncio.gather(prepara("caffè", 0.2), prepara("toast", 0.1)))`,
+      solution:`import asyncio
+
+async def prepara(cosa, secondi):
+    print(f"inizio {cosa}")
+    # mentre aspetta, l'altra
+    # coroutine va avanti
+    await asyncio.sleep(secondi)
+    print(f"pronto {cosa}")
+    return cosa
+
+async def main():
+    # partono insieme: il toast
+    # (0.1 s) finisce prima del
+    # caffè (0.2 s)
+    risultati = await asyncio.gather(
+        prepara("caffè", 0.2),
+        prepara("toast", 0.1),
+    )
+    # i risultati restano nell'ordine
+    # in cui li hai passati
+    print(risultati)
+
+asyncio.run(main())`
+    },
   ];
 
   const algo = [
@@ -2360,6 +3650,56 @@ for _ in range(30):
 print(a)`
     },
     {
+      id:'algo-11', track:'algo', title:'Complessità: la notazione O grande', diff:3, xp:80,
+      theory:`<h2>⏱️ Complessità: la notazione O grande</h2>
+<p>La <b>complessità</b> dice come cresce il lavoro di un algoritmo quando crescono i dati (n = quanti elementi). Non misura i secondi: misura la <i>forma</i> della crescita.</p>
+<ul>
+<li><b>O(1)</b> costante: <code>lista[0]</code>, <code>x in un_set</code>, <code>diz[chiave]</code> (per set e dizionari è O(1) in media). Non dipende da n.</li>
+<li><b>O(log n)</b>: la ricerca binaria. Raddoppiare i dati aggiunge un solo passo.</li>
+<li><b>O(n)</b> lineare: un ciclo su tutti gli elementi, <code>x in una_lista</code>, <code>sum</code>, <code>max</code>.</li>
+<li><b>O(n log n)</b>: <code>sorted()</code>, il merge sort.</li>
+<li><b>O(n²)</b> quadratica: due cicli uno dentro l'altro, il bubble sort. Dieci volte i dati = cento volte il lavoro.</li>
+</ul>
+<p>Con un milione di elementi, O(n) fa circa un milione di passi, O(n²) mille miliardi: la differenza tra un attimo e molte ore.</p>
+<pre><code># O(n²): confronta ogni coppia
+def ha_doppioni_lento(lista):
+    for i in range(len(lista)):
+        for j in range(i + 1, len(lista)):
+            if lista[i] == lista[j]:
+                return True
+    return False</code></pre>
+<p>Spesso il trucco per scendere a O(n) è un <b>set</b> o un <b>dizionario</b>: controllare se un elemento c'è costa O(1), invece di scorrere tutta la lista.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Scrivi <code>ha_doppioni(lista)</code> in <b>O(n)</b>: un solo ciclo e un set degli elementi già visti (oppure confronta <code>len(set(lista))</code> con <code>len(lista)</code>). Niente cicli uno dentro l'altro e niente <code>.count()</code>.</p>
+<p>Output atteso:</p><pre><code>True
+False</code></pre>
+</div>`,
+      starter:`def ha_doppioni(lista):
+    # O(n): usa un set
+    pass
+
+print(ha_doppioni([3, 1, 4, 1, 5]))
+print(ha_doppioni([1, 2, 3]))
+`,
+      tests:[OUT('True\nFalse'),
+        USA('Usa un set, niente .count()', i=>(i.calls.set || i.nodes.includes('Set') || i.nodes.includes('SetComp')) && !i.calls.count && !i.calls.index, 'Tieni gli elementi già visti in un set (visti = set()) oppure confronta len(set(lista)) con len(lista); .count() rifà ogni volta un giro di tutta la lista.'),
+        USA('Un solo ciclo', i=>(i.loopDepth || 0) <= 1, 'Niente due cicli uno dentro l\'altro: è proprio quello che rende l\'algoritmo O(n²).'),
+        PROVA('print(ha_doppioni([]), ha_doppioni([7, 7]))', 'False True')],
+      hint:`visti = set() — for x in lista: if x in visti: return True — visti.add(x) — alla fine return False`,
+      solution:`def ha_doppioni(lista):
+    # con un set, "x in visti" è O(1)
+    visti = set()
+    # un solo giro della lista: O(n)
+    for x in lista:
+        if x in visti:
+            return True
+        visti.add(x)
+    return False
+
+print(ha_doppioni([3, 1, 4, 1, 5]))
+print(ha_doppioni([1, 2, 3]))`
+    },
+    {
       id:'algo-5', track:'algo', title:'Bubble Sort', diff:4, xp:90,
       theory:`<h2>🫧 Bubble Sort</h2>
         <p>Algoritmo classico di ordinamento. O(n²).</p>
@@ -2394,6 +3734,74 @@ for i in range(n):
             a[j], a[j + 1] = a[j + 1], a[j]
 
 print(a)`
+    },
+    {
+      id:'algo-12', track:'algo', title:'Merge sort (dividi e conquista)', diff:4, xp:115,
+      theory:`<h2>🧩 Merge sort: dividi e conquista</h2>
+<p><b>Dividi e conquista</b>: spezzi il problema a metà, risolvi le metà (con la ricorsione) e unisci i risultati. Il merge sort ordina così:</p>
+<ol><li>una lista di 0 o 1 elementi è già ordinata (caso base);</li>
+<li>altrimenti la dividi a metà e ordini ciascuna metà con merge sort;</li>
+<li><b>fondi</b> le due metà ordinate: confronti i primi elementi, prendi il più piccolo, ripeti.</li></ol>
+<pre><code>[38, 27, 43, 3]
+[38, 27]    [43, 3]      dividi
+[38] [27]   [43] [3]     caso base
+[27, 38]    [3, 43]      fondi
+[3, 27, 38, 43]          fondi</code></pre>
+<p>Complessità <b>O(n log n)</b>: la lista si dimezza log n volte e ogni livello di fusioni costa O(n). Con un milione di numeri sono circa 20 milioni di passi, contro mille miliardi del bubble sort. Anche <code>sorted()</code> di Python usa un'idea simile (Timsort).</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p><code>fondi(a, b)</code> è già scritta: unisce due liste ordinate. Scrivi <code>merge_sort(lista)</code> <b>ricorsiva</b>: se la lista ha 0 o 1 elementi restituiscila; altrimenti <code>mezzo = len(lista) // 2</code>, ordina le due metà con merge_sort e restituisci <code>fondi(...)</code> delle due. Niente <code>sorted()</code> né <code>.sort()</code>.</p>
+<p>Output atteso: <code>[3, 9, 10, 27, 38, 43, 82]</code></p>
+</div>`,
+      starter:`def fondi(a, b):
+    risultato = []
+    i = j = 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            risultato.append(a[i])
+            i += 1
+        else:
+            risultato.append(b[j])
+            j += 1
+    # quello che avanza è già ordinato
+    return risultato + a[i:] + b[j:]
+
+def merge_sort(lista):
+    # caso base: 0 o 1 elementi
+    # dividi a metà, ordina, fondi
+    pass
+
+print(merge_sort([38, 27, 43, 3, 9, 82, 10]))
+`,
+      tests:[OUT('[3, 9, 10, 27, 38, 43, 82]'),
+        USA('merge_sort ricorsiva, niente sorted()', i=>i.funcs.merge_sort && i.funcs.merge_sort.recursive && !i.calls.sorted && !i.calls.sort, 'Dentro merge_sort richiama merge_sort sulle due metà; niente sorted() né .sort().'),
+        USA('Divide a metà e unisce con fondi', i=>(i.calls.fondi || 0) >= 1 && i.ops.includes('FloorDiv'), 'Dividi con mezzo = len(lista) // 2 e alla fine restituisci fondi(sinistra, destra), con le due metà già ordinate.'),
+        PROVA('print(merge_sort([]), merge_sort([2, 1]), merge_sort([5, 5, 1]))', '[] [1, 2] [1, 5, 5]')],
+      hint:`if len(lista) <= 1: return lista — mezzo = len(lista) // 2 — return fondi(merge_sort(lista[:mezzo]), merge_sort(lista[mezzo:]))`,
+      solution:`def fondi(a, b):
+    risultato = []
+    i = j = 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            risultato.append(a[i])
+            i += 1
+        else:
+            risultato.append(b[j])
+            j += 1
+    # quello che avanza è già ordinato
+    return risultato + a[i:] + b[j:]
+
+def merge_sort(lista):
+    # caso base: già ordinata
+    if len(lista) <= 1:
+        return lista
+    mezzo = len(lista) // 2
+    # ordina le due metà...
+    sinistra = merge_sort(lista[:mezzo])
+    destra = merge_sort(lista[mezzo:])
+    # ...e uniscile in ordine
+    return fondi(sinistra, destra)
+
+print(merge_sort([38, 27, 43, 3, 9, 82, 10]))`
     },
     {
       id:'algo-6', track:'algo', title:'Binary Search', diff:4, xp:100,
@@ -2460,6 +3868,204 @@ print(bsearch(arr, 42))`
         visti[x] = i
 
 print(two_sum([2, 7, 11, 15], 9))`
+    },
+    {
+      id:'algo-13', track:'algo', title:'Pila: parentesi bilanciate', diff:4, xp:100,
+      theory:`<h2>🥞 Pila (stack)</h2>
+<p>Una <b>pila</b> funziona come una pila di piatti: si aggiunge in cima e si toglie dalla cima. L'ultimo entrato è il primo a uscire (<b>LIFO</b>, Last In First Out). In Python basta una lista: <code>append</code> mette in cima, <code>pop()</code> toglie dalla cima, <code>pila[-1]</code> guarda la cima.</p>
+<pre><code>pila = []
+pila.append("pagina 1")
+pila.append("pagina 2")
+print(pila.pop())   # pagina 2 (come il tasto Indietro)
+print(pila)         # ['pagina 1']</code></pre>
+<p>Usi tipici: il tasto Annulla, il tasto Indietro del browser, il controllo delle parentesi in un'espressione; anche Python tiene le chiamate di funzione in sospeso in una pila.</p>
+<p><b>Parentesi bilanciate</b>: scorri il testo; ogni parentesi aperta va sulla pila; ogni parentesi chiusa deve corrispondere a quella in cima, che togli. Alla fine la pila deve essere vuota.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>Scrivi <code>bilanciate(s)</code>: True se le parentesi <code>( ) [ ] { }</code> di s sono bilanciate, usando una lista come pila. Gli altri caratteri si ignorano. Il dizionario <code>coppie</code> dice quale aperta corrisponde a ogni chiusa.</p>
+<p>Output atteso:</p><pre><code>True
+False
+False</code></pre>
+</div>`,
+      starter:`def bilanciate(s):
+    coppie = {")": "(", "]": "[", "}": "{"}
+    pila = []
+    # aperte: sulla pila
+    # chiuse: devono corrispondere alla cima
+    pass
+
+print(bilanciate("(a[b]{c})"))
+print(bilanciate("(]"))
+print(bilanciate("(("))
+`,
+      tests:[OUT('True\nFalse\nFalse'),
+        USA('Pila con append e pop', i=>i.calls.append && (i.calls.pop || i.nodes.includes('Delete')), 'Metti le parentesi aperte sulla pila con pila.append(c) e toglile con pila.pop() quando arriva la chiusa giusta.'),
+        PROVA('print(bilanciate(""), bilanciate(")("), bilanciate("{[()()]}"))', 'True False True'),
+        PROVA('print(bilanciate("x)"), bilanciate("([)]"))', 'False False')],
+      hint:`for c in s: if c in "([{": pila.append(c) — elif c in coppie: if not pila or pila.pop() != coppie[c]: return False — alla fine return not pila`,
+      solution:`def bilanciate(s):
+    coppie = {")": "(", "]": "[", "}": "{"}
+    pila = []
+    for c in s:
+        if c in "([{":
+            # aperta: va in cima
+            pila.append(c)
+        elif c in coppie:
+            # chiusa: deve chiudere
+            # l'aperta in cima
+            if not pila or pila.pop() != coppie[c]:
+                return False
+    # restano aperte senza chiusa?
+    return not pila
+
+print(bilanciate("(a[b]{c})"))
+print(bilanciate("(]"))
+print(bilanciate("(("))`
+    },
+    {
+      id:'algo-14', track:'algo', title:'Coda e grafi: ricerca in ampiezza (BFS)', diff:5, xp:130,
+      theory:`<h2>🚇 Coda e grafi: ricerca in ampiezza (BFS)</h2>
+<p>Una <b>coda</b> è come la fila alla posta: si entra in fondo e si esce davanti (<b>FIFO</b>, First In First Out). Con una lista, <code>pop(0)</code> è lento (sposta tutti gli altri); <code>collections.deque</code> fa <code>append</code> e <code>popleft</code> in O(1).</p>
+<pre><code>from collections import deque
+fila = deque(["Ada", "Bob"])
+fila.append("Cleo")     # entra in fondo
+print(fila.popleft())   # Ada: esce il primo</code></pre>
+<p>Un <b>grafo</b> è fatto di nodi collegati: fermate e linee della metro, amici in un social, pagine e link. In Python si rappresenta con un dizionario che a ogni nodo associa la lista dei vicini.</p>
+<pre><code>amici = {"Ada": ["Bob"], "Bob": ["Ada", "Cleo"], "Cleo": ["Bob"]}</code></pre>
+<p>La <b>ricerca in ampiezza (BFS)</b> parte da un nodo e visita prima tutti i vicini, poi i vicini dei vicini, a cerchi sempre più larghi, usando una coda. Così la prima volta che raggiunge un nodo lo fa con il <b>minor numero di passi</b>. Un set dei nodi già visti evita di girare in tondo.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p><code>metro</code> è il grafo delle fermate. Completa <code>distanza(grafo, da, a)</code> con la coda di coppie (fermata, passi) e il set delle fermate visitate: restituisce il numero minimo di passi per andare da <code>da</code> ad <code>a</code>, oppure -1 se non si può arrivare.</p>
+<p>Output atteso: <code>3</code></p>
+</div>`,
+      starter:`from collections import deque
+
+metro = {
+    "A": ["B", "C"],
+    "B": ["A", "D"],
+    "C": ["A", "D", "E"],
+    "D": ["B", "C", "F"],
+    "E": ["C"],
+    "F": ["D"],
+    "G": [],
+}
+
+def distanza(grafo, da, a):
+    coda = deque([(da, 0)])
+    visitate = {da}
+    # finché la coda non è vuota:
+    # fermata, passi = coda.popleft()
+    # arrivato? restituisci i passi
+    # se no, in coda i vicini nuovi
+    return -1
+
+print(distanza(metro, "A", "F"))
+`,
+      tests:[OUT('3'),
+        USA('Coda con popleft', i=>(i.calls.popleft || (i.calls.appendleft && i.calls.pop)) && i.nodes.includes('While'), 'Usa while coda: e prendi il primo elemento con coda.popleft().'),
+        PROVA('print(distanza(metro, "A", "A"), distanza(metro, "E", "F"), distanza(metro, "A", "G"))', '0 3 -1'),
+        PROVA('g = {"A": ["B", "C"], "B": ["F"], "C": ["D"], "D": ["F"], "F": []}\nprint(distanza(g, "A", "F"))', '2')],
+      hint:`while coda: fermata, passi = coda.popleft() — if fermata == a: return passi — for v in grafo[fermata]: if v not in visitate: visitate.add(v); coda.append((v, passi + 1))`,
+      solution:`from collections import deque
+
+metro = {
+    "A": ["B", "C"],
+    "B": ["A", "D"],
+    "C": ["A", "D", "E"],
+    "D": ["B", "C", "F"],
+    "E": ["C"],
+    "F": ["D"],
+    "G": [],
+}
+
+def distanza(grafo, da, a):
+    # coppie (fermata, passi)
+    coda = deque([(da, 0)])
+    visitate = {da}
+    while coda:
+        # esce chi è entrato prima:
+        # si visita a cerchi sempre
+        # più larghi
+        fermata, passi = coda.popleft()
+        if fermata == a:
+            return passi
+        for v in grafo[fermata]:
+            if v not in visitate:
+                visitate.add(v)
+                coda.append((v, passi + 1))
+    # coda vuota: irraggiungibile
+    return -1
+
+print(distanza(metro, "A", "F"))`
+    },
+    {
+      id:'algo-15', track:'algo', title:'Alberi: visita ricorsiva', diff:5, xp:135,
+      theory:`<h2>🌳 Alberi: visita ricorsiva</h2>
+<p>Un <b>albero</b> è una struttura a rami: un nodo <i>radice</i> in cima, ogni nodo ha dei <i>figli</i>, i nodi senza figli sono le <i>foglie</i>. Esempi: cartelle e sottocartelle, un organigramma, l'HTML di una pagina.</p>
+<pre><code>class Nodo:
+    def __init__(self, valore, figli=None):
+        self.valore = valore
+        self.figli = figli if figli is not None else []</code></pre>
+<p>Attenzione al valore predefinito: con <code>figli=[]</code> tutti i nodi creati senza figli condividerebbero <b>la stessa</b> lista, perché il valore predefinito viene creato una volta sola, quando Python legge il <code>def</code>. Per questo si usa <code>None</code>.</p>
+<p>Gli alberi sono fatti per la ricorsione: ogni figlio è a sua volta un albero, più piccolo.</p>
+<pre><code>def conta(nodo):
+    # 1 per il nodo + i nodi di ogni sottoalbero
+    return 1 + sum(conta(f) for f in nodo.figli)</code></pre>
+<p>Le foglie non hanno figli: <code>sum</code> di niente fa 0, quindi il caso base arriva da solo.</p>
+<div class="task-box"><h3>🎯 Esercizio</h3>
+<p>L'albero è già costruito. Scrivi due funzioni <b>ricorsive</b>:</p>
+<ul><li><code>somma(nodo)</code>: la somma di tutti i valori dell'albero;</li>
+<li><code>altezza(nodo)</code>: il numero di livelli (una foglia ha altezza 1). Per il figlio più alto: <code>max(..., default=0)</code>.</li></ul>
+<p>Output atteso:</p><pre><code>28
+4</code></pre>
+</div>`,
+      starter:`class Nodo:
+    def __init__(self, valore, figli=None):
+        self.valore = valore
+        self.figli = figli if figli is not None else []
+
+radice = Nodo(1, [
+    Nodo(2, [Nodo(4), Nodo(5)]),
+    Nodo(3, [Nodo(6, [Nodo(7)])]),
+])
+
+def somma(nodo):
+    # il suo valore + la somma di ogni figlio
+    pass
+
+def altezza(nodo):
+    # 1 + l'altezza del figlio più alto
+    pass
+
+print(somma(radice))
+print(altezza(radice))
+`,
+      tests:[OUT('28\n4'),
+        USA('somma e altezza ricorsive', i=>i.funcs.somma && i.funcs.somma.recursive && i.funcs.altezza && i.funcs.altezza.recursive, 'Dentro somma richiama somma(f) per ogni figlio f, e dentro altezza richiama altezza(f).'),
+        USA('Niente risultati scritti a mano', i=>senzaNumeri(i, 28), 'Il 28 deve venire dalla visita dell\'albero.'),
+        PROVA('print(somma(Nodo(5)), altezza(Nodo(5)))', '5 1'),
+        PROVA('t = Nodo(0, [Nodo(0, [Nodo(10)]), Nodo(-3)])\nprint(somma(t), altezza(t))', '7 3'),
+        PROVA('t = Nodo(0, [Nodo(1), Nodo(2), Nodo(3, [Nodo(4)])])\nprint(somma(t), altezza(t))', '10 3')],
+      hint:`return nodo.valore + sum(somma(f) for f in nodo.figli) — return 1 + max((altezza(f) for f in nodo.figli), default=0)`,
+      solution:`class Nodo:
+    def __init__(self, valore, figli=None):
+        self.valore = valore
+        self.figli = figli if figli is not None else []
+
+radice = Nodo(1, [
+    Nodo(2, [Nodo(4), Nodo(5)]),
+    Nodo(3, [Nodo(6, [Nodo(7)])]),
+])
+
+def somma(nodo):
+    # foglia: sum() di niente fa 0, ed
+    # ecco il caso base
+    return nodo.valore + sum(somma(f) for f in nodo.figli)
+
+def altezza(nodo):
+    # default=0: una foglia vale 1
+    return 1 + max((altezza(f) for f in nodo.figli), default=0)
+
+print(somma(radice))
+print(altezza(radice))`
     },
     {
       id:'algo-8', track:'algo', title:'Anagrammi', diff:3, xp:75,
@@ -2569,7 +4175,7 @@ const BADGES = [
   {id:'streak3', icon:'🔥', name:'In fiamme', desc:'Streak di 3 giorni', cond: s => s.streak >= 3},
   {id:'streak7', icon:'💎', name:'Settimana perfetta', desc:'Streak di 7 giorni', cond: s => s.streak >= 7},
   {id:'fond5', icon:'🐍', name:'Pythonista', desc:'5 fondamenti completati', cond: s => countDoneInTrack(s,'fond')>=5},
-  {id:'fondAll', icon:'📘', name:'Solide basi', desc:'Tutti i fondamenti', cond: s => countDoneInTrack(s,'fond')>=10},
+  {id:'fondAll', icon:'📘', name:'Solide basi', desc:'Tutti i fondamenti', cond: s => countDoneInTrack(s,'fond')>=LESSONS.filter(l=>l.track==='fond').length},
   {id:'dati5', icon:'📦', name:'Maestro dei dati', desc:'5 strutture dati', cond: s => countDoneInTrack(s,'dati')>=5},
   {id:'func5', icon:'⚙️', name:'OOP iniziato', desc:'5 funzioni & OOP', cond: s => countDoneInTrack(s,'func')>=5},
   {id:'avan3', icon:'🚀', name:'Avanzato', desc:'3 lezioni avanzate', cond: s => countDoneInTrack(s,'avan')>=3},
@@ -2830,6 +4436,92 @@ async function resetPythonGlobals(){
   }finally{
     try{ if(keys && keys.destroy) keys.destroy(); }catch(_){}
   }
+  // Moduli scritti dall'allievo (lezione «Moduli e pacchetti»): senza questa pulizia un
+  // "import geometria" successivo userebbe ancora la versione vecchia rimasta in memoria.
+  let ns = null;
+  try{
+    ns = pyodide.toPy({});
+    pyodide.runPython(MODULE_RESET, {globals: ns});
+  }catch(e){
+    console.warn('CodeQuest: pulizia dei moduli non riuscita', e);
+  }finally{
+    try{ if(ns) ns.destroy(); }catch(_){}
+  }
+}
+const MODULE_RESET = [
+  "import sys, importlib, builtins, asyncio",
+  "sys.dont_write_bytecode = True",
+  "def __cq_mio(m):",
+  "    posti = [getattr(m, '__file__', None) or ''] + list(getattr(m, '__path__', None) or [])",
+  "    return any(str(x).startswith(('/home/pyodide/', '/tmp/')) for x in posti)",
+  "for k, m in list(sys.modules.items()):",
+  "    if __cq_mio(m):",
+  "        del sys.modules[k]",
+  "importlib.invalidate_caches()",
+  // al posto di asyncio.run (vedi fixAsyncRun): esegue la coroutine e, come asyncio.run sul PC,
+  // alla fine cancella i task lasciati in sospeso, che altrimenti stamperebbero nelle esecuzioni dopo
+  "if not hasattr(builtins, '__cq_arun'):",
+  "    async def __cq_arun(coro, **_):",
+  "        prima = asyncio.all_tasks()",
+  "        try:",
+  "            return await coro",
+  "        finally:",
+  "            for t in asyncio.all_tasks() - prima:",
+  "                if t is not asyncio.current_task():",
+  "                    t.cancel()",
+  "    builtins.__cq_arun = __cq_arun"
+].join('\n');
+
+// Nel browser Python gira gia' dentro un ciclo di eventi, quindi asyncio.run() darebbe
+// RuntimeError. Le chiamate ad asyncio.run (anche "from asyncio import run") fuori dalle funzioni
+// diventano "await __cq_arun(...)", che fa la stessa cosa. Si usa il parser di Python, quindi i
+// testi tra virgolette restano intatti; righe e colonne del resto del codice non cambiano.
+const ASYNC_FIX = String.raw`
+import ast
+def __cq_fix(src):
+    tree = ast.parse(src)
+    moduli, funzioni = set(), set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Import):
+            moduli.update(a.asname or a.name for a in n.names if a.name == 'asyncio')
+        elif isinstance(n, ast.ImportFrom) and n.module == 'asyncio':
+            funzioni.update(a.asname or 'run' for a in n.names if a.name == 'run')
+    def e_run(f):
+        return ((isinstance(f, ast.Attribute) and f.attr == 'run' and isinstance(f.value, ast.Name) and f.value.id in moduli)
+                or (isinstance(f, ast.Name) and f.id in funzioni))
+    trovate = []
+    def visita(node):
+        for c in ast.iter_child_nodes(node):
+            if isinstance(c, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.ClassDef)):
+                continue
+            if isinstance(c, ast.Call) and e_run(c.func) and c.func.lineno == c.func.end_lineno:
+                trovate.append(c.func)
+            visita(c)
+    visita(tree)
+    righe = src.split('\n')
+    for f in sorted(trovate, key=lambda f: (f.lineno, f.col_offset), reverse=True):
+        b = righe[f.lineno - 1].encode('utf-8')
+        righe[f.lineno - 1] = (b[:f.col_offset] + b'await __cq_arun' + b[f.end_col_offset:]).decode('utf-8')
+    return '\n'.join(righe)
+try:
+    __cq_out = __cq_fix(__cq_src)
+except Exception:
+    __cq_out = __cq_src
+`;
+function fixAsyncRun(code){
+  code = String(code);
+  if(!pyodideReady || !/\basyncio\b/.test(code) || !/\brun\b/.test(code)) return code;
+  let ns = null;
+  try{
+    ns = pyodide.toPy({__cq_src: code});
+    pyodide.runPython(ASYNC_FIX, {globals: ns});
+    return String(ns.get('__cq_out'));
+  }catch(e){
+    console.warn('CodeQuest: conversione di asyncio.run non riuscita', e);
+    return code;
+  }finally{
+    try{ if(ns) ns.destroy(); }catch(_){}
+  }
 }
 
 // Errore Python come lo vede l'allievo: senza "PythonError:" e senza le righe interne di Pyodide.
@@ -2872,7 +4564,7 @@ async function runPython(code, captureOut){
     out.end(); err.end();
   };
   try{
-    await pyodide.runPythonAsync(code);
+    await pyodide.runPythonAsync(fixAsyncRun(code));
     flush();
     return {ok:true, output:buf};
   }catch(e){
@@ -3108,8 +4800,7 @@ async function runCode(){
   if(!r.ok){
     // l'errore completo e' gia' in console: qui la riga e la spiegazione
     const n = [...String(r.error).matchAll(/File "<exec>", line (\d+)/g)].pop();
-    const last = String(r.error).trim().split('\n').pop();
-    const type = (last.match(/^(\w+(?:Error|Exception))/) || [])[1];
+    const {last, type} = errorTail(r.error);
     if(n) logTo('out', `❌ Errore alla riga ${n[1]}: <code>${htmlEscape((code.split('\n')[n[1]-1] || '').trim())}</code>`, 'log-err');
     const hint = errorHint(last, type, code);
     if(hint) logTo('out', '💡 ' + hint, 'log-warn');
@@ -3121,12 +4812,15 @@ async function runCode(){
 // "<codice>" cosi' i numeri di riga degli errori sono quelli dell'editor; poi mostra
 // l'esito, la riga dell'errore evidenziata e le variabili con il loro tipo.
 const DEBUG_RUNNER = [
-  "import traceback as __cq_tb, types as __cq_types, json as __cq_json, linecache as __cq_lc",
-  "__cq_lc.cache['<codice>'] = (len(__cq_src), None, __cq_src.splitlines(True), '<codice>')",
+  "import traceback as __cq_tb, types as __cq_types, json as __cq_json, linecache as __cq_lc, ast as __cq_ast",
+  "__cq_lc.cache['<codice>'] = (len(__cq_show), None, __cq_show.splitlines(True), '<codice>')",
   "__cq_ns = {'__name__': '__main__'}",
   "__cq_res = {'err': None, 'line': None, 'vars': [], 'more': 0}",
   "try:",
-  "    exec(compile(__cq_src, '<codice>', 'exec'), __cq_ns)",
+  // con await permesso al primo livello (lezione async): se il codice lo usa, eval restituisce
+  // una coroutine da attendere; altrimenti None, come un exec normale
+  "    __cq_co = eval(compile(__cq_src, '<codice>', 'exec', flags=__cq_ast.PyCF_ALLOW_TOP_LEVEL_AWAIT), __cq_ns)",
+  "    if __cq_co is not None: await __cq_co",
   "except SyntaxError as __e:",
   "    __cq_res['line'] = __e.lineno",
   "    __cq_res['err'] = ''.join(__cq_tb.format_exception_only(type(__e), __e))",
@@ -3165,7 +4859,9 @@ async function debugCode(){
   markErrorLine(null);
   logTo('dbg','🐞 Avvio debug Python...', 'log-trace');
   const code = editor.getValue();
-  const r = await runPython('__cq_src = ' + JSON.stringify(code) + '\n' + DEBUG_RUNNER, false);
+  await ensurePyodide();
+  // __cq_show: il codice come lo vede l'allievo, per le righe mostrate negli errori
+  const r = await runPython('__cq_src = ' + JSON.stringify(fixAsyncRun(code)) + '\n__cq_show = ' + JSON.stringify(code) + '\n' + DEBUG_RUNNER, false);
   let res = null;
   try{ res = JSON.parse(pyodide.globals.get('__cq_out')); }catch(_){ res = null; }
   dbgLogs = [];
@@ -3213,7 +4909,7 @@ def __cq_analyze(src):
         tree = ast.parse(__cq_tw.dedent(src))
     info = {'nodes': set(), 'ops': set(), 'calls': {}, 'attrs': set(), 'used': set(), 'assigned': set(),
             'consts': [], 'funcs': {}, 'classes': {}, 'imports': set(), 'kw': set(), 'excepts': set(),
-            'bigLiterals': 0}
+            'bigLiterals': 0, 'asserts': 0, 'genCalls': set(), 'firstArg': {}, 'withNames': set(), 'forIterNames': set()}
     for n in ast.walk(tree):
         info['nodes'].add(type(n).__name__)
         if isinstance(n, (ast.BinOp, ast.BoolOp, ast.UnaryOp, ast.AugAssign)):
@@ -3229,6 +4925,10 @@ def __cq_analyze(src):
             for k in n.keywords:
                 if k.arg:
                     info['kw'].add(k.arg)
+            if name and any(isinstance(x, ast.GeneratorExp) for x in n.args):
+                info['genCalls'].add(name)
+            if name and n.args and isinstance(n.args[0], ast.Name):
+                info['firstArg'].setdefault(name, []).append(n.args[0].id)
         if isinstance(n, ast.Attribute):
             info['attrs'].add(n.attr)
         if isinstance(n, ast.Name):
@@ -3241,8 +4941,16 @@ def __cq_analyze(src):
             info['bigLiterals'] += 1
         if isinstance(n, ast.If) and len(n.orelse) == 1 and isinstance(n.orelse[0], ast.If):
             info['nodes'].add('Elif')
-        if isinstance(n, ast.Assign) and any(isinstance(x, ast.Tuple) for x in n.targets):
+        if isinstance(n, ast.Assign) and any(isinstance(x, (ast.Tuple, ast.List)) for x in n.targets):
             info['nodes'].add('Unpack')
+            if any(isinstance(e, ast.Starred) for x in n.targets if isinstance(x, (ast.Tuple, ast.List)) for e in x.elts):
+                info['nodes'].add('StarAssign')
+        if isinstance(n, (ast.With, ast.AsyncWith)):
+            for it in n.items:
+                if isinstance(it.optional_vars, ast.Name):
+                    info['withNames'].add(it.optional_vars.id)
+        if isinstance(n, (ast.For, ast.AsyncFor)) and isinstance(n.iter, ast.Name):
+            info['forIterNames'].add(n.iter.id)
         if isinstance(n, (ast.Import, ast.ImportFrom)):
             if isinstance(n, ast.ImportFrom) and n.module:
                 info['imports'].add(n.module)
@@ -3262,15 +4970,37 @@ def __cq_analyze(src):
                 'yields': any(isinstance(x, (ast.Yield, ast.YieldFrom)) for x in inner),
                 'returns': any(isinstance(x, ast.Return) and x.value is not None for x in inner),
                 'decorators': [ast.unparse(d) for d in n.decorator_list],
-                'recursive': any(isinstance(x, ast.Call) and isinstance(x.func, ast.Name) and x.func.id == n.name for x in inner),
+                'recursive': any(isinstance(x, ast.Name) and isinstance(x.ctx, ast.Load) and x.id == n.name for x in inner),
+                'assigned': sorted({x.id for x in inner if isinstance(x, ast.Name) and isinstance(x.ctx, ast.Store)}),
             }
         if isinstance(n, ast.ClassDef):
             info['classes'][n.name] = {
                 'bases': [ast.unparse(x) for x in n.bases],
+                'decorators': [ast.unparse(d) for d in n.decorator_list],
                 'methods': {m.name: [ast.unparse(d) for d in m.decorator_list]
                             for m in n.body if isinstance(m, (ast.FunctionDef, ast.AsyncFunctionDef))},
             }
-    for k in ('nodes', 'ops', 'attrs', 'used', 'assigned', 'imports', 'kw', 'excepts'):
+        if isinstance(n, ast.Try):
+            if n.orelse:
+                info['nodes'].add('TryElse')
+            if n.finalbody:
+                info['nodes'].add('TryFinally')
+        if isinstance(n, ast.Assert) and any(isinstance(x, ast.Call) for x in ast.walk(n.test)):
+            info['asserts'] += 1
+    # cicli uno dentro l'altro (for, while, comprehension): 2 o piu' = di solito O(n^2)
+    def depth(node, d):
+        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            d2 = d + len(node.generators)
+            parts = [c for c in ast.iter_child_nodes(node) if not isinstance(c, ast.comprehension)]
+            parts += [x for g in node.generators for x in [g.iter] + g.ifs]
+            return max([d2] + [depth(c, d2) for c in parts])
+        best = d
+        for c in ast.iter_child_nodes(node):
+            dd = d + 1 if isinstance(c, (ast.For, ast.AsyncFor, ast.While)) else d
+            best = max(best, depth(c, dd))
+        return best
+    info['loopDepth'] = depth(tree, 0)
+    for k in ('nodes', 'ops', 'attrs', 'used', 'assigned', 'imports', 'kw', 'excepts', 'genCalls', 'withNames', 'forIterNames'):
         info[k] = sorted(info[k])
     return __cq_json.dumps(info)
 __cq_info = __cq_analyze(__cq_src)
@@ -3307,7 +5037,10 @@ const ERROR_HELP = {
   AttributeError: 'Questo valore non ha il metodo o l\'attributo che chiedi: controlla il nome dopo il punto e che l\'oggetto sia quello giusto.',
   ValueError: 'Valore non valido per questa operazione, per esempio int("ciao") o una lista spacchettata nel numero sbagliato di variabili.',
   RecursionError: 'La funzione richiama sé stessa all\'infinito: manca il caso base che la fa fermare.',
-  UnboundLocalError: 'Usi una variabile dentro la funzione prima di averle dato un valore.',
+  UnboundLocalError: 'Usi una variabile dentro la funzione prima di averle dato un valore. Se volevi cambiare una variabile di fuori, serve <code>global</code> (o <code>nonlocal</code> in una funzione dentro un\'altra).',
+  AssertionError: 'Un <code>assert</code> ha trovato una condizione falsa: il test dice che il risultato non è quello previsto. Controlla la riga indicata.',
+  FileNotFoundError: 'Il file non esiste: controlla il nome e di averlo scritto (modo "w") prima di leggerlo.',
+  ModuleNotFoundError: 'Python non trova il modulo: il file .py va scritto prima dell\'import, con lo stesso nome (senza .py nell\'import).',
 };
 // Spiegazione piu' precisa per i casi in cui quella generica del tipo di errore non basta.
 const BUILTIN_NAMES = ['list','dict','str','int','float','bool','set','tuple','sum','max','min','len','print','input','range','sorted','type','map','filter','abs','round'];
@@ -3321,12 +5054,22 @@ function errorHint(last, type, code){
   }
   return type && ERROR_HELP[type] ? ERROR_HELP[type] : '';
 }
+// Tipo e messaggio dell'errore: dalla riga "TipoError: ..." in fondo al traceback (il messaggio
+// puo' continuare su piu' righe, per esempio assert x, "prima\nseconda").
+function errorTail(error){
+  const lines = String(error || '').trim().split('\n');
+  const isType = (l) => /^\w+(?:Error|Exception)\b/.test(l || '');
+  let i = lines.length - 1;
+  while(i > 0 && !isType(lines[i])) i--;
+  if(!isType(lines[i])) i = lines.length - 1;
+  const last = lines.slice(i).join('\n');
+  return {last, type: (last.match(/^(\w+(?:Error|Exception))/) || [])[1]};
+}
 function explainError(error, code, tab){
   const text = String(error || '');
   const lines = [...text.matchAll(/File "<exec>", line (\d+)/g)];
   const n = lines.length ? +lines[lines.length - 1][1] : null;
-  const last = text.trim().split('\n').pop();
-  const type = (last.match(/^(\w+(?:Error|Exception))/) || [])[1];
+  const {last, type} = errorTail(text);
   const src = n ? (code.split('\n')[n - 1] || '').trim() : '';
   if(n) logTo(tab, `❌ Errore alla riga ${n}: <code>${htmlEscape(src)}</code>`, 'log-err');
   logTo(tab, htmlEscape(last), 'log-err');

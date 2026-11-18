@@ -6,7 +6,7 @@
      steps   3-5 passi per risolvere
      traps   1-3 errori da evitare
    Nei testi è ammesso solo <code>, <b>, <i>; i caratteri < > vanno scritti &lt; &gt;.
-   Scritte da Claude (fond, dati) e Codex (func, avan, algo); esempi verificati eseguendoli con Python 3.12. */
+   Scritte da Claude (fond, dati) e Codex (func, avan, algo; e le 25 lezioni aggiunte il 2026-11-19); esempi verificati eseguendoli con Python 3.12. */
 window.MINI_LESSONS = {
   'fond-1': {
     goal: `Devi far comparire nella console la frase <code>Ciao, Python!</code>, identica: stessa virgola, stesso spazio, stesso punto esclamativo.`,
@@ -1220,6 +1220,696 @@ while d * d <= numero:
       `Considerare uno come primo o escludere due.`,
       `Saltare il controllo sul divisore uguale alla radice e accettare alcuni quadrati.`,
       `Scrivere direttamente 7919 o contare tutti i candidati invece dei soli primi.`
+    ]
+  },
+  'fond-11': {
+    goal: `Scegli l'esito del voto con un ternario. Parti con la lode assente, assegnala solo per un 10 e stampa prima l'esito, poi il controllo sulla lode.`,
+    idea: `Un ternario è come un bivio: una condizione decide quale dei due valori usare. <code>None</code> indica l'assenza di un valore, come una casella lasciata vuota. <code>pass</code> occupa il posto di un'istruzione quando un blocco deve restare senza azioni.`,
+    example: {
+      code: `piove = False
+mezzo = "bus" if piove else "bici"
+ombrello = None
+if piove:
+    pass
+print(mezzo)
+print(ombrello is None)`,
+      out: `bici
+True`,
+      note: `La condizione è falsa, quindi viene scelta la bici. La variabile <code>ombrello</code> contiene ancora <code>None</code>.`
+    },
+    steps: [
+      `Costruisci <code>esito</code> nella forma <code>valore if condizione else altro</code>, con la soglia di 6.`,
+      `Inizializza <code>lode</code> con <code>None</code> e cambiala dentro un <code>if</code> riservato al voto 10.`,
+      `Stampa <code>esito</code> e, su un'altra riga, il risultato di <code>lode is None</code>.`
+    ],
+    traps: [
+      `Scrivere <code>"None"</code> tra virgolette crea una stringa.`,
+      `Controlla che il voto 6 sia promosso e che il voto 10 faccia stampare <code>False</code> sulla seconda riga.`
+    ]
+  },
+  'fond-12': {
+    goal: `Somma i numeri della lista saltando i negativi. Appena incontri un numero maggiore di 20, fermati prima di aggiungerlo e stampa il totale.`,
+    idea: `Immagina di smistare buste su un nastro. <code>continue</code> lascia passare la busta corrente e va alla prossima, mentre <code>break</code> ferma il nastro. Un eventuale <code>else</code> del ciclo parte solo se il ciclo termina senza un <code>break</code>.`,
+    example: {
+      code: `for parola in ["ciao", "", "fine"]:
+    if parola == "":
+        continue
+    if parola == "fine":
+        break
+    print(parola)`,
+      out: `ciao`,
+      note: `La stringa vuota viene saltata. La parola <code>"fine"</code> fa uscire dal ciclo prima della stampa.`
+    },
+    steps: [
+      `Parti con un totale a zero e scorri <code>numeri</code> nell'ordine dato.`,
+      `Usa <code>continue</code> quando il numero è negativo.`,
+      `Usa <code>break</code> quando il numero è maggiore di 20.`,
+      `Aggiungi al totale solo i numeri che superano entrambi i controlli e stampa dopo il ciclo.`
+    ],
+    traps: [
+      `Aggiungere prima del <code>break</code> conterebbe anche il numero che ferma il ciclo.`,
+      `Calcola il totale dalla lista: scrivere <code>28</code> a mano fallisce quando cambiano i numeri.`
+    ]
+  },
+  'dati-11': {
+    goal: `Crea una copia della lista della spesa, aggiungi le uova alla copia e stampa entrambe le liste. Usa <code>is</code> per controllare quali nomi indicano lo stesso oggetto.`,
+    idea: `Con <code>b = a</code> metti due etichette sulla stessa scatola. Una lista è mutabile e le modifiche si vedono da entrambe le etichette, mentre una stringa è immutabile. <code>.copy()</code> crea una nuova scatola con gli stessi elementi. <code>is</code> controlla l'identità, mentre <code>==</code> confronta i valori.`,
+    example: {
+      code: `colori = ["blu"]
+tavolozza = colori.copy()
+print(colori == tavolozza)
+print(colori is tavolozza)
+tavolozza[0] = "verde"
+print(colori[0], tavolozza[0])`,
+      out: `True
+False
+blu verde`,
+      note: `All'inizio le liste contengono lo stesso colore, ma sono due oggetti distinti. Sostituire un elemento nella copia lascia intatta la lista di partenza.`
+    },
+    steps: [
+      `Parti dai due nomi dello starter, <code>spesa</code> e <code>stessa</code>.`,
+      `Crea <code>copia</code> con <code>.copy()</code> e aggiungi a questa lista <code>"uova"</code>.`,
+      `Stampa prima <code>spesa</code>, poi <code>copia</code>.`,
+      `Confronta prima <code>stessa</code> e poi <code>copia</code> con <code>spesa</code>, usando <code>is</code> in entrambe le stampe.`
+    ],
+    traps: [
+      `<code>copia = spesa</code> aggiunge un nome per la lista esistente.`,
+      `<code>.copy()</code>, <code>list(spesa)</code> e <code>spesa[:]</code> copiano la lista esterna. Se contiene altre liste, queste restano condivise: per copiarle usa <code>copy.deepcopy()</code>.`
+    ]
+  },
+  'dati-12': {
+    goal: `Estrai il primo e l'ultimo nome della classifica e raccogli i nomi in mezzo. Stampa i due estremi insieme, poi il centro con virgola e spazio tra i nomi.`,
+    idea: `Immagina di distribuire carte in tre mucchi. Le variabili senza asterisco ricevono una carta ciascuna, mentre quella con <code>*</code> riceve tutte le carte rimanenti in una lista. In una chiamata, <code>*</code> fa il contrario: passa ciascun elemento come argomento separato.`,
+    example: {
+      code: `pezzi = ["sab", "dom", "lun"]
+*weekend, prossimo = pezzi
+print(prossimo)
+print(*weekend, sep=" / ")`,
+      out: `lun
+sab / dom`,
+      note: `L'ultimo giorno va in <code>prossimo</code>. L'asterisco nella stampa fa uscire i due giorni separati da una barra.`
+    },
+    steps: [
+      `Assegna la classifica a tre nomi, mettendo l'asterisco davanti a <code>centro</code>.`,
+      `Passa il primo e l'ultimo nome alla stessa chiamata di <code>print</code>.`,
+      `Nella seconda stampa espandi <code>centro</code> con <code>*</code> e imposta <code>sep</code> a virgola e spazio.`
+    ],
+    traps: [
+      `Stampare direttamente <code>centro</code> mostra la lista con parentesi quadre.`,
+      `Usa l'asterisco su un solo nome nell'assegnazione. Una classifica di tre elementi lascia un solo nome al centro.`
+    ]
+  },
+  'dati-13': {
+    goal: `Controlla se tutti i voti sono sufficienti e se c'è almeno un 10. Poi stampa la media arrotondata a una cifra decimale e il numero di voti da 8 in su.`,
+    idea: `Pensa a un controllo dei biglietti in fila. <code>all</code> cerca se passano tutti, <code>any</code> si accontenta del primo che passa. Una generator expression consegna un risultato alla volta, così i controlli possono fermarsi appena hanno la risposta.`,
+    example: {
+      code: `ore = [2, 0, 5, 1]
+print(all(h > 0 for h in ore))
+print(any(h == 5 for h in ore))
+print(sum(1 for h in ore if h > 1))
+print(round(sum(ore) / len(ore), 1))`,
+      out: `False
+True
+2
+2.0`,
+      note: `Il giorno con zero ore fa fallire <code>all</code>. Il conteggio aggiunge 1 per ognuno dei due giorni con più di un'ora.`
+    },
+    steps: [
+      `Passa ad <code>all</code> il confronto con la soglia di 6 per ciascun voto.`,
+      `Passa ad <code>any</code> il controllo di uguaglianza con 10.`,
+      `Dividi la somma per il numero di voti e usa <code>round</code> con una cifra decimale.`,
+      `Usa <code>sum</code> per aggiungere 1 per ogni voto di almeno 8. Stampa i risultati nell'ordine richiesto.`
+    ],
+    traps: [
+      `Dentro <code>all</code>, <code>any</code> e il conteggio evita le parentesi quadre: creerebbero una lista.`,
+      `Conta i voti che superano la soglia: sommare direttamente quei voti darebbe un risultato diverso.`
+    ]
+  },
+  'dati-14': {
+    goal: `Definisci il tipo <code>Frutto</code> con i campi nome e colore. Raggruppa per colore i nomi dei frutti dello starter e stampa il risultato come dizionario.`,
+    idea: `Una <code>namedtuple</code> è come una schedina con caselle etichettate: leggi il campo dal nome. Un <code>defaultdict(list)</code> è come uno schedario che apre un cassetto vuoto al primo accesso a una nuova chiave. Nello stesso modulo, <code>deque</code> permette di inserire o rimuovere elementi alle due estremità.`,
+    example: {
+      code: `from collections import namedtuple
+from collections import defaultdict
+Treno = namedtuple("Treno", "binario")
+conteggi = defaultdict(int)
+treni = [Treno(2), Treno(2), Treno(1)]
+for t in treni:
+    conteggi[t.binario] += 1
+print(dict(conteggi))`,
+      out: `{2: 2, 1: 1}`,
+      note: `Ogni treno ha un campo <code>binario</code>. Il dizionario parte da zero per ogni binario nuovo perché qui la funzione predefinita è <code>int</code>.`
+    },
+    steps: [
+      `Importa <code>namedtuple</code> e <code>defaultdict</code> da <code>collections</code>.`,
+      `Crea <code>Frutto</code> con i campi <code>nome</code> e <code>colore</code>, prima della lista dello starter.`,
+      `Inizializza <code>per_colore</code> con <code>defaultdict(list)</code> e scorri i frutti.`,
+      `Per ogni frutto, aggiungi il nome alla lista del suo colore. Alla fine usa <code>dict</code> nella stampa.`
+    ],
+    traps: [
+      `Passa <code>list</code> senza chiamarla: <code>list()</code> produrrebbe una lista, mentre qui serve la funzione.`,
+      `Aggiungi il nome alla lista esistente con <code>append</code>, così i frutti dello stesso colore restano insieme.`
+    ]
+  },
+  'func-11': {
+    goal: `Fai aumentare il contatore globale a ogni chiamata di <code>incrementa()</code>. Poi crea un contatore locale dentro <code>prova()</code> e stampa il valore che restituisce accanto al globale.`,
+    idea: `Python cerca un nome come chi cerca una penna: prima sul proprio banco, poi nel banco della funzione esterna, quindi nella stanza condivisa e infine tra gli strumenti incorporati. È l'ordine LEGB: locale, funzione esterna, globale, incorporato. Con <code>global</code> dichiari che l'assegnazione deve usare il nome del modulo.`,
+    example: {
+      code: `luce = "spenta"
+def accendi():
+    global luce
+    luce = "accesa"
+
+def cartello():
+    luce = "guasta"
+    return luce
+
+accendi()
+print(cartello(), luce)`,
+      out: `guasta accesa`,
+      note: `<code>accendi</code> modifica la variabile condivisa. <code>cartello</code> restituisce un valore dalla propria variabile locale.`
+    },
+    steps: [
+      `Dentro <code>incrementa</code>, dichiara <code>contatore</code> globale prima di aumentarlo di 1.`,
+      `Chiama <code>incrementa</code> tre volte e stampa il contatore globale.`,
+      `Dentro <code>prova</code>, assegna 100 a un contatore locale e restituiscilo.`,
+      `Stampa insieme il risultato di <code>prova()</code> e il contatore globale.`
+    ],
+    traps: [
+      `Con <code>+=</code> senza <code>global</code>, Python prova a leggere una variabile locale prima che abbia un valore: <i>UnboundLocalError</i>.`,
+      `In <code>prova</code> lascia il nome locale, così l'assegnazione a 100 rimane nella funzione.`
+    ]
+  },
+  'func-12': {
+    goal: `Scrivi <code>somma_cifre(n)</code> come funzione ricorsiva. Provala con 1234 e stampa la somma delle sue cifre.`,
+    idea: `La ricorsione è come aprire scatole sempre più piccole. Ogni chiamata risolve un pezzetto e passa il resto alla stessa funzione. Il caso base è la scatola più piccola: lì hai già la risposta e puoi tornare indietro.`,
+    example: {
+      code: `def potenza_due(n):
+    if n == 0:
+        return 1
+    return 2 * potenza_due(n - 1)
+
+print(potenza_due(4))`,
+      out: `16`,
+      note: `A ogni chiamata l'esponente diminuisce di 1. Quando arriva a zero, le chiamate in attesa completano le moltiplicazioni.`
+    },
+    steps: [
+      `Gestisci prima il caso di un numero con una sola cifra: quella cifra è già la somma.`,
+      `Usa <code>% 10</code> per isolare l'ultima cifra e <code>// 10</code> per ottenere il resto del numero.`,
+      `Chiama <code>somma_cifre</code> sul numero accorciato e aggiungi l'ultima cifra al risultato.`,
+      `Stampa il risultato della chiamata con 1234.`
+    ],
+    traps: [
+      `Se l'argomento resta uguale o il caso base è irraggiungibile, Python arriva a un <i>RecursionError</i>.`,
+      `La verifica richiede la chiamata ricorsiva. Lascia fuori i cicli <code>for</code> e <code>while</code>.`
+    ]
+  },
+  'func-13': {
+    goal: `Crea due prodotti e fai tenere alla classe il conto di quanti ne hai creati. Stampa il nome e il prezzo con IVA del prodotto ricavato dal testo, il controllo su un prezzo negativo e il conteggio.`,
+    idea: `Pensa a un laboratorio: ogni prodotto ha la propria targhetta, ma l'aliquota e il registro delle creazioni sono condivisi. Un metodo di classe riceve <code>cls</code> e può usarlo per costruire un oggetto. Un metodo statico è uno strumento della classe che lavora con i soli dati passati alla chiamata.`,
+    example: {
+      code: `class Carta:
+    sigla = "T"
+    def __init__(self, codice):
+        self.codice = codice
+    @classmethod
+    def da_numero(cls, n):
+        return cls(f"{cls.sigla}{n}")
+    @staticmethod
+    def corta(codice):
+        return len(codice) < 4
+t = Carta.da_numero(8)
+print(t.codice, Carta.corta(t.codice))`,
+      out: `T8 True`,
+      note: `Il metodo di classe usa il prefisso condiviso e crea una tessera. Quello statico controlla la lunghezza del codice ricevuto.`
+    },
+    steps: [
+      `<code>IVA</code>, <code>creati</code> e <code>prezzo_ivato</code> sono già nello starter. In <code>__init__</code> aumenta il contatore della classe: <code>Prodotto.creati</code>.`,
+      `In <code>da_testo</code>, separa il nome dal prezzo ai due punti, converti il prezzo con <code>float</code> e usa <code>cls</code> per creare l'oggetto.`,
+      `Decora <code>valido</code> con <code>@staticmethod</code> e fai restituire se il prezzo è positivo.`,
+      `Esegui: le stampe sono già nello starter, con il totale delle creazioni per ultimo.`
+    ],
+    traps: [
+      `Incrementare <code>self.creati</code> assegnerebbe il conteggio all'istanza. Aggiorna il contatore sulla classe.`,
+      `Metti <code>@classmethod</code> sopra <code>da_testo</code> e usa <code>cls</code> come primo parametro. <code>valido</code> riceve solo il prezzo.`
+    ]
+  },
+  'func-14': {
+    goal: `Aggiungi un rettangolo alla famiglia delle forme e fagli calcolare l'area. Stampa le descrizioni delle due forme e intercetta il tentativo di creare direttamente una <code>Forma</code>.`,
+    idea: `Una classe astratta è come un modulo con campi obbligatori: ogni modello concreto deve completare i metodi segnati con <code>@abstractmethod</code>. Con <code>super()</code> la sottoclasse riusa il lavoro già scritto nella classe base. In questo esercizio serve a inizializzare il nome della forma.`,
+    example: {
+      code: `from abc import ABC, abstractmethod
+class Sveglia(ABC):
+    def __init__(self, ora):
+        self.ora = ora
+    @abstractmethod
+    def suona(self): pass
+class SvegliaCasa(Sveglia):
+    def __init__(self):
+        super().__init__(7)
+    def suona(self):
+        print("Ora", self.ora)
+SvegliaCasa().suona()`,
+      out: `Ora 7`,
+      note: `La sveglia di casa riusa il costruttore della base per salvare l'ora. Puoi crearla perché implementa <code>suona</code>.`
+    },
+    steps: [
+      `Usa <code>Quadrato</code> come modello e fai ereditare <code>Rettangolo</code> da <code>Forma</code>.`,
+      `Nel costruttore di <code>Rettangolo</code>, passa il nome a <code>super().__init__()</code> e salva base e altezza.`,
+      `Implementa <code>area</code> con il prodotto dei due lati. Usa <code>descrivi()</code> per stampare entrambe le forme.`,
+      `Prova a creare <code>Forma("x")</code> dentro un <code>try</code> e stampa il messaggio richiesto quando intercetti <code>TypeError</code>.`
+    ],
+    traps: [
+      `Se dimentichi <code>area</code> o le dai un altro nome, anche <code>Rettangolo</code> rimane astratta.`,
+      `Il metodo <code>area</code> deve restituire il numero, così <code>descrivi()</code> può inserirlo nel testo.`
+    ]
+  },
+  'func-15': {
+    goal: `Dai a <code>Punto</code> una rappresentazione leggibile e stampane due dentro una lista. Usa poi <code>@dataclass</code> per definire <code>Libro</code>, stamparne uno e confrontare due libri con gli stessi dati.`,
+    idea: `<code>__repr__</code> è come l'etichetta dettagliata di una scatola: dice che oggetto hai e quali valori contiene. Quando stampi una lista, Python usa <code>repr</code> per rappresentarne gli elementi. Una dataclass legge i campi dichiarati e genera metodi come <code>__init__</code>, <code>__repr__</code> e <code>__eq__</code>.`,
+    example: {
+      code: `from dataclasses import dataclass
+@dataclass
+class Biglietto:
+    posto: int
+
+fila = [Biglietto(4), Biglietto(5)]
+print(fila)
+print(fila[0] == Biglietto(4))`,
+      out: `[Biglietto(posto=4), Biglietto(posto=5)]
+True`,
+      note: `I campi compaiono nella lista grazie al <code>__repr__</code> generato. Il confronto restituisce <code>True</code> perché i posti coincidono.`
+    },
+    steps: [
+      `Il costruttore di <code>Punto</code> è già pronto: aggiungi il metodo <code>__repr__</code>.`,
+      `Fai restituire a <code>__repr__</code> una stringa con il nome della classe e le coordinate. Stampa la lista di punti.`,
+      `Importa <code>dataclass</code>, decora <code>Libro</code> e dichiara <code>titolo</code> e <code>pagine</code> con i tipi richiesti.`,
+      `Stampa il libro richiesto e poi confronta due istanze con gli stessi campi usando <code>==</code>.`
+    ],
+    traps: [
+      `<code>__repr__</code> deve restituire una stringa. Una stampa dentro il metodo lascia Python senza il valore da usare.`,
+      `Lascia che <code>@dataclass</code> generi il costruttore di <code>Libro</code>. Per confrontarne i valori usa <code>==</code>.`
+    ]
+  },
+  'func-16': {
+    goal: `Crea una funzione che restituisce un contatore. Ogni contatore deve ricordare il proprio totale, aumentarlo del passo scelto e restituire il valore aggiornato.`,
+    idea: `Una closure è come una funzione con uno zainetto: porta con sé le variabili della funzione che l'ha creata. <code>nonlocal</code> le permette di aggiornare una variabile nello zainetto. Ogni chiamata alla funzione esterna prepara uno zainetto separato.`,
+    example: {
+      code: `def rubinetto(litri):
+    def versa():
+        nonlocal litri
+        if litri > 0:
+            litri -= 1
+            return "acqua"
+        return "vuoto"
+    return versa
+
+r = rubinetto(1)
+print(r(), r())`,
+      out: `acqua vuoto`,
+      note: `La prima chiamata consuma il litro disponibile. La seconda trova il valore aggiornato e restituisce <code>"vuoto"</code>.`
+    },
+    steps: [
+      `Inizializza <code>totale</code> a zero dentro <code>crea_contatore</code>, prima di definire <code>conta</code>.`,
+      `Dentro <code>conta</code>, usa <code>nonlocal</code> per il totale, aggiungi il passo e restituisci il totale aggiornato.`,
+      `Dalla funzione esterna restituisci <code>conta</code> senza chiamarla.`,
+      `Chiama tre volte il contatore con passo 5 e stampa il terzo valore. Poi stampa la prima chiamata del contatore con passo 1 e la quarta di quello con passo 5.`
+    ],
+    traps: [
+      `Con <code>return conta()</code> restituiresti un numero al posto della funzione.`,
+      `Se inizializzi il totale dentro <code>conta</code>, lo azzeri a ogni chiamata.`
+    ]
+  },
+  'avan-11': {
+    goal: `Segnala un prelievo troppo grande con <code>SaldoInsufficiente</code>. Prova entrambi gli importi e stampa il risultato o l'errore, seguito ogni volta dal messaggio di chiusura.`,
+    idea: `<code>raise</code> è come alzare una bandierina quando un'operazione si blocca. Una classe derivata da <code>Exception</code> dà un nome al problema, così puoi intercettarlo con il suo <code>except</code>. <code>else</code> gestisce il successo del <code>try</code> e <code>finally</code> esegue la chiusura in ogni caso.`,
+    example: {
+      code: `class Chiusa(Exception):
+    pass
+try:
+    aperta = False
+    if not aperta:
+        raise Chiusa("usa la chiave")
+except Chiusa as errore:
+    print(errore)
+else:
+    print("Entra")
+finally:
+    print("Controllo finito")`,
+      out: `usa la chiave
+Controllo finito`,
+      note: `La porta chiusa fa eseguire <code>except</code>. Il messaggio di fine controllo viene da <code>finally</code>.`
+    },
+    steps: [
+      `Definisci <code>SaldoInsufficiente</code> come sottoclasse di <code>Exception</code>.`,
+      `In <code>preleva</code>, se l'importo supera il saldo, solleva l'eccezione con la differenza nel messaggio. Altrimenti restituisci il saldo rimanente.`,
+      `Per ciascun importo, chiama <code>preleva</code> nel <code>try</code> e salva il risultato.`,
+      `Usa <code>except ... as e</code> per stampare l'errore e <code>else</code> per stampare il resto.`,
+      `Stampa <code>Operazione chiusa</code> nel <code>finally</code>.`
+    ],
+    traps: [
+      `<code>return</code> e <code>raise</code> fanno due cose diverse: il secondo fa scattare il blocco <code>except</code>.`,
+      `Se metti il messaggio di chiusura dentro <code>else</code>, lo vedrai solo quando il prelievo riesce.`
+    ]
+  },
+  'avan-12': {
+    goal: `Scrivi tre controlli per <code>media</code>: più numeri, un numero e una lista vuota. Correggi la funzione perché restituisca zero per la lista vuota, poi stampa il messaggio di successo.`,
+    idea: `Un <code>assert</code> è come un controllo al tornello: il programma passa se la condizione è vera. Se è falsa, Python solleva <i>AssertionError</i> e mostra anche l'eventuale messaggio scritto dopo la virgola. Per organizzare molti test puoi usare <code>unittest</code> oppure <code>pytest</code>, che sul PC si installa con <code>pip install pytest</code>.`,
+    example: {
+      code: `def capienza(sedie, tavoli):
+    return sedie * tavoli
+
+assert capienza(4, 3) == 12, "posti"
+assert capienza(4, 0) == 0
+print("Capienza verificata")`,
+      out: `Capienza verificata`,
+      note: `I due controlli passano e il programma raggiunge la stampa. Se il primo confronto fosse falso, il messaggio dell'errore sarebbe <code>posti</code>.`
+    },
+    steps: [
+      `Aggiungi tre <code>assert</code> distinti e confronta il risultato di ogni chiamata con il valore atteso.`,
+      `Esegui il codice: con una lista vuota, la funzione dello starter prova a dividere per zero.`,
+      `Gestisci il caso della lista vuota prima della divisione, mantenendo il calcolo per le altre liste.`,
+      `Metti la stampa di successo dopo i tre controlli e riesegui.`
+    ],
+    traps: [
+      `Uno <i>ZeroDivisionError</i> indica che la chiamata si è fermata prima di completare il confronto.`,
+      `Prova anche liste diverse: la media va calcolata con i numeri ricevuti dalla funzione.`
+    ]
+  },
+  'avan-13': {
+    goal: `Salva le righe della spesa in <code>spesa.txt</code>, una per riga. Riapri il file, leggi i prezzi e stampa il totale.`,
+    idea: `Un file di testo è come un quaderno. Il modo <code>r</code> lo apre per leggerlo, <code>w</code> riparte da una pagina vuota e <code>a</code> aggiunge in fondo. Con <code>with</code> Python chiude il file all'uscita dal blocco. In CodeQuest i file sono nella memoria del browser e spariscono quando ricarichi la pagina.`,
+    example: {
+      code: `nome = "note.txt"
+with open(
+    nome, "w", encoding="utf-8"
+) as f:
+    f.write("Felicità\\nSabato\\n")
+
+with open(
+    nome, encoding="utf-8"
+) as f:
+    for riga in f:
+        print(len(riga.strip()))`,
+      out: `8
+6`,
+      note: `Il file contiene due righe. <code>strip()</code> rimuove gli spazi alle estremità e il carattere di fine riga prima del conteggio.`
+    },
+    steps: [
+      `Apri <code>spesa.txt</code> con <code>with</code>, in modo <code>w</code> e con codifica <code>utf-8</code>.`,
+      `Scorri <code>righe</code> e usa <code>write</code> aggiungendo un carattere di fine riga dopo ciascuna voce.`,
+      `Finito il primo blocco, apri lo stesso file in lettura con un secondo <code>with</code>.`,
+      `Scorri il file e usa <code>split()</code> per separare nome e prezzo. Converti il prezzo con <code>float</code> e aggiungilo al totale.`,
+      `Stampa il totale con il testo <code>Totale:</code> seguito da uno spazio.`
+    ],
+    traps: [
+      `<code>write</code> scrive solo il testo che riceve: senza fine riga le voci finirebbero attaccate.`,
+      `Il totale va ricavato dal file. La verifica cambia le voci e ricalcola il risultato atteso.`
+    ]
+  },
+  'avan-14': {
+    goal: `Leggi <code>vendite.csv</code> con <code>csv.DictReader</code>. Conta le righe di dati e stampa il ricavo totale, calcolato da quantità e prezzo di ogni vendita.`,
+    idea: `Un CSV è come una tabella stampata come testo. <code>DictReader</code> usa le intestazioni come etichette per leggere le celle riga per riga. Il punto e virgola è comodo quando i decimali usano la virgola. In scrittura, <code>csv.writer</code> gestisce le colonne e <code>newline=""</code> lascia al modulo la gestione dei fine riga.`,
+    example: {
+      code: `import csv
+righe = [
+    "nome;posti", "Anna;4", "Leo;2"
+]
+lettore = csv.DictReader(
+    righe, delimiter=";"
+)
+for riga in lettore:
+    posti = int(riga["posti"])
+    if posti > 2:
+        print(riga["nome"])`,
+      out: `Anna`,
+      note: `<code>DictReader</code> può leggere anche righe già in memoria. Usa la prima riga per i nomi delle colonne e restituisce i valori come stringhe.`
+    },
+    steps: [
+      `Lascia che lo starter scriva il file, poi aprilo in lettura con <code>with</code>, <code>newline=""</code> e codifica <code>utf-8</code>.`,
+      `Crea un <code>csv.DictReader</code> sul file e indica <code>;</code> come separatore.`,
+      `Scorri le righe. Aumenta il conteggio e aggiungi al totale il prodotto tra quantità intera e prezzo decimale.`,
+      `Stampa il conteggio dopo <code>Righe:</code> e il ricavo dopo <code>Totale:</code>, su due righe.`
+    ],
+    traps: [
+      `Con il separatore predefinito, la virgola, le colonne dello starter verrebbero lette come una sola.`,
+      `Converti <code>quantita</code> con <code>int</code> e <code>prezzo</code> con <code>float</code> prima di moltiplicare.`
+    ]
+  },
+  'avan-15': {
+    goal: `Crea un iteratore <code>Rovescia</code> che restituisce i numeri da quello iniziale fino a 1. Trasformalo in una lista, poi usa <code>iter</code> e due chiamate a <code>next</code> sulla lista di lettere.`,
+    idea: `Un iteratore è come un distributore con memoria: ogni <code>next()</code> eroga il prossimo elemento e aggiorna lo stato. <code>iter()</code> chiede a un oggetto il suo iteratore. Quando gli elementi finiscono, <code>__next__</code> segnala la fine con <code>StopIteration</code>.`,
+    example: {
+      code: `class Semaforo:
+    def __init__(self):
+        colori = ["rosso", "verde"]
+        self.colori = iter(colori)
+    def __iter__(self):
+        return self
+    def __next__(self):
+        return next(self.colori)
+
+for colore in Semaforo():
+    print(colore)`,
+      out: `rosso
+verde`,
+      note: `Il ciclo chiede un colore alla volta. Quando l'iteratore interno solleva <code>StopIteration</code>, il ciclo termina.`
+    },
+    steps: [
+      `<code>__init__</code> e <code>__iter__</code> sono già pronti: lavori solo su <code>__next__</code>.`,
+      `In <code>__next__</code> controlla se hai finito. Altrimenti conserva il valore corrente, diminuisci lo stato di 1 e restituisci il valore conservato.`,
+      `Stampa la lista ottenuta da <code>Rovescia(5)</code>. Poi crea un iteratore di lettere e stampa insieme i due valori ottenuti da <code>next</code>.`
+    ],
+    traps: [
+      `A fine sequenza usa <code>raise StopIteration</code>. Restituire <code>None</code> produrrebbe un elemento in più a ogni chiamata.`,
+      `Salva il numero corrente prima di scalarlo, così partendo da 5 il primo valore resta 5.`
+    ]
+  },
+  'avan-16': {
+    goal: `Calcola la distanza tra due punti, poi quante casse servono per 17 bottiglie. Simula 1000 lanci di dado e stampa se la media è compresa strettamente tra 3 e 4.`,
+    idea: `<code>math</code> è come una calcolatrice con tasti dedicati: per esempio <code>ceil</code> arrotonda per eccesso. <code>random</code> è come un sacchetto per estrazioni: <code>choice</code> pesca un elemento e <code>shuffle</code> mescola una lista sul posto. Un <code>seed</code> fissato prima delle estrazioni permette di ripetere la stessa sequenza.`,
+    example: {
+      code: `import math
+import random
+
+lunghezza = math.hypot(5, 12)
+print(lunghezza)
+print(math.ceil(lunghezza / 4))
+dado = random.Random(0)
+print(dado.choice(["blu", "verde"]))`,
+      out: `13.0
+4
+verde`,
+      note: `L'esempio misura la diagonale di un telo e calcola quante sezioni da 4 servono per coprirla. Il seme fisso rende ripetibile la scelta del colore.`
+    },
+    steps: [
+      `Importa <code>math</code> e <code>random</code>. Usa <code>math.dist</code> con le due coppie di coordinate.`,
+      `Dividi il numero di bottiglie per la capienza e dai il risultato a <code>math.ceil</code>.`,
+      `Estrai 1000 numeri con <code>random.randint(1, 6)</code> e calcolane la media.`,
+      `Stampa la distanza, il numero di casse e il risultato del confronto <code>3 &lt; media &lt; 4</code>.`
+    ],
+    traps: [
+      `<code>randint</code> include entrambi gli estremi. Con <code>randrange(1, 6)</code> il 6 sarebbe escluso.`,
+      `Stampa il risultato del confronto. La media dei lanci può cambiare tra un'esecuzione e l'altra.`
+    ]
+  },
+  'avan-17': {
+    goal: `Completa il modulo <code>geometria.py</code> con il perimetro del quadrato. Importa il modulo e la funzione richiesta, poi stampa i risultati dei calcoli e i due valori di <code>__name__</code>.`,
+    idea: `Un modulo è come un cassetto con gli strumenti per un lavoro: in questo caso è un file <code>.py</code>. Un pacchetto tradizionale raccoglie moduli in una cartella con <code>__init__.py</code>. Il controllo <code>if __name__ == "__main__":</code> fa partire un blocco solo quando esegui direttamente quel modulo. Sul PC, <code>python -m venv</code> prepara un ambiente separato dove puoi installare librerie con <code>pip install</code>.`,
+    example: {
+      code: `import calendar
+from calendar import isleap
+
+print(calendar.month_name[1])
+print(isleap(2024))
+print(calendar.__name__, __name__)`,
+      out: `January
+True
+calendar __main__`,
+      note: `Con <code>import</code> usi il nome del modulo davanti ai suoi contenuti. Con <code>from ... import</code> puoi chiamare direttamente <code>isleap</code>.`
+    },
+    steps: [
+      `Dentro la stringa dello starter, aggiungi la definizione di <code>perimetro_quadrato</code> su una nuova riga e fai restituire quattro volte il lato.`,
+      `Scrivi la stringa completa nel file <code>geometria.py</code> e chiudi il file prima di importare.`,
+      `Importa prima <code>geometria</code>, poi <code>perimetro_quadrato</code> con <code>from</code>.`,
+      `Stampa l'area del cerchio di raggio 2 arrotondata a due decimali, il perimetro di lato 5 e i due nomi sulla terza riga.`
+    ],
+    traps: [
+      `Nel nome del file serve <code>.py</code>. Nell'istruzione <code>import</code> scrivi solo <code>geometria</code>.`,
+      `Controlla i rientri dentro la stringa: la nuova <code>def</code> parte a sinistra e il suo <code>return</code> è indentato.`
+    ]
+  },
+  'avan-18': {
+    goal: `Fai partire insieme caffè e toast con <code>asyncio</code>. Stampa quando ciascuno inizia e finisce, poi mostra la lista degli ordini restituiti.`,
+    idea: `Mentre aspetti che il forno si scaldi puoi preparare gli ingredienti. Con <code>await</code> una funzione asincrona può attendere e lasciare che un altro lavoro proceda. <code>asyncio.gather</code> raccoglie i risultati nell'ordine in cui gli hai passato le funzioni, anche se terminano in un altro ordine.`,
+    example: {
+      code: `import asyncio
+async def quadrato(n):
+    await asyncio.sleep(0)
+    return n * n
+
+async def main():
+    valori = await asyncio.gather(
+        quadrato(4), quadrato(2)
+    )
+    print(valori)
+
+asyncio.run(main())`,
+      out: `[16, 4]`,
+      note: `<code>asyncio.sleep(0)</code> cede il turno agli altri lavori pronti. La lista conserva l'ordine delle chiamate passate a <code>gather</code>.`
+    },
+    steps: [
+      `Definisci <code>prepara</code> con <code>async def</code> e stampa l'inizio della preparazione.`,
+      `Attendi il numero di secondi ricevuto con <code>await asyncio.sleep(...)</code>, stampa che il cibo è pronto e restituiscine il nome.`,
+      `In <code>main</code>, passa entrambe le chiamate a <code>asyncio.gather</code> e usa <code>await</code> per ottenere la lista da stampare.`,
+      `Avvia <code>main()</code> con <code>asyncio.run</code>.`
+    ],
+    traps: [
+      `<code>time.sleep</code> bloccherebbe anche l'altro lavoro. Usa <code>asyncio.sleep</code> con <code>await</code>.`,
+      `Se attendi i due ordini uno alla volta, il secondo inizierà dopo che il primo è pronto.`
+    ]
+  },
+  'algo-11': {
+    goal: `Scrivi <code>ha_doppioni</code> usando un insieme per ricordare i valori già visti. Stampa il risultato per la lista con un doppione e per quella senza doppioni.`,
+    idea: `La notazione O descrive come cresce il lavoro quando aumentano i dati. Prendere il primo libro dallo scaffale richiede O(1), cercarne uno dimezzando gli scaffali rimasti richiede O(log n), leggere tutti i titoli O(n). Confrontare ogni libro con tutti gli altri richiede O(n²). Con un insieme, una ricerca richiede in media O(1), quindi basta un solo giro sulla lista per trovare i doppioni in O(n) in media.`,
+    example: {
+      code: `iscritti = {"Nina", "Luca"}
+for nome in ["Luca", "Eva", "Mia"]:
+    if nome not in iscritti:
+        iscritti.add(nome)
+        print(nome)`,
+      out: `Eva
+Mia`,
+      note: `L'insieme permette di verificare velocemente chi è già iscritto. Il programma aggiunge e stampa solo i nuovi nomi.`
+    },
+    steps: [
+      `Crea un insieme vuoto con <code>set()</code> all'inizio di <code>ha_doppioni</code>.`,
+      `Scorri la lista una sola volta. Se l'elemento è già nell'insieme, restituisci subito <code>True</code>.`,
+      `Se l'elemento è nuovo, aggiungilo all'insieme. Restituisci <code>False</code> solo dopo aver finito il giro.`,
+      `Stampa i valori restituiti dalle due chiamate richieste.`
+    ],
+    traps: [
+      `Due cicli annidati o una chiamata a <code>.count()</code> ripetono il lavoro. La verifica richiede un solo giro con un insieme.`,
+      `Controlla se il valore è già presente prima di aggiungerlo, altrimenti troverai sempre una corrispondenza.`
+    ]
+  },
+  'algo-12': {
+    goal: `Ordina la lista con <code>merge_sort</code>, dividendo il lavoro in due parti. La funzione <code>fondi</code>, che unisce due liste già ordinate, è già pronta: tu scrivi <code>merge_sort</code>.`,
+    idea: `Immagina due mazzetti di carte già ordinati. Per unirli, confronta le carte in cima e prendi ogni volta la più piccola. Merge sort divide la lista fino a ottenere gruppi di al massimo un elemento, poi li ricompone con questa stessa regola.`,
+    example: {
+      code: `a = ["ape", "lupo"]
+b = ["cane", "zebra"]
+i = j = 0
+while i < len(a) and j < len(b):
+    if a[i] <= b[j]:
+        print(a[i])
+        i += 1
+    else:
+        print(b[j])
+        j += 1
+for parola in a[i:] + b[j:]:
+    print(parola)`,
+      out: `ape
+cane
+lupo
+zebra`,
+      note: `L'esempio mostra solo la fusione di due gruppi già ordinati. Stampa ogni parola scelta e infine le parole rimaste.`
+    },
+    steps: [
+      `In <code>merge_sort</code>, restituisci subito la lista se ha al massimo un elemento.`,
+      `Dividi la lista a metà e richiama <code>merge_sort</code> su ciascuna metà.`,
+      `Leggi <code>fondi</code>: confronta i primi elementi delle due liste, prende il minore e alla fine aggiunge quelli rimasti.`,
+      `Fai restituire a <code>merge_sort</code> il risultato di <code>fondi</code> sulle due metà già ordinate.`,
+      `Stampa la lista ordinata e prova anche i casi con zero e due elementi.`
+    ],
+    traps: [
+      `Gestisci la lista vuota nel caso base. Altrimenti continueresti a dividerla in liste vuote.`,
+      `La verifica richiede divisione e fusione. Evita <code>sorted</code> e <code>.sort()</code>.`
+    ]
+  },
+  'algo-13': {
+    goal: `Scrivi <code>bilanciate(s)</code> per controllare parentesi tonde, quadre e graffe. Usa una lista come pila e stampa il risultato dei tre esempi richiesti.`,
+    idea: `Una pila è come una torre di piatti: l'ultimo piatto appoggiato è il primo che puoi togliere. L'ultima parentesi aperta deve essere la prima a chiudersi. Con <code>append</code> metti un elemento in cima, con <code>pop</code> lo riprendi.`,
+    example: {
+      code: `cronologia = []
+for p in ["Home", "Meteo", "Foto"]:
+    cronologia.append(p)
+print("Chiudo", cronologia.pop())
+print("Rivedo", cronologia[-1])`,
+      out: `Chiudo Foto
+Rivedo Meteo`,
+      note: `Togliere l'ultima pagina aperta riporta a quella precedente. Anche con le parentesi si lavora sempre con l'elemento in cima.`
+    },
+    steps: [
+      `Crea una pila vuota e prepara un abbinamento da ogni parentesi di chiusura alla sua apertura.`,
+      `Scorri il testo: aggiungi le aperture alla pila con <code>append</code> e lascia passare lettere e altri caratteri.`,
+      `Per ogni chiusura, restituisci <code>False</code> se la pila è vuota o se l'elemento tolto con <code>pop</code> è del tipo sbagliato.`,
+      `A fine giro restituisci se la pila è vuota. Stampa le tre prove richieste.`
+    ],
+    traps: [
+      `Controlla la pila prima di chiamare <code>pop</code>: togliere un elemento da una lista vuota dà errore.`,
+      `Contare solo aperture e chiusure perderebbe l'ordine. In <code>([)]</code> i conti tornano, ma le coppie sono incrociate.`
+    ]
+  },
+  'algo-14': {
+    goal: `Scrivi <code>distanza</code> per trovare il numero minimo di tratte tra due fermate della metro. Restituisci -1 se la destinazione è irraggiungibile e stampa la distanza da A a F.`,
+    idea: `La ricerca in ampiezza si allarga come i cerchi nell'acqua. Visita prima i vicini a una tratta, poi quelli a due e così via. Una coda <code>deque</code> con <code>append</code> e <code>popleft</code> mantiene quell'ordine, facendo uscire per primo chi è entrato per primo.`,
+    example: {
+      code: `from collections import deque
+
+coda = deque([("atrio", 0)])
+vicini = {
+    "atrio": ["sala", "corte"],
+    "sala": ["cucina"],
+}
+while coda:
+    stanza, passi = coda.popleft()
+    print(stanza, passi)
+    for v in vicini.get(stanza, []):
+        coda.append((v, passi + 1))`,
+      out: `atrio 0
+sala 1
+corte 1
+cucina 2`,
+      note: `Dall'atrio raggiungi sala e corte in un passo e la cucina in due. I collegamenti sono a senso unico e qui ogni stanza entra in coda una volta sola.`
+    },
+    steps: [
+      `Metti in coda la fermata di partenza con distanza zero e segnala che l'hai già vista.`,
+      `Finché la coda contiene elementi, estrai la prima coppia con <code>popleft()</code>. Se hai raggiunto la destinazione, restituisci la distanza.`,
+      `Per ogni vicino ancora sconosciuto, segnalo come visitato e aggiungilo in coda con distanza aumentata di uno.`,
+      `Se la coda si esaurisce, restituisci -1. Stampa il risultato della chiamata con A e F.`
+    ],
+    traps: [
+      `Con <code>pop()</code> esploreresti per primi gli ultimi arrivi, perdendo l'ordine per distanza.`,
+      `Segna ogni fermata quando entra in coda, così due percorsi diversi non la fanno accodare due volte.`
+    ]
+  },
+  'algo-15': {
+    goal: `Completa le funzioni ricorsive <code>somma</code> e <code>altezza</code> per l'albero dello starter. Stampa prima la somma dei valori e poi l'altezza dell'albero.`,
+    idea: `Pensa a un albero genealogico: da ogni persona puoi visitare i suoi figli, poi i figli dei figli. Una foglia è un nodo senza figli ed è il punto in cui la ricorsione si ferma. Per la somma raccogli il contributo di tutti i rami. Per l'altezza conta solo il ramo più lungo, usando l'unità indicata nell'esercizio.`,
+    example: {
+      code: `def foglie(ramo):
+    if not ramo:
+        return 1
+    totale = 0
+    for figlio in ramo:
+        totale += foglie(figlio)
+    return totale
+
+albero = [[], [[], []]]
+print(foglie(albero))`,
+      out: `3`,
+      note: `Ogni lista rappresenta una cartella e contiene le sue sottocartelle. Una lista vuota vale una foglia, mentre una cartella con figli somma i conteggi dei suoi rami.`
+    },
+    steps: [
+      `Guarda <code>Nodo</code> nello starter: ogni nodo ha <code>valore</code> e la lista <code>figli</code> (vuota per le foglie).`,
+      `Per <code>somma</code>, parti dal valore del nodo e aggiungi il risultato ottenuto richiamando la funzione su ogni figlio.`,
+      `Per <code>altezza</code>, gestisci prima la foglia con il valore previsto dall'esercizio.`,
+      `Per un nodo con figli, prendi la maggiore delle loro altezze e aggiungi un livello. Prova entrambe le funzioni sulla radice data.`
+    ],
+    traps: [
+      `Evita <code>figli=[]</code> come valore predefinito: i nodi creati senza figli condividerebbero la stessa lista.`,
+      `Calcola il massimo solo quando ci sono figli. Per l'altezza conta il percorso più lungo, anche quando ci sono molti rami.`
     ]
   },
 };
